@@ -1,0 +1,82 @@
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6">Resume Analyser Tool</h1>
+
+    <form [formGroup]="jobForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Job Title --> 
+        <div>
+            <label class="blcok text-sm font-medium mb-2">Job Title *</label>
+            <input 
+            type="text"
+            formController="title"
+            class="w-full p-3 border rounded"
+            placeholder="e.g.. Senior Ruby Software Engineer"
+            />
+        </div>
+
+        <!-- Job Description-->
+        <div>
+            <label class="blcok text-sm font-medium mb-2">Job Description *</label>
+            <textarea 
+            formController="description"
+            rows="6"
+            class="w-full p-3 border rounded"
+            placeholder="Paste the job description here ...">      </textarea>
+        </div>
+
+        <!-- Resume Upload -->
+        <div>
+            <label class="blcok text-sm font-medium mb-2">Upload your Resume/CV *</label>
+            <input 
+            type="file"
+            (change)="onFileSelected"
+            accept=".pdf, .docx"
+            class="w-full p-3 border rounded"
+            />
+            <p class="text-sm text-gray-500 mt-1">Supported formats: PDF, DOCX (Max 10MB)</p>
+        </div>
+
+        <!-- Submit Button-->
+        <button
+            type="submit"
+            [disabled]="jobForm.invalid || isLoading"
+            class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 disabled:bg-gray-400">
+                {{ isLoading ? 'Analyzing...' : 'Analyze Resume'}}
+        </button>
+    </form>
+
+    <!-- Results Section -->
+    <div *ngIf="analysisResult" class="mt-8 p-6 bg-gray-50 rounded">
+        <h2 class="text-2xl font-bold mb-4">Analysis Result</h2>
+
+        <div class="space-y-6">
+            <!-- Display Summary-->
+            <div>
+                <h3 class="font-semibold text-lg"> Summary</h3>
+                <p class="mt-2"> {{analysisResult.summary}}</p>
+            </div>
+
+
+            <div class="grid md:grid-cols-2 gap-6"
+            >
+                <!-- Display Strengths-->
+                <div>
+                    <h3 class="font-semibold text-lg text-green-600">Strengths</h3>
+                    <div class="mt-2" [innerHTML]="analysisResult.strengths"></div>
+                </div>
+            
+                <!-- Display Weaknesses-->
+                <div>
+                    <h3 class="font-semibold text-lg text-red-600">Weaknesses</h3>
+                    <div class="mt-2" [innerHTML]="analysisResult.weaknesses"></div>
+                </div>
+            </div>
+
+            <!-- Display Recommendations -->
+            <div>
+                <h3 class="font-semibold text-lg">Recommendations</h3>
+                <div class ="mt-2" [innerHTML]="analysisResult.recommendations"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
