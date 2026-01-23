@@ -9,6 +9,19 @@ gem "puma", ">= 5.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 
+
+#Authentication
+gem 'devise'
+gem 'devise-jwt'
+
+#background jobs 
+gem 'sidekiq'
+gem 'sidekiq-cron' #for scheduled tasks
+
+#rate limiting 
+gem 'rack-attack'
+
+
 #ENV gem 
 gem 'dotenv', groups: [:development, :test]
 
@@ -46,6 +59,9 @@ gem "ruby-openai"
 #File Parsing gems
 gem 'pdf-reader'
 gem 'docx'
+
+#API Documentation
+gem 'rswag'
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"
