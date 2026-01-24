@@ -38,6 +38,13 @@ module ResumeAnalyser
 
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.
+
+    # Enabling Rack Attack middleware
+    config.middleware.use Rack::Attack
+
+    #Configuring active job - Sidekiq as the queue adapter
+    config.active_job.queue_adapter = :sidekiq
+    
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
   end

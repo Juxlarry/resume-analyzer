@@ -26,11 +26,11 @@ class ResumeAnalysisJob < ApplicationJob
       status: 'completed'
     )
 
-     # Notifying user (can implement ActionCable or email notification here)
+    # Notifying user (can implement ActionCable or email notification here)
     UserMailer.analysis_complete(job_description.user, job_description).deliver_later
   rescue => e
-    job_description.cv_analysis.update(status: 'failed', error_message: e.message) if job_description.cv_analysis
-    Rails.logger.error "CV Analysis Job failed: #{e.message}"
+    job_description.resume_analysis.update(status: 'failed', error_message: e.message) if job_description.resume_analysis
+    Rails.logger.error "Resume Analysis Job failed: #{e.message}"
     raise e if executions < 3 # Retry up to 3 times
   end
 end
