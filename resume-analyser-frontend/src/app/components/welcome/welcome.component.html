@@ -1,0 +1,95 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <!-- Hero Section -->
+    <div class="container mx-auto px-6 py-16">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
+                Resume Analyser Tool
+            </h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                Leverage AI to match your resume against job descriptions and get 
+                instant feedback to improve your chances of landing your dream job.
+            </p>
+            <div class="flex gap-4 justify-center">
+                <a 
+                    routerLink="/analyze" 
+                    class="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    Start Analysis
+                </a>
+                <a 
+                    href="#features" 
+                    class="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 transition border-2 border-blue-600">
+                    Learn More
+                </a>
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div id="features" class="mt-24 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div *ngFor="let feature of features" 
+                 class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-2">
+                <div class="text-4xl mb-4">{{ feature.icon }}</div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">
+                    {{ feature.title }}
+                </h3>
+                <p class="text-gray-600">
+                    {{ feature.description }}
+                </p>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="mt-24">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+                How It Works
+            </h2>
+            <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div class="text-center">
+                    <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        1
+                    </div>
+                    <h3 class="font-semibold text-lg mb-2">Paste Job Description</h3>
+                    <p class="text-gray-600">Copy and paste the job posting you're interested in</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        2
+                    </div>
+                    <h3 class="font-semibold text-lg mb-2">Upload Resume</h3>
+                    <p class="text-gray-600">Upload your resume in PDF or DOCX format</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        3
+                    </div>
+                    <h3 class="font-semibold text-lg mb-2">Get Insights</h3>
+                    <p class="text-gray-600">Receive detailed analysis and recommendations</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="mt-24 bg-blue-600 rounded-2xl p-12 text-center text-white">
+            <h2 class="text-3xl font-bold mb-4">Ready to Optimize Your Resume?</h2>
+            <p class="text-xl mb-8 opacity-90">
+                Join thousands of job seekers who have improved their applications
+            </p>
+            <a 
+                routerLink="/analyze" 
+                class="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block">
+                Get Started Free
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-16">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Resume Analyser. All rights reserved.</p>
+            <div class="mt-4 space-x-4">
+                <a routerLink="/admin" class="hover:text-blue-400 transition">Admin</a>
+                <a href="#" class="hover:text-blue-400 transition">Privacy</a>
+                <a href="#" class="hover:text-blue-400 transition">Terms</a>
+            </div>
+        </div>
+    </footer>
+</div>

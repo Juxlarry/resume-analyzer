@@ -1,0 +1,9 @@
+/* Admin-specific styles */
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+tr:hover {
+    transition: background-color 0.2s;
+}

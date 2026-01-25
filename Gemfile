@@ -60,7 +60,7 @@ gem "ruby-openai"
 gem 'pdf-reader'
 gem 'docx'
 
-#API Documentation
+#API Documentation - Swagger/OpenAPI Docs
 gem 'rswag'
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
