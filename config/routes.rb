@@ -12,16 +12,16 @@ Rails.application.routes.draw do
       registration: 'api/v1/signup'
     }
 
-  # Simple health check for load balancers (root level)
   get "/up", to: proc { [200, {}, ["OK"]] }
 
   namespace :api do 
     namespace :v1 do 
 
-      resources :resume_analyses
       resources :job_descriptions, only: [:index, :show, :create, :destroy] do 
-        post :analyze, on: :member
-        get :analysis_status, on: :member
+        member do
+          post :analyze
+          get :analysis_status
+        end
       end  
 
       #User Profiles 
@@ -44,9 +44,6 @@ Rails.application.routes.draw do
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
-  
-  # Defines the root path route ("/")
-  # root "posts#index"
-  # Root path (optional - could be Angular app or API info)
+
   root to: 'api/v1/health#show'
 end

@@ -25,7 +25,7 @@ class ResumeParserService
         when "application/msword"
             extract_text_from_docx(tempfile.path)
         else
-            "Unsupported File format: #{resume_attachment.content_type}"
+            "Unsupported File format: #{resume_file.content_type}"
         end
         ensure
             tempfile.close

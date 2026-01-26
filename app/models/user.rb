@@ -25,20 +25,9 @@ class User < ApplicationRecord
   def password_complexity
     return if password.blank?
     
-    if password.length < 8
-      errors.add(:password, 'must be at least 8 characters')
-    end
-    
-    unless password =~ /[A-Z]/
-      errors.add(:password, 'must contain at least one uppercase letter')
-    end
-    
-    unless password =~ /\d/
-      errors.add(:password, 'must contain at least one number')
-    end
-    
-    unless password =~ /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
-      errors.add(:password, 'must contain at least one special character')
-    end
+    errors.add(:password, 'must be at least 8 characters') if password.length < 8
+    errors.add(:password, 'must contain at least one uppercase letter') unless password =~ /[A-Z]/
+    errors.add(:password, 'must contain at least one number') unless password =~ /\d/
+    errors.add(:password, 'must contain at least one special character') unless password =~ /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   end
 end

@@ -11,10 +11,6 @@ export const routes: Routes = [
         path: 'welcome',
         loadComponent: () => import('./components/welcome/welcome.component').then(m => m.WelcomeComponent)
     },
-    // {
-    //     path: 'welcome',
-    //     component: WelcomeComponent
-    // },
     {
         path: 'analyze',
         loadComponent: () => import('./components/job-form/job-form.component').then(m => m.JobFormComponent)

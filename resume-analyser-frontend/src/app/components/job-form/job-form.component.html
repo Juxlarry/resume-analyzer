@@ -1,81 +1,183 @@
 <div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-6">Resume Analyser Tool</h1>
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Resume Analyser Tool</h1>
 
-    <form [formGroup]="jobForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <form [formGroup]="jobForm" (ngSubmit)="onSubmit()" class="space-y-6 bg-white p-6 rounded-lg shadow-md">
         <!-- Job Title --> 
         <div>
-            <label class="block text-sm font-medium mb-2">Job Title *</label>
+            <label class="block text-sm font-medium mb-2 text-gray-700">Job Title *</label>
             <input 
             type="text"
             formController="title"
-            class="w-full p-3 border rounded"
+            class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
             placeholder="e.g.. Senior Ruby Software Engineer"
+            [class.border-red-500]="jobForm.get('title')?.invalid && jobForm.get('title')?.touched"
             />
+            <p *ngIf="jobForm.get('title')?.invalid && jobForm.get('title')?.touched" 
+               class="text-red-500 text-sm mt-1">
+                Job title is required
+            </p>
         </div>
 
         <!-- Job Description-->
         <div>
-            <label class="block text-sm font-medium mb-2">Job Description *</label>
+            <label class="block text-sm font-medium mb-2 text-gray-700">Job Description *</label>
             <textarea 
                 formController="description"
                 rows="6"
-                class="w-full p-3 border rounded"
+                class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
+                [class.border-red-500]="jobForm.get('description')?.invalid && jobForm.get('description')?.touched"
                 placeholder="Paste the job description here ...">      
             </textarea>
+            <p *ngIf="jobForm.get('description')?.invalid && jobForm.get('description')?.touched" 
+               class="text-red-500 text-sm mt-1">
+                Job description is required (minimum 50 characters)
+            </p>
         </div>
 
         <!-- Resume Upload -->
         <div>
-            <label class="block text-sm font-medium mb-2">Upload your Resume/CV *</label>
+            <label class="block text-sm font-medium mb-2 text-gray-700">Upload your Resume/CV *</label>
             <input 
-            type="file"
-            (change)="onFileSelected($event)"
-            accept=".pdf,.docx"
-            class="w-full p-3 border rounded"
+                #fileInput
+                type="file"
+                (change)="onFileSelected($event)"
+                accept=".pdf,.docx"
+                class="w-full p-3 border rounded"
             />
             <p class="text-sm text-gray-500 mt-1">Supported formats: PDF, DOCX (Max 10MB)</p>
+            <div class="flex items-center justify-between mt-1">
+                <p class="text-sm text-gray-500">
+                    Supported formats: PDF, DOCX (Max 10MB)
+                </p>
+                <p *ngIf="selectedFile" class="text-sm text-green-600 font-medium">
+                    ✓ {{ selectedFile.name }}
+                </p>
+            </div>
         </div>
 
         <!-- Submit Button-->
-        <button
-            type="submit"
-            [disabled]="jobForm.invalid || isLoading || !selectedFile"
-            class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 disabled:bg-gray-400">
-                {{ isLoading ? 'Analyzing...' : 'Analyze Resume'}}
-        </button>
+        <div class="flex gap-4">
+            <button
+                type="submit"
+                [disabled]="jobForm.invalid || !selectedFile || isLoading"
+                class="flex-1 bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all font-medium">
+                <span *ngIf="!isLoading">Analyze Resume</span>
+                <span *ngIf="isLoading">{{ loadingMessage }}</span>
+            </button>
+
+            <button
+                type="button"
+                (click)="resetForm()"
+                class="px-6 py-3 border border-gray-300 rounded hover:bg-gray-50 transition disabled:opacity-50">
+                Reset
+            </button>
+        </div>
     </form>
 
-    <!-- Results Section -->
-    <div *ngIf="analysisResult" class="mt-8 p-6 bg-gray-50 rounded">
-        <h2 class="text-2xl font-bold mb-4">Analysis Result</h2>
+    <!--Analysis Status -->
+    <div *ngIf="isAnalyzing" class="mt-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+        <div class="flex items-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
+            <div>
+                <h3 class="font-semibold text-blue-900">{{ analysisStatus }}</h3>
+                <p class="text-sm text-blue-700">This usually takes 2-3 minutes...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="mt-8 p-6 bg-red-50 rounded-lg border-l-4 border-red-500">
+        <h3 class="font-semibold text-red-900">Error</h3>
+        <p class="text-sm text-red-700">{{ errorMessage }}</p>
+    </div>
+
+    <!-- Analysis Result Section-->
+    <div *ngIf="analysisResult" class="mt-8 p-6 bg-white rounded-lg shadow-md analysis-result">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Analysis Result</h2>
 
         <div class="space-y-6">
+            <!-- Match Score -->
+            <div class="text-center p-6 rounded-lg"
+                 [ngClass]="{
+                     'bg-green-50': analysisResult.match_score >= 70,
+                     'bg-yellow-50': analysisResult.match_score >= 50 && analysisResult.match_score < 70,
+                     'bg-red-50': analysisResult.match_score < 50
+                 }">
+                <p class="text-sm text-gray-600 mb-2">Match Score</p>
+                <p class="text-5xl font-bold"
+                   [ngClass]="{
+                       'text-green-600': analysisResult.match_score >= 70,
+                       'text-yellow-600': analysisResult.match_score >= 50 && analysisResult.match_score < 70,
+                       'text-red-600': analysisResult.match_score < 50
+                   }">
+                    {{ analysisResult.match_score }}%
+                </p>
+                <p class="text-lg font-semibold mt-2"
+                   [ngClass]="{
+                       'text-green-700': analysisResult.verdict === 'STRONG_MATCH',
+                       'text-blue-700': analysisResult.verdict === 'GOOD_MATCH',
+                       'text-yellow-700': analysisResult.verdict === 'PARTIAL_MATCH',
+                       'text-red-700': analysisResult.verdict === 'WEAK_MATCH'
+                   }">
+                    {{ formatVerdict(analysisResult.verdict) }}
+                </p>
+            </div>
+
             <!-- Display Summary-->
-            <div>
-                <h3 class="font-semibold text-lg"> Summary</h3>
-                <p class="mt-2"> {{analysisResult.summary}}</p>
+            <div class="border-l-4 border-blue-500 pl-4">
+                <h3 class="font-semibold text-lg text-gray-800">Summary</h3>
+                <p class="mt-2 text-gray-700">{{ analysisResult.summary }}</p>
             </div>
 
 
             <div class="grid md:grid-cols-2 gap-6"
             >
                 <!-- Display Strengths-->
-                <div>
-                    <h3 class="font-semibold text-lg text-green-600">Strengths</h3>
-                    <div class="mt-2" [innerHTML]="analysisResult.strengths"></div>
+                <div class="strengths-section p-4 rounded bg-green-50">
+                    <h3 class="font-semibold text-lg text-green-600 flex items-center gap-2 mb-2">
+                        <span>✓</span>Strengths</h3>
+                    <div class="text-gray-700" [innerHTML]="analysisResult.strengths"></div>
                 </div>
             
                 <!-- Display Weaknesses-->
-                <div>
-                    <h3 class="font-semibold text-lg text-red-600">Weaknesses</h3>
-                    <div class="mt-2" [innerHTML]="analysisResult.weaknesses"></div>
+                <div class="weaknesses-section p-4 rounded bg-red-50">
+                    <h3 class="font-semibold text-lg text-red-600 flex items-center gap-2 mb-2">
+                        <span>⚠</span> Areas for Improvement
+                    </h3>
+                    <div class="text-gray-700" [innerHTML]="analysisResult.weaknesses"></div>
                 </div>
             </div>
 
             <!-- Display Recommendations -->
-            <div>
-                <h3 class="font-semibold text-lg">Recommendations</h3>
-                <div class ="mt-2" [innerHTML]="analysisResult.recommendations"></div>
+            <div class="border-l-4 border-purple-500 pl-4">
+                <h3 class="font-semibold text-lg text-gray-800">Recommendations</h3>
+                <div class="mt-2 text-gray-700" [innerHTML]="analysisResult.recommendations"></div>
+            </div>
+
+            <!-- Missing Keywords -->
+            <div *ngIf="analysisResult.missing_keywords?.length > 0" 
+                 class="border-l-4 border-orange-500 pl-4">
+                <h3 class="font-semibold text-lg text-gray-800">Missing Keywords (Add to Resume)</h3>
+                <div class="mt-2 flex flex-wrap gap-2">
+                    <span *ngFor="let keyword of analysisResult.missing_keywords"
+                          class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
+                        {{ keyword }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4 pt-4 border-t">
+                <button 
+                    (click)="resetForm()"
+                    class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                    Analyze Another Resume
+                </button>
+                <button 
+                    (click)="printResults()"
+                    class="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
+                    Print Results
+                </button>
             </div>
         </div>
     </div>

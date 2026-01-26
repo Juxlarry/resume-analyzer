@@ -1,10 +1,12 @@
 class JobDescription < ApplicationRecord
+    belongs_to :user
+
     has_one_attached :resume
     has_one :resume_analysis, dependent: :destroy
 
     validates :title, presence: true
     validates :description, presence: true, length: { minimum: 50 }
-    validates : validate_resume_format
+    validates :validate_resume_format
 
     # Delegate for easier access
     delegate :completed?, :processing?, :failed?, :pending?, to: :resume_analysis, prefix: true, allow_nil: true

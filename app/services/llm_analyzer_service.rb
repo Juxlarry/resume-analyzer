@@ -66,26 +66,6 @@ class LLMAnalyzerService
         # Build user prompt
         user_prompt = build_user_prompt(job_description, resume_text)
 
-        #Calling OpenAI API
-        USER_PROMPT = <<~PROMPT
-            Job Description:
-            #{job_description}
-
-            Resume:
-            #{resume_text}
-
-            Analyze match quality. Focus on:
-            - Skills alignment (technical & soft)
-            - Experience level fit
-            - Education/certifications
-            - ATS keyword presence
-            - Gaps and improvement areas
-
-            Provide match_score, summary, strengths, weaknesses, recommendations, missing_keywords, and verdict.
-
-            Remember: Respond ONLY with the JSON object. No additional text.
-        PROMPT
-
         response = @client.chat(
             parameters: {
                 model: "gpt-4o-mini",
