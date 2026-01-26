@@ -55,6 +55,7 @@ gem "active_storage_validations"
 # gem "openai"
 gem "ruby-openai"
 
+gem "active_model_serializers"
 
 #File Parsing gems
 gem 'pdf-reader'

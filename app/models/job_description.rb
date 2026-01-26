@@ -3,9 +3,22 @@ class JobDescription < ApplicationRecord
     has_one :resume_analysis, dependent: :destroy
 
     validates :title, presence: true
-    validates :description, presence: true
+    validates :description, presence: true, length: { minimum: 50 }
     validates : validate_resume_format
-    
+
+    # Delegate for easier access
+    delegate :completed?, :processing?, :failed?, :pending?, to: :resume_analysis, prefix: true, allow_nil: true
+
+    def extract_resume_text
+        return nil unless resume.attached?
+
+        ResumeParserService.extract_text(resume)
+    end 
+
+    def analysis_ready? 
+        resume_analysis&.completed? && resume_analysis.match_score.present?
+    end 
+
     private 
 
     def validate_resume_format

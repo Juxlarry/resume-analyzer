@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_24_035510) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_26_014849) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,19 +42,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_24_035510) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "cv_analyses", force: :cascade do |t|
-    t.string "ai_model_used"
-    t.datetime "created_at", null: false
-    t.text "error_messages"
-    t.bigint "job_description_id"
-    t.text "recommendations"
-    t.integer "status"
-    t.text "strengths"
-    t.text "summary"
-    t.datetime "updated_at", null: false
-    t.text "weaknesses"
-  end
-
   create_table "job_descriptions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -69,6 +56,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_24_035510) do
     t.string "jti", null: false
     t.datetime "updated_at", null: false
     t.index ["jti"], name: "index_jwt_blacklists_on_jti"
+  end
+
+  create_table "resume_analyses", force: :cascade do |t|
+    t.string "ai_model_used"
+    t.datetime "created_at", null: false
+    t.text "error_messages"
+    t.bigint "job_description_id"
+    t.integer "match_score"
+    t.text "missing_keywords"
+    t.text "recommendations"
+    t.integer "status"
+    t.text "strengths"
+    t.text "summary"
+    t.datetime "updated_at", null: false
+    t.string "verdict"
+    t.text "weaknesses"
+    t.index ["job_description_id"], name: "index_resume_analyses_on_job_description_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|

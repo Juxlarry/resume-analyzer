@@ -4,15 +4,19 @@ class ResumeParserService
     end 
 
     def self.extract_text(resume_file)
+        return "No resume provided/attached" if  resume_file.blank?
+
         #download the file to temp location 
         tempfile = Tempfile.new(['resume', File.extname(resume_file.filename.to_s)])
         # tempfile.binmode 
 
         begin 
-            resume_file.download { |chunk| tempfile.write(chunk) }
+            resume_file.download do |chunk|
+                tempfile.write(chunk)
         end 
         tempfile.rewind
 
+        #Extract text based on content type
         case resume_file.content_type
         when "application/pdf"
             extract_text_from_pdf(tempfile.path)
@@ -21,7 +25,7 @@ class ResumeParserService
         when "application/msword"
             extract_text_from_docx(tempfile.path)
         else
-            "Unsupported File Format"
+            "Unsupported File format: #{resume_attachment.content_type}"
         end
         ensure
             tempfile.close
@@ -29,32 +33,29 @@ class ResumeParserService
         end
     end 
 
-    # def parse(file)
-    #     # Placeholder logic for parsing resume files
-    #     # In a real implementation, this would extract text from various file formats (PDF, DOCX, etc.)
-    #     extracted_text = "Extracted text from the resume file."
-    #     extracted_text
-    # end 
-
-
     private 
+
     def self.extract_text_from_pdf(file_path)
         reader = PDF::Reader.new(file_path)
-        text = reader.pages.map(&:text).join("\n")
-        text
+        text = reader.pages.map(&:text).join("\n").strip
 
+        return "Could not extract text from PDF (empty content)" if text.blank?
+
+        text
     rescue => e
-        Rails.logger.error "PDF parsing error: #{e.message}"
-        "Could not extract text from PDF"
+        Rails.logger.error "PDF parsing error: #{e.class} - #{e.message}"
+        "Could not extract text from PDF: #{e.message}"
     end 
 
     def self.extract_text_from_docx(file_path)
         doc = Docx::Document.open(file_path)
-        text = doc.paragraphs.map(&:text).join("\n")
-        text
+        text = doc.paragraphs.map(&:text).join("\n").strip
 
+        return "Could not extract text from DOCX (empty content)" if text.blank?
+
+        text
         rescue => e
-            Rails.logger.error "DOCX parsing error: #{e.message}"
-            "Could not extract text from DOCX"
+            Rails.logger.error "DOCX parsing error: #{e.class} - #{e.message}"
+            "Could not extract text from DOCX: #{e.message}"
     end
 end
