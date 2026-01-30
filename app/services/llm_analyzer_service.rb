@@ -1,4 +1,4 @@
-class LLMAnalyzerService 
+class LlmAnalyzerService 
     SYSTEM_PROMPT = <<~PROMPT 
         You are an expert ATS (Applicant Tracking System) analyzer and career advisor with 15+ years of experience in technical recruiting.
 
@@ -42,7 +42,7 @@ class LLMAnalyzerService
     MIN_JOB_DESC_LENGTH = 50
 
     #Maximum content lengths
-    MAX_RESUME_LENGTH = 6000
+    MAX_RESUME_LENGTH = 6000 
     MAX_JOB_DESC_LENGTH = 4000
 
 
@@ -59,12 +59,16 @@ class LLMAnalyzerService
         validation_error = validate_inputs(job_description, resume_text)
         return validation_error if validation_error
 
+        Rails.logger.info "LLM analysis started. No Validation errors. Job description length: #{job_description.length}, Resume length: #{resume_text.length}"
+
         # Truncate if needed
         job_description = truncate_text(job_description, MAX_JOB_DESC_LENGTH)
         resume_text = truncate_text(resume_text, MAX_RESUME_LENGTH)
 
         # Build user prompt
         user_prompt = build_user_prompt(job_description, resume_text)
+
+        Rails.logger.info "LLM analysis request initiated. User prompt length: #{user_prompt.length} characters"
 
         response = @client.chat(
             parameters: {
@@ -78,6 +82,8 @@ class LLMAnalyzerService
                 response_format: {type: "json_object"}
             }
         )
+
+        Rails.logger.info "LLM analysis response: #{response}"
 
         parse_response(response)
 
@@ -119,6 +125,8 @@ class LLMAnalyzerService
         truncated = text[0...max_length]
         Rails.logger.warn "Text truncated from #{text.length} to #{max_length} characters"
         truncated
+
+        Rails.logger.info "Truncated text: #{truncated[0..100]}..."  # Log first 100 characters
     end
 
     def build_user_prompt(job_description, resume_text)
@@ -149,8 +157,10 @@ class LLMAnalyzerService
 
         result = JSON.parse(content)
 
+        Rails.logger.info "LLM analysis parsed result: #{result}"
+
         # Ensure all required keys exist
-        {
+        result_hash = {
         match_score: result["match_score"]&.to_i || 0,
         summary: result["summary"] || "Analysis unavailable",
         strengths: sanitize_html(result["strengths"]) || "<ul><li>N/A</li></ul>",
@@ -159,6 +169,10 @@ class LLMAnalyzerService
         missing_keywords: result["missing_keywords"] || [],
         verdict: result["verdict"] || "WEAK_MATCH"
         }
+
+        Rails.logger.info "LLM parsed result_hash: #{result_hash}"
+
+        result_hash
     end
 
     def sanitize_html(html_content)

@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-welcome',
@@ -32,4 +35,15 @@ export class WelcomeComponent {
       description: 'Your data is encrypted and never shared with third parties'
     }
   ];
+
+  // isAuthenticated$ = this.authService.isAuthenticated$;
+  // isAdmin$ = this.authService.currentUser$.pipe(
+  //   map(user => user?.role === 'admin')
+  // );
+
+  // constructor(private authService: AuthService) {}
+
+  // logout(): void {
+  //   this.authService.logout();
+  // }
 }

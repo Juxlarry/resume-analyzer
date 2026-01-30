@@ -8,7 +8,7 @@ class ResumeParserService
 
         #download the file to temp location 
         tempfile = Tempfile.new(['resume', File.extname(resume_file.filename.to_s)])
-        # tempfile.binmode 
+        tempfile.binmode 
 
         begin 
             resume_file.download do |chunk|
@@ -39,9 +39,19 @@ class ResumeParserService
         reader = PDF::Reader.new(file_path)
         text = reader.pages.map(&:text).join("\n").strip
 
-        return "Could not extract text from PDF (empty content)" if text.blank?
+        # Force UTF-8 encoding and remove invalid characters
+        text = text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
 
-        text
+        if text.blank?
+            Rails.logger.error "PDF extraction: empty content"
+            return "Could not extract text from PDF (empty content)"
+        end
+
+        Rails.logger.info "PDF text extracted: #{text.length} chars"
+
+        Rails.logger.info "PDF text: #{text[0..100]}..."  # Log first 100 characters
+
+        return text   
     rescue => e
         Rails.logger.error "PDF parsing error: #{e.class} - #{e.message}"
         "Could not extract text from PDF: #{e.message}"
@@ -51,11 +61,21 @@ class ResumeParserService
         doc = Docx::Document.open(file_path)
         text = doc.paragraphs.map(&:text).join("\n").strip
 
-        return "Could not extract text from DOCX (empty content)" if text.blank?
+        # Force UTF-8 encoding and remove invalid characters
+        text = text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
 
-        text
-        rescue => e
-            Rails.logger.error "DOCX parsing error: #{e.class} - #{e.message}"
-            "Could not extract text from DOCX: #{e.message}"
+        if text.blank?
+            Rails.logger.error "DOCX extraction: empty content"
+            return "Could not extract text from DOCX (empty content)"
+        end
+
+        Rails.logger.info "DOCX text extracted: #{text.length} chars"
+
+        Rails.logger.info "DOCX text: #{text[0..100]}..."  # Log first 100 characters
+
+        return text 
+    rescue => e
+        Rails.logger.error "DOCX parsing error: #{e.class} - #{e.message}"
+        "Could not extract text from DOCX: #{e.message}"
     end
 end

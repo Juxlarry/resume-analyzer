@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from "@angular/core";
+import { Component, ViewChild, ElementRef, ChangeDetectorRef } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 import { JobService } from "../../services/job.service";
@@ -32,7 +32,8 @@ export class JobFormComponent {
 
     constructor(
         private fb: FormBuilder,
-        private jobService: JobService
+        private jobService: JobService, 
+        private cdr: ChangeDetectorRef
     ) {
         this.jobForm = this.fb.group({
             title: ["", Validators.required],
@@ -45,19 +46,15 @@ export class JobFormComponent {
         const file = event.target.files[0];
         if (!file) return; 
 
-        
-        //validate file size (max 10MB)
-        if(file.size > 10 * 1024 * 1024){
-            alert("File size exceeds 10MB limit. Please choose a smaller file.");
-            return
-        }
-
         //validate file type
         const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
 
-        if(!allowedTypes.includes(file.type)){
-            alert("Invalid file type. Please upload a PDF or DOCX file.");
-            return
+        //validate file size (max 10MB)
+        if(file.size > 10 * 1024 * 1024 || !allowedTypes.includes(file.type)){
+            alert("Invalid file. Please ensure it is a PDF/DOCX under 10MB.");
+            this.selectedFile = null;
+            this.fileInput.nativeElement.value = '';
+            return;
         }
 
         this.selectedFile = file;
@@ -81,7 +78,7 @@ export class JobFormComponent {
         
 
         this.jobService.createJobDescription(formData).subscribe({
-            next: (response: any) => {
+            next: (response: any) => { 
                    console.log("Job description created:", response);
                 this.loadingMessage = 'Starting analysis...';
                 
@@ -102,7 +99,7 @@ export class JobFormComponent {
                 console.log("Analysis started:", response);
                 this.loadingMessage = 'Analyzing resume...';
                 this.isAnalyzing = true;
-                this.isLoading = false;
+                this.isLoading = true;
 
                 // Step 3: Poll for analysis result
                 this.pollAnalysisStatus(jobId);
@@ -140,13 +137,18 @@ export class JobFormComponent {
                     if (response.status === 'completed' && response.analysis) {
                         this.analysisResult = response.analysis;
                         this.isAnalyzing = false;
+                        this.isLoading = false;
+                        this.cdr.detectChanges();
+                        this.scrollToResults();
                         this.pollingSubscription?.unsubscribe();
                     } else if (response.status === 'failed') {
                         this.errorMessage = response.error || "Analysis failed. Please try again.";
                         this.isAnalyzing = false;
+                        this.isLoading = false;
                         this.pollingSubscription?.unsubscribe();
-                    } else if (response.status === 'processing') {
+                    }else if (response.status === 'processing') {
                         this.analysisStatus = response.estimated_wait_time ? `Processing your resume... (Estimated wait time: ${response.estimated_wait_time} seconds)` : 'Processing your resume...';
+                        this.isAnalyzing = true;
                     }
                 }, 
                 error: (err) => {
@@ -167,6 +169,15 @@ export class JobFormComponent {
     printResults(): void {
         window.print();
     }
+
+    private scrollToResults() {
+    setTimeout(() => {
+        const element = document.querySelector('.analysis-result');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 100);
+}
 
     resetForm(): void {
         this.jobForm.reset();

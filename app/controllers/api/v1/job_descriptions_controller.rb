@@ -1,6 +1,6 @@
 class Api::V1::JobDescriptionsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_job_description, only: %i[ show update destroy analyze analysis_status ]
+  before_action :set_job_description, only: %i[ show analyze analysis_status ]
 
   # GET /api/v1/job_descriptions
   def index
@@ -27,14 +27,10 @@ class Api::V1::JobDescriptionsController < ApplicationController
         title: @job_description.title,
         message: "Job deescription created successfully."
       }, status: :created
-
-      # render json: @job_description, status: :created, location: @job_description
     else
       render json: {
         errors: @job_description.errors.full_messages
       }, status: :unprocessable_entity
-
-      # render json: @job_description.errors, status: :unprocessable_content
     end
   end
 
@@ -73,20 +69,10 @@ class Api::V1::JobDescriptionsController < ApplicationController
     analysis.update!(status: :processing)
     ResumeAnalysisJob.perform_later(@job_description.id)
 
-
-    #check if analysis already exists and is not pending
-    # if @job_description.resume_analysis.completed? || @job_description.resume_analysis.processing?
-    #   return render json: { error: "Analysis already completed or in progress for this job description." }, status: :ok 
-    # end
-
-    # @job_description.resume_analysis.update(status: 'processing')
-
-    # ResumeAnalysisJob.perform_later(@job_description.id, current_user.id)
-
     render json: { 
       message: "Analysis started in background.",
       job_id: @job_description.id, 
-      status_url: api_v1_job_description_analysis_status_url(@job_description)
+      status_url: analysis_status_api_v1_job_description_url(@job_description)
     }, status: :accepted
   rescue => e
     Rails.logger.error "Analyze action error: #{e.message}"
@@ -120,21 +106,10 @@ class Api::V1::JobDescriptionsController < ApplicationController
         completed_at: analysis.updated_at
       }
     elsif analysis.failed?
-      response_data[:error] = analysis.error_message || "Analysis failed"
+      response_data[:error] = analysis.error_messages || "Analysis failed"
     end
 
     render json: response_data
-
-
-    # render json: {
-    #   status: @job_description.resume_analysis.status,
-    #   analysis: @job_descriptions.resume_analysis.completed? ? @job_description.resume_analysis : nil, 
-    #   estimated_wait_time: @job_description.resume_analysis.processing? ? "Approximately 2 - 3 minutes" : nil
-      # summary: @job_description.resume_analysis.summary,
-      # strengths: @job_description.resume_analysis.strengths,
-      # weaknesses: @job_description.resume_analysis.weaknesses,
-      # recommendations: @job_description.resume_analysis.recommendations
-    # }
   end
 
 

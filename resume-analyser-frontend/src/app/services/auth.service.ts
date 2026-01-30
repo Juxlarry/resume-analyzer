@@ -1,9 +1,22 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Observable, BehaviorSubject } from "rxjs";
 import { tap } from "rxjs/operators";
 import { Router } from "@angular/router";
 
+// export interface User {
+//     id: number;
+//     email: string;
+//     role: string;
+//     created_at: string;
+//     updated_at: string;
+// }
+
+// export interface AuthResponse {
+//     user: User;
+//     token: string;
+//     message: string;
+// }
 
 export interface AuthResponse {
     user: {
@@ -16,11 +29,12 @@ export interface AuthResponse {
     message: string;
 }
 
+
 @Injectable({
     providedIn: "root"
 })
 export class AuthService {
-    private apiUrl = "http://localhost:3000/api/v1"; // Adjust the URL as needed
+    private apiUrl = "http://localhost:3000/api/v1"; 
     private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
     public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
@@ -43,8 +57,12 @@ export class AuthService {
     register(email: string, password: string, passwordConfirmation: string): Observable<AuthResponse> {
         return this.http.post<AuthResponse>(
             `${this.apiUrl}/signup`, {
-                user: {email, password, passwordConfirmation: passwordConfirmation }
-            }).pipe(
+                user: {
+                    email, 
+                    password, password_confirmation: passwordConfirmation 
+                }
+            }
+        ).pipe(
                 tap(response => {
                 this.setToken(response.token);
                 this.isAuthenticatedSubject.next(true);
@@ -52,12 +70,19 @@ export class AuthService {
         );
     }
 
-
     logout(): void {
-        this.http.delete(`${this.apiUrl}/logout`).subscribe(() => {
-            this.clearToken();
-            this.isAuthenticatedSubject.next(false);
-            this.router.navigate(['/login']);
+        this.http.delete(`${this.apiUrl}/logout`).subscribe({
+            next: () => {
+                this.clearToken();
+                this.isAuthenticatedSubject.next(false);
+                this.router.navigate(['/login']);
+            },
+            error: (error) => {
+                console.error('Logout failed: ', error);
+                this.clearToken();
+                this.isAuthenticatedSubject.next(false);
+                this.router.navigate(['/login']);
+            }
         });
     }
 

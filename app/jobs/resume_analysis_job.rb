@@ -3,31 +3,45 @@ class ResumeAnalysisJob < ApplicationJob
   sidekiq_options retry: 3, dead: false 
 
   def perform(job_description_id)
-    job_description = JobDescription.find_by(job_description_id)
+    Rails.logger.info "=== Starting ResumeAnalysisJob for JD ##{job_description_id} ==="
+
+    job_description = JobDescription.find(job_description_id)
     analysis = job_description.resume_analysis
+
+    unless analysis
+      Rails.logger.error "No analysis record found for JD ##{job_description_id}"
+      return
+    end
 
     #Validate prerequisites
     unless job_description&.resume.attached?
       analysis.update!(
         status: :failed, 
-        error_message: "No resume attached"
+        error_messages: "No resume attached"
       )
+      Rails.logger.error "No resume attached for job_description ##{job_description_id}"
       return
     end 
 
     #Extract text from resume 
-    resume_text = ResumeParserService.extract_text(job_description.resume)
+    Rails.logger.info "Extracting text from resume..."
+    resume_text = ResumeParserService.extract_text(job_description.resume) 
 
-    if resume_text.blank? || resume_text.start_with?("Could not extract", "Unsupported")
+    unless resume_text.is_a?(String) && resume_text.length >= 100
+      error_msg = resume_text.is_a?(String) ? resume_text : "Invalid resume data returned"
+      Rails.logger.error "Resume extraction failed: #{error_msg}"
       analysis.update!(
         status: :failed, 
-        error_message: "Failed to extract text from resume: #{resume_text}"
+        error_messages: "Failed to extract text from resume"
       )
       return
     end
 
+    Rails.logger.info "Resume text extracted successfully - #{resume_text.length} chars"
+
     #Call LLM Service
-    analyzer = LLMAnalyzerService.new
+    Rails.logger.info "Calling LLM analyzer..."
+    analyzer = LlmAnalyzerService.new
     result = analyzer.analyze(
       job_description.description, 
       resume_text
@@ -37,12 +51,13 @@ class ResumeAnalysisJob < ApplicationJob
     if result[:error]
       analysis.update!(
         status: :failed, 
-        error_message: result[:error]
+        error_messages: result[:error]
       )
       return
     end
 
     #Save susccessful analysis
+    Rails.logger.info "Saving analysis results..."
     analysis.update!(
       match_score: result[:match_score],
       summary: result[:summary],
@@ -69,7 +84,7 @@ class ResumeAnalysisJob < ApplicationJob
     if job_description&.resume_analysis 
       job_description.resume_analysis.update(
         status: :failed, 
-        error_message: "Analysis error: #{e.message}"
+        error_messages: "Analysis error: #{e.message}"
       )
     end
 
