@@ -39,10 +39,17 @@ export class AuthService {
     private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
     public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
+    private currentUserSubject = new BehaviorSubject<User | null>(null);
+    public currentUser$ = this.currentUserSubject.asObservable();
+
     constructor(
         private http: HttpClient,
         private router: Router
-    ){}
+    ){
+        if (this.hasToken()) {
+            this.loadCurrentUser();
+        }
+    }
 
     login(email: string, password: string): Observable<AuthResponse> {
         return this.http.post<AuthResponse>(`${this.apiUrl}/login`, {
@@ -51,6 +58,7 @@ export class AuthService {
             tap(response => {
                 this.setToken(response.token);
                 this.isAuthenticatedSubject.next(true);
+                this.loadCurrentUser();
             })
       ); 
     }
@@ -67,6 +75,7 @@ export class AuthService {
                 tap(response => {
                 this.setToken(response.token);
                 this.isAuthenticatedSubject.next(true);
+                this.loadCurrentUser();
             })
         );
     }
@@ -76,13 +85,13 @@ export class AuthService {
             next: () => {
                 this.clearToken();
                 this.isAuthenticatedSubject.next(false);
-                this.router.navigate(['/login']);
+                this.router.navigate(['/welcome']);
             },
             error: (error) => {
                 console.error('Logout failed: ', error);
                 this.clearToken();
                 this.isAuthenticatedSubject.next(false);
-                this.router.navigate(['/login']);
+                this.router.navigate(['/welcome']);
             }
         });
     }
@@ -96,7 +105,26 @@ export class AuthService {
     }
 
     updateProfile(data: UpdateProfileData): Observable<any> {
-        return this.http.put(`${this.apiUrl}/profile`, { user: data });
+        return this.http.put(`${this.apiUrl}/profile`, { user: data }).pipe(
+            tap(() => {
+                this.loadCurrentUser()
+            })
+        );
+    }
+
+    private loadCurrentUser(): void {
+        this.getProfile().subscribe({
+            next: (user) => {
+                this.currentUserSubject.next(user);
+            },
+            error: (error) => {
+                console.error('Failed to load user profile:', error);
+                // If profile load fails, user might not be authenticated
+                this.clearToken();
+                this.isAuthenticatedSubject.next(false);
+                this.currentUserSubject.next(null);
+            }
+        });
     }
 
     private setToken(token: string): void {
