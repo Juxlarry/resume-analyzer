@@ -4,19 +4,20 @@ import { Observable, BehaviorSubject } from "rxjs";
 import { tap } from "rxjs/operators";
 import { Router } from "@angular/router";
 
-// export interface User {
-//     id: number;
-//     email: string;
-//     role: string;
-//     created_at: string;
-//     updated_at: string;
-// }
+export interface User {
+    id: number;
+    email: string; 
+    role: string; 
+    created_at: string; 
+    total_analyses: number; 
+    completed_analyses: number;
+}
 
-// export interface AuthResponse {
-//     user: User;
-//     token: string;
-//     message: string;
-// }
+export interface UpdateProfileData {
+    email?: string;
+    password?: string; 
+    password_confirmation?: string;
+}
 
 export interface AuthResponse {
     user: {
@@ -59,7 +60,7 @@ export class AuthService {
             `${this.apiUrl}/signup`, {
                 user: {
                     email, 
-                    password, password_confirmation: passwordConfirmation 
+                    password, password_confirmation: passwordConfirmation  
                 }
             }
         ).pipe(
@@ -88,6 +89,14 @@ export class AuthService {
 
     getToken(): string | null {
         return localStorage.getItem("auth_token");
+    }
+
+    getProfile(): Observable<User> {
+        return this.http.get<User>(`${this.apiUrl}/profile`);
+    }
+
+    updateProfile(data: UpdateProfileData): Observable<any> {
+        return this.http.put(`${this.apiUrl}/profile`, { user: data });
     }
 
     private setToken(token: string): void {

@@ -1,16 +1,26 @@
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-    <!-- Nav Section-->
+    <!-- Nav Section
      <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
         <h2 class="text-2xl font-bold text-gray-900">Resume Analyser</h2>
         <div class="flex gap-4 items-center">
-            <a routerLink="/login" class="text-gray-700 hover:text-blue-600 transition font-medium">
-                Sign In
-            </a>
-            <a routerLink="/signup" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
-                Sign Up
-            </a>
+            <ng-container *ngIf="(isAuthenticated$ | async) === false; else loggedIn">
+                <a routerLink="/login" class="text-gray-700 hover:text-blue-600 transition font-medium">
+                    Sign In
+                </a>
+                <a routerLink="/signup" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+                    Sign Up
+                </a>
+            </ng-container>
+
+            <ng-template #loggedIn>
+                <button 
+                    (click)="logout()" 
+                    class="text-red-600 hover:text-red-700 transition font-medium">
+                    Logout
+                </button>
+            </ng-template>
         </div>
-    </nav>
+    </nav> -->
 
     <!-- Hero Section -->
     <div class="container mx-auto px-6 py-16">

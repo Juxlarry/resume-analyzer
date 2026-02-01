@@ -1,6 +1,6 @@
 class Api::V1::JobDescriptionsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_job_description, only: %i[ show analyze analysis_status ]
+  before_action :set_job_description, only: %i[ show analyze analysis_status destroy ]
 
   # GET /api/v1/job_descriptions
   def index
@@ -36,11 +36,23 @@ class Api::V1::JobDescriptionsController < ApplicationController
 
   #POST /api/v1/job_descriptions/:id/analyze
   def analyze 
-    # Validate resume is attached
-    unless @job_description.resume.attached?
-      return render json: { 
-        error: "No resume attached to this job description" 
-      }, status: :unprocessable_entity
+    # Check if a new resume is being uploaded
+    if params[:resume].present?
+      # Attach new resume
+      @job_description.resume.attach(params[:resume])
+
+      unless @job_description.resume.attached?
+        return render json: { 
+          error: "Failed to attach new resume" 
+        }, status: :unprocessable_entity
+      end
+    else
+      # Validate existing resume is attached
+      unless @job_description.resume.attached?
+        return render json: { 
+          error: "No resume attached to this job description. Please upload a resume." 
+        }, status: :unprocessable_entity
+      end
     end
 
     # Check if analysis already exists
@@ -50,13 +62,21 @@ class Api::V1::JobDescriptionsController < ApplicationController
       analysis = @job_description.create_resume_analysis!(status: :pending)
     end
 
-    # Check status
-    if analysis.completed?
+    # Allow re-run even if completed (user might have uploaded new resume)
+    if analysis.processing?
       return render json: { 
-        message: "Analysis already completed",
-        analysis: analysis
+        message: "Analysis already in progress",
+        status_url: analysis_status_api_v1_job_description_url(@job_description)
       }, status: :ok
     end
+
+    # Check status
+    # if analysis.completed?
+    #   return render json: { 
+    #     message: "Analysis already completed",
+    #     analysis: analysis
+    #   }, status: :ok
+    # end
 
     if analysis.processing?
       return render json: { 
@@ -72,12 +92,13 @@ class Api::V1::JobDescriptionsController < ApplicationController
     render json: { 
       message: "Analysis started in background.",
       job_id: @job_description.id, 
-      status_url: analysis_status_api_v1_job_description_url(@job_description)
+      status_url: analysis_status_api_v1_job_description_url(@job_description),  new_resume_uploaded: params[:resume].present?
     }, status: :accepted
   rescue => e
     Rails.logger.error "Analyze action error: #{e.message}"
     render json: { error: "Failed to start analysis: #{e.message}" }, status: :internal_server_error
   end 
+  
 
   # GET /api/v1/job_descriptions/:id/analysis_status
   def analysis_status
@@ -86,7 +107,7 @@ class Api::V1::JobDescriptionsController < ApplicationController
     if analysis.nil?
       return render json: { 
         status: "not_started",
-        message: "No analysis found for this job description." }, status:not_found
+        message: "No analysis found for this job description." }, status: :not_found
     end
 
     response_data = {
@@ -110,6 +131,15 @@ class Api::V1::JobDescriptionsController < ApplicationController
     end
 
     render json: response_data
+  end
+
+  # DELETE /api/v1/job_descriptions/:id
+  def destroy
+    if @job_description.destroy
+      render json: { message: "Job description deleted successfully." }, status: :ok
+    else
+      render json: { error: "Failed to delete job description." }, status: :unprocessable_entity
+    end
   end
 
 

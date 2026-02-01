@@ -1,0 +1,170 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="container mx-auto px-6 max-w-3xl">
+    
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
+      <p class="text-gray-600">Manage your account settings and preferences</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
+      <p class="text-green-700">{{ successMessage }}</p>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
+      <p class="text-red-700">{{ errorMessage }}</p>
+    </div>
+
+    <!-- Profile Content -->
+    <div *ngIf="!isLoading && profile" class="space-y-6">
+      
+      <!-- Account Statistics -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Account Statistics</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <p class="text-3xl font-bold text-blue-600">{{ profile.total_analyses }}</p>
+            <p class="text-sm text-gray-600 mt-1">Total Analyses</p>
+          </div>
+          <div class="text-center p-4 bg-green-50 rounded-lg">
+            <p class="text-3xl font-bold text-green-600">{{ profile.completed_analyses }}</p>
+            <p class="text-sm text-gray-600 mt-1">Completed</p>
+          </div>
+          <div class="text-center p-4 bg-purple-50 rounded-lg">
+            <p class="text-sm text-gray-600">Member since</p>
+            <p class="text-lg font-semibold text-purple-600 mt-1">{{ formatDate(profile.created_at) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Settings -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Email Settings</h2>
+        <form [formGroup]="profileForm" (ngSubmit)="updateEmail()" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+            <input
+              type="email"
+              formControlName="email"
+              class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
+              [class.border-red-500]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
+            />
+            <p *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" 
+               class="text-red-500 text-sm mt-1">
+              Please enter a valid email address
+            </p>
+          </div>
+          
+          <button
+            type="submit"
+            [disabled]="profileForm.invalid || isSaving"
+            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition">
+            <span *ngIf="!isSaving">Update Email</span>
+            <span *ngIf="isSaving">Updating...</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Password Settings -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-900">Password Settings</h2>
+          <button
+            (click)="togglePasswordForm()"
+            class="text-blue-600 hover:text-blue-700 font-medium">
+            {{ showPasswordForm ? 'Cancel' : 'Change Password' }}
+          </button>
+        </div>
+
+        <form *ngIf="showPasswordForm" 
+              [formGroup]="passwordForm" 
+              (ngSubmit)="updatePassword()" 
+              class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+            <input
+              type="password"
+              formControlName="password"
+              class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
+              [class.border-red-500]="passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched"
+              placeholder="Minimum 8 characters"
+            />
+            <p *ngIf="passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched" 
+               class="text-red-500 text-sm mt-1">
+              Password must be at least 8 characters
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+            <input
+              type="password"
+              formControlName="password_confirmation"
+              class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
+              [class.border-red-500]="passwordForm.hasError('passwordMismatch') && passwordForm.get('password_confirmation')?.touched"
+            />
+            <p *ngIf="passwordForm.hasError('passwordMismatch') && passwordForm.get('password_confirmation')?.touched" 
+               class="text-red-500 text-sm mt-1">
+              Passwords do not match
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            [disabled]="passwordForm.invalid || isSaving"
+            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition">
+            <span *ngIf="!isSaving">Update Password</span>
+            <span *ngIf="isSaving">Updating...</span>
+          </button>
+        </form>
+
+        <p *ngIf="!showPasswordForm" class="text-gray-600">
+          Click "Change Password" to update your password
+        </p>
+      </div>
+
+      <!-- Account Information -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Account Information</h2>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Account ID:</span>
+            <span class="font-medium text-gray-900">{{ profile.id }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Role:</span>
+            <span class="font-medium text-gray-900 capitalize">{{ profile.role }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Member Since:</span>
+            <span class="font-medium text-gray-900">{{ formatDate(profile.created_at) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <div class="flex flex-wrap gap-3">
+          <a 
+            routerLink="/analyze"
+            class="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+            New Analysis
+          </a>
+          <a 
+            routerLink="/job-descriptions"
+            class="inline-block border border-gray-300 px-6 py-2 rounded hover:bg-gray-50 transition">
+            View My Analyses
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

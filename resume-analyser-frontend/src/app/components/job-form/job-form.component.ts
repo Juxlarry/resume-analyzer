@@ -11,7 +11,7 @@ import { max, switchMap, takeWhile } from "rxjs/operators";
     standalone: true,
     imports: [
         CommonModule,
-        ReactiveFormsModule
+        ReactiveFormsModule 
     ],
     templateUrl: "./job-form.component.html",
     styleUrls: ["./job-form.component.css"],

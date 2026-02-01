@@ -1,0 +1,207 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="container mx-auto px-6 max-w-5xl">
+    
+    <!-- Back Button -->
+    <div class="mb-6">
+      <a 
+        routerLink="/job-descriptions"
+        class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to My Analyses
+      </a>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage && !isLoading" class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
+      <p class="text-red-700">{{ errorMessage }}</p>
+    </div>
+
+    <!-- Main Content -->
+    <div *ngIf="jobDescription && !isLoading" class="space-y-6">
+      
+      <!-- Header Section -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-start mb-4">
+          <div class="flex-1">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ jobDescription.title }}</h1>
+            <p class="text-sm text-gray-500">
+              Created on {{ formatDate(jobDescription.created_at) }}
+            </p>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="flex gap-2">
+            <button
+                (click)="openRerunModal()"
+                [disabled]="isPolling"
+                class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Re-run analysis">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </button>
+            
+            <button
+              (click)="printResults()"
+              class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition"
+              title="Print results">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+            </button>
+            
+            <button
+              (click)="deleteAnalysis()"
+              class="px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition"
+              title="Delete analysis">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Job Description Content -->
+        <div class="border-t pt-4">
+          <h3 class="font-semibold text-lg text-gray-800 mb-2">Job Description</h3>
+          <p class="text-gray-700 whitespace-pre-wrap">{{ jobDescription.description }}</p>
+        </div>
+      </div>
+
+      <!-- Processing State -->
+      <div *ngIf="isPolling" class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
+        <div class="flex items-center">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
+          <div>
+            <h3 class="font-semibold text-blue-900">Analysis in Progress</h3>
+            <p class="text-sm text-blue-700">This usually takes 2-3 minutes...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analysis Results -->
+      <div *ngIf="jobDescription.resume_analysis?.status === 'completed'" 
+           class="bg-white rounded-lg shadow-md p-6 space-y-6">
+        
+        <h2 class="text-2xl font-bold text-gray-900">Analysis Results</h2>
+
+        <!-- Match Score -->
+        <div class="text-center p-8 rounded-lg"
+             [ngClass]="getScoreBgClass(jobDescription.resume_analysis.match_score)">
+          <p class="text-sm text-gray-600 mb-2">Match Score</p>
+          <p class="text-6xl font-bold mb-3"
+             [ngClass]="getScoreClass(jobDescription.resume_analysis.match_score)">
+            {{ jobDescription.resume_analysis.match_score }}%
+          </p>
+          <p class="text-xl font-semibold"
+             [ngClass]="{
+               'text-green-700': jobDescription.resume_analysis.verdict === 'STRONG_MATCH',
+               'text-blue-700': jobDescription.resume_analysis.verdict === 'GOOD_MATCH',
+               'text-yellow-700': jobDescription.resume_analysis.verdict === 'PARTIAL_MATCH',
+               'text-red-700': jobDescription.resume_analysis.verdict === 'WEAK_MATCH'
+             }">
+            {{ formatVerdict(jobDescription.resume_analysis.verdict) }}
+          </p>
+        </div>
+
+        <!-- Summary -->
+        <div class="border-l-4 border-blue-500 pl-4">
+          <h3 class="font-semibold text-lg text-gray-800 mb-2">Summary</h3>
+          <p class="text-gray-700">{{ jobDescription.resume_analysis.summary }}</p>
+        </div>
+
+        <!-- Strengths and Weaknesses Grid -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Strengths -->
+          <div class="p-6 rounded-lg bg-green-50">
+            <h3 class="font-semibold text-lg text-green-700 flex items-center gap-2 mb-3">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Strengths
+            </h3>
+            <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis.strengths"></div>
+          </div>
+
+          <!-- Weaknesses -->
+          <div class="p-6 rounded-lg bg-red-50">
+            <h3 class="font-semibold text-lg text-red-700 flex items-center gap-2 mb-3">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              Areas for Improvement
+            </h3>
+            <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis.weaknesses"></div>
+          </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="border-l-4 border-purple-500 pl-4">
+          <h3 class="font-semibold text-lg text-gray-800 mb-3">Recommendations</h3>
+          <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis.recommendations"></div>
+        </div>
+
+        <!-- Missing Keywords -->
+        <div *ngIf="jobDescription.resume_analysis.missing_keywords?.length > 0" 
+             class="border-l-4 border-orange-500 pl-4">
+          <h3 class="font-semibold text-lg text-gray-800 mb-3">
+            Missing Keywords (Add to Resume)
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            <span *ngFor="let keyword of jobDescription.resume_analysis.missing_keywords"
+                  class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
+              {{ keyword }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Analysis Metadata -->
+        <div class="border-t pt-4 text-sm text-gray-500">
+          <p>AI Model: {{ jobDescription.resume_analysis.ai_model_used }}</p>
+          <p>Analyzed on: {{ formatDate(jobDescription.resume_analysis.updated_at) }}</p>
+        </div>
+      </div>
+
+      <!-- Failed Analysis State -->
+      <div *ngIf="jobDescription.resume_analysis?.status === 'failed'" 
+           class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
+        <h3 class="font-semibold text-red-900 mb-2">Analysis Failed</h3>
+        <p class="text-red-700">
+          The analysis could not be completed. Please try re-running the analysis.
+        </p>
+        <button 
+            (click)="openRerunModal()"
+            class="mt-4 bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">
+            Retry Analysis
+        </button>
+      </div>
+
+      <!-- No Analysis State -->
+      <div *ngIf="!jobDescription.resume_analysis" 
+           class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-lg">
+        <h3 class="font-semibold text-yellow-900 mb-2">No Analysis Available</h3>
+        <p class="text-yellow-700">
+          This job description hasn't been analyzed yet.
+        </p>
+        <button 
+            (click)="openRerunModal()"
+            class="mt-4 bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700 transition">
+            Start Analysis
+        </button>
+      </div>
+    </div>
+  </div>
+  <app-rerun-analysis-modal
+    [isOpen]="isRerunModalOpen"
+    [jobTitle]="jobDescription?.title || ''"
+    (close)="closeRerunModal()"
+    (confirm)="confirmRerun($event)">
+   </app-rerun-analysis-modal>
+</div>

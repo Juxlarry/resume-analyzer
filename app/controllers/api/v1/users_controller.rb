@@ -3,40 +3,39 @@ class Api::V1::UsersController < ApplicationController
 
     # GET /api/v1/profile
     def show
-        puts "DEBUG: current_user = #{current_user.inspect}"
-        puts "DEBUG: user_signed_in? = #{user_signed_in?}"
-
-        if current_user
-            render json: {
-            id: current_user.id,
-            email: current_user.email,
-            role: current_user.role,
-            created_at: current_user.created_at
-            }
-        else
-          render json: { error: 'Not authenticated' }, status: :unauthorized
-        end
-    end
+      if current_user
+        render json: {
+        id: current_user.id,
+        email: current_user.email,
+        role: current_user.role,
+        created_at: current_user.created_at, 
+        total_analyses: current_user.job_descriptions.count,
+        completed_analyses: current_user.resume_analyses.completed.count
+      }
+      else
+        render json: { error: 'Not authenticated' }, status: :unauthorized
+      end
+    end 
 
     # PUT /api/v1/profile
     def update
-        if current_user.update(user_params)
-          render json: {
-            message: 'Profile updated',
-            user: {
-              id: current_user.id,
-              email: current_user.email,
-              role: current_user.role
-            }
+      if current_user.update(user_params)
+        render json: {
+          message: 'Profile updated successfully',
+          user: {
+            id: current_user.id,
+            email: current_user.email,
+            role: current_user.role
           }
-        else
-          render json: { errors: current_user.errors.full_messages }, status: :unprocessable_entity
-        end
+        }
+      else
+        render json: { errors: current_user.errors.full_messages }, status: :unprocessable_entity
+      end
     end
     
     private
     
     def user_params
-        params.require(:user).permit(:role)
+      params.require(:user).permit(:email, :password, :password_confirmation )
     end
 end

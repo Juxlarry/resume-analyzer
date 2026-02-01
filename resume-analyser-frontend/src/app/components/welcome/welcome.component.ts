@@ -36,14 +36,22 @@ export class WelcomeComponent {
     }
   ];
 
+  isAuthenticated$: Observable<boolean>;
+
+  constructor( 
+    private authService: AuthService,
+  ){
+    this.isAuthenticated$ = this.authService.isAuthenticated$;
+  }
+
   // isAuthenticated$ = this.authService.isAuthenticated$;
   // isAdmin$ = this.authService.currentUser$.pipe(
   //   map(user => user?.role === 'admin')
   // );
 
-  // constructor(private authService: AuthService) {}
+  // constructor(private authService: AuthService) {} 
 
-  // logout(): void {
-  //   this.authService.logout();
-  // }
+  logout(): void {
+    this.authService.logout();
+  }
 }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';import { AuthService } from '../../../services/auth.service';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
+import { AuthService } from '../../../services/auth.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 
@@ -28,7 +29,7 @@ export class Login {
       password: ['', Validators.required],
     });
 
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/analyze';
+    // this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/welcome';
   } 
 
   onSubmit(): void {
@@ -46,10 +47,11 @@ export class Login {
       next: (response) => {
         console.log('Login successful: ', response);
         // this.isLoading = false;
-        // this.router.navigate(['/analyze']);
+        this.router.navigate(['/welcome']);
 
         //navigating back to where user came from 
-        this.router.navigateByUrl(this.returnUrl!);
+        // console.log('The return url: ', this.returnUrl);
+        // this.router.navigateByUrl(this.returnUrl!);
       }, 
       error: (err) => {
         console.error('Login failed: ', err);

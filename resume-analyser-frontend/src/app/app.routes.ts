@@ -26,12 +26,27 @@ export const routes: Routes = [
         canActivate: [authGuard]
     },
     {
+        path: 'job-descriptions',
+        loadComponent: () => import('./components/job-descriptions-list/job-descriptions-list.component').then(m => m.JobDescriptionListComponent),
+        canActivate: [authGuard]
+    },
+    {
+        path: 'job-descriptions/:id',
+        loadComponent: () => import('./components/job-description-detail/job-description-detail.component').then(m => m.JobDescriptionDetailComponent),
+        canActivate: [authGuard]
+    },
+    {
+        path: 'profile',
+        loadComponent: () => import('./components/user-profile/user-profile.component').then(m => m.UserProfile),
+        canActivate: [authGuard]
+    },
+    {
         path: 'admin',
         loadComponent: () => import('./components/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
         canActivate: [authGuard] // Will add admin guard later
     },
     {
         path: '**',
-        redirectTo: '/welcome'
+        redirectTo: ''
     }
 ];

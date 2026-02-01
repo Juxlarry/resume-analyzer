@@ -1,0 +1,9 @@
+@media print {
+  nav, .no-print, button {
+    display: none !important;
+  }
+  
+  .container {
+    max-width: 100% !important;
+  }
+}

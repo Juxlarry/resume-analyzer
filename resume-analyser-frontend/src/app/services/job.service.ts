@@ -47,10 +47,25 @@ export class JobService {
     return this.http.post<JobDescription>(`${this.apiUrl}/job_descriptions`, jobData);
   }
 
-  analyzeResume(jobId: number): Observable<any> {
+  //Old analyze function. 
+  // analyzeResume(jobId: number): Observable<any> {
+  //   return this.http.post(
+  //     `${this.apiUrl}/job_descriptions/${jobId}/analyze`, 
+  //     {}
+  //   );
+  // }
+
+  analyzeResume(jobId: number, resumeFile?: File | null): Observable<any> {
+    const formData = new FormData();
+    
+    // Add resume file if provided
+    if (resumeFile) {
+      formData.append('resume', resumeFile);
+    }
+    
     return this.http.post(
       `${this.apiUrl}/job_descriptions/${jobId}/analyze`, 
-      {}
+      resumeFile ? formData : {}
     );
   }
 
@@ -67,6 +82,23 @@ export class JobService {
   getJobDescription(jobId: number): Observable<JobDescription> {
     return this.http.get<JobDescription>(
         `${this.apiUrl}/job_descriptions/${jobId}`
+    );
+  }
+
+  deleteJobDescription(jobId: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(
+      `${this.apiUrl}/job_descriptions/${jobId}`
+    );
+  }
+
+  deleteJob(jobId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/job_descriptions/${jobId}`);
+  }
+
+  pollAnalysisStatus(jobId: number, intervalMs: number = 5000): Observable<AnalysisStatusResponse> {
+    return interval(intervalMs).pipe(
+      switchMap(() => this.getAnalysisStatus(jobId)),
+      takeWhile(response => response.status === 'pending' || response.status === 'processing', true)
     );
   }
 }
