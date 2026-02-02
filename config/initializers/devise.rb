@@ -319,18 +319,12 @@ Devise.setup do |config|
 
     jwt.dispatch_requests = [
       ['POST', %r{^/api/v1/login$}],
-      ['POST', %r{^/api/v1/users/sign_in$}]
+      ['POST', %r{^/api/v1/signup$}]
     ]
     jwt.revocation_requests = [
-      ['DELETE', %r{^/api/v1/logout$}],
-      ['DELETE', %r{^/api/v1/users/sign_out$}]
+      ['DELETE', %r{^/api/v1/logout$}]
     ]
 
-    jwt.expiration_time = 24.hours.to_i
-
-    #telling jwt to use 'sub' as user_id
-    # jwt.claims = {
-    #   sub: ->(user) { user.id }
-    # }
+    jwt.expiration_time = 1.day.to_i
   end
 end

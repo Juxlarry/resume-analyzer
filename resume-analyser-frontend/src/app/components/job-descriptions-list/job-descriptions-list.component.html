@@ -51,6 +51,7 @@
           <p class="text-sm text-gray-500">
             {{ formatDate(job.created_at) }}
           </p>
+          <p class="text-sm text-gray-500">Analyzed on: {{ formatDate(job.resume_analysis?.updated_at ?? '') }}</p>
         </div>
 
         <!-- Analysis Summary -->
@@ -116,7 +117,7 @@
         <!-- Action Buttons -->
         <div class="p-6 bg-gray-50 border-t border-gray-200 flex gap-2">
           <button
-            (click)="viewAnalysis(job.id)"
+            (click)="viewJobDescription(job.id)"
             class="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-sm font-medium">
             View Details
           </button>

@@ -34,6 +34,7 @@
             <p class="text-sm text-gray-500">
               Created on {{ formatDate(jobDescription.created_at) }}
             </p>
+            <p class="text-sm text-gray-500">Analyzed on: {{ formatDate(jobDescription.resume_analysis?.updated_at ?? jobDescription.created_at) }}</p>
           </div>
           
           <!-- Action Buttons -->
@@ -94,27 +95,27 @@
 
         <!-- Match Score -->
         <div class="text-center p-8 rounded-lg"
-             [ngClass]="getScoreBgClass(jobDescription.resume_analysis.match_score)">
+             [ngClass]="getScoreBgClass(jobDescription.resume_analysis?.match_score ?? 0)">
           <p class="text-sm text-gray-600 mb-2">Match Score</p>
           <p class="text-6xl font-bold mb-3"
-             [ngClass]="getScoreClass(jobDescription.resume_analysis.match_score)">
-            {{ jobDescription.resume_analysis.match_score }}%
+             [ngClass]="getScoreClass(jobDescription.resume_analysis?.match_score ?? 0)">
+            {{ jobDescription.resume_analysis?.match_score }}%
           </p>
           <p class="text-xl font-semibold"
              [ngClass]="{
-               'text-green-700': jobDescription.resume_analysis.verdict === 'STRONG_MATCH',
-               'text-blue-700': jobDescription.resume_analysis.verdict === 'GOOD_MATCH',
-               'text-yellow-700': jobDescription.resume_analysis.verdict === 'PARTIAL_MATCH',
-               'text-red-700': jobDescription.resume_analysis.verdict === 'WEAK_MATCH'
+               'text-green-700': jobDescription.resume_analysis?.verdict === 'STRONG_MATCH',
+               'text-blue-700': jobDescription.resume_analysis?.verdict === 'GOOD_MATCH',
+               'text-yellow-700': jobDescription.resume_analysis?.verdict === 'PARTIAL_MATCH',
+               'text-red-700': jobDescription.resume_analysis?.verdict === 'WEAK_MATCH'
              }">
-            {{ formatVerdict(jobDescription.resume_analysis.verdict) }}
+            {{ formatVerdict(jobDescription.resume_analysis?.verdict ?? '') }}
           </p>
         </div>
 
         <!-- Summary -->
         <div class="border-l-4 border-blue-500 pl-4">
           <h3 class="font-semibold text-lg text-gray-800 mb-2">Summary</h3>
-          <p class="text-gray-700">{{ jobDescription.resume_analysis.summary }}</p>
+          <p class="text-gray-700">{{ jobDescription.resume_analysis?.summary }}</p>
         </div>
 
         <!-- Strengths and Weaknesses Grid -->
@@ -127,7 +128,7 @@
               </svg>
               Strengths
             </h3>
-            <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis.strengths"></div>
+            <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis?.strengths"></div>
           </div>
 
           <!-- Weaknesses -->
@@ -138,25 +139,25 @@
               </svg>
               Areas for Improvement
             </h3>
-            <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis.weaknesses"></div>
+            <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis?.weaknesses"></div>
           </div>
         </div>
 
         <!-- Recommendations -->
         <div class="border-l-4 border-purple-500 pl-4">
           <h3 class="font-semibold text-lg text-gray-800 mb-3">Recommendations</h3>
-          <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis.recommendations"></div>
+          <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis?.recommendations"></div>
         </div>
 
         <!-- Missing Keywords -->
-        <div *ngIf="jobDescription.resume_analysis.missing_keywords?.length > 0" 
-             class="border-l-4 border-orange-500 pl-4">
+        <div *ngIf="(jobDescription.resume_analysis?.missing_keywords?.length ?? 0) > 0"  
+        class="border-l-4 border-orange-500 pl-4">
           <h3 class="font-semibold text-lg text-gray-800 mb-3">
             Missing Keywords (Add to Resume)
           </h3>
           <div class="flex flex-wrap gap-2">
-            <span *ngFor="let keyword of jobDescription.resume_analysis.missing_keywords"
-                  class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
+            <span *ngFor="let keyword of jobDescription.resume_analysis?.missing_keywords"
+            class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
               {{ keyword }}
             </span>
           </div>
@@ -164,8 +165,8 @@
 
         <!-- Analysis Metadata -->
         <div class="border-t pt-4 text-sm text-gray-500">
-          <p>AI Model: {{ jobDescription.resume_analysis.ai_model_used }}</p>
-          <p>Analyzed on: {{ formatDate(jobDescription.resume_analysis.updated_at) }}</p>
+          <p>AI Model: {{ jobDescription.resume_analysis?.ai_model_used }}</p>
+          <p>Analyzed on: {{ formatDate(jobDescription.resume_analysis?.updated_at ?? jobDescription.created_at) }}</p>
         </div>
       </div>
 

@@ -45,6 +45,11 @@ export class RerunAnalysisModal {
     this.errorMessage = null;
   }
 
+  onClose(): void {
+    this.resetModal();
+    this.close.emit();
+  }
+
   onConfirm(): void {
     // Emit the selected file (or null if user wants to use existing resume)
     this.confirm.emit(this.selectedFile);

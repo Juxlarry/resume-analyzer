@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'; 
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; 
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router'; 
 import { JobService, JobDescription } from '../../services/job.service'; 
@@ -22,7 +22,9 @@ export class JobDescriptionListComponent implements OnInit {
     selectedJobForRerun: JobDescription | null = null;
 
     constructor(
-        private jobService: JobService, private router: Router
+        private jobService: JobService, 
+        private router: Router, 
+        private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit(): void {
@@ -37,14 +39,16 @@ export class JobDescriptionListComponent implements OnInit {
             next: (data) =>{
                 this.jobDescriptions = data;
                 this.isLoading = false; 
+                this.cdr.detectChanges();
             }, 
             error: (error) => {
                 console.error('Error loading job descriptions:', error);
                 this.errorMessage = 'Failed to load job descriptions.';
                 this.isLoading = false;
+                this.cdr.detectChanges();
             }
         });
-    }
+    } 
 
     viewJobDescription(jobId: number): void {
         this.router.navigate(['/job-descriptions', jobId]);

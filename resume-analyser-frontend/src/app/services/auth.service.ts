@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable, BehaviorSubject } from "rxjs";
-import { tap } from "rxjs/operators";
+import { Observable, BehaviorSubject, of } from "rxjs";
+import { catchError, map, tap } from "rxjs/operators";
 import { Router } from "@angular/router";
 
 export interface User {
@@ -46,9 +46,11 @@ export class AuthService {
         private http: HttpClient,
         private router: Router
     ){
-        if (this.hasToken()) {
-            this.loadCurrentUser();
-        }
+        // if (this.hasToken()) {
+            // this.validateToken().subscribe();
+            // this.loadCurrentUser();
+
+        // }
     }
 
     login(email: string, password: string): Observable<AuthResponse> {
@@ -68,7 +70,8 @@ export class AuthService {
             `${this.apiUrl}/signup`, {
                 user: {
                     email, 
-                    password, password_confirmation: passwordConfirmation  
+                    password, 
+                    password_confirmation: passwordConfirmation  
                 }
             }
         ).pipe(
@@ -80,20 +83,28 @@ export class AuthService {
         );
     }
 
+
     logout(): void {
         this.http.delete(`${this.apiUrl}/logout`).subscribe({
             next: () => {
-                this.clearToken();
-                this.isAuthenticatedSubject.next(false);
-                this.router.navigate(['/welcome']);
+                this.performLogout();
             },
             error: (error) => {
-                console.error('Logout failed: ', error);
-                this.clearToken();
-                this.isAuthenticatedSubject.next(false);
-                this.router.navigate(['/welcome']);
+                console.error('Logout API failed: ', error);
+                this.performLogout('/');
             }
         });
+    }
+
+    silentLogout(): void {
+        this.performLogout('/login');
+    }
+
+    private performLogout(redirectTo: string = '/'): void {
+        this.clearToken();
+        this.isAuthenticatedSubject.next(false);
+        this.currentUserSubject.next(null);
+        this.router.navigate([redirectTo]);
     }
 
     getToken(): string | null {
@@ -112,17 +123,73 @@ export class AuthService {
         );
     }
 
+
+    isTokenExpiringSoon(): boolean {
+        const token = this.getToken();
+        if (!token) return true;
+        
+        try {
+            // Decode JWT token (basic parsing - for production use a library like jwt-decode)
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const expirationTime = payload.exp * 1000; // Convert to milliseconds
+            const currentTime = Date.now();
+            const timeUntilExpiration = expirationTime - currentTime;
+            
+            // Return true if expiring within 5 minutes
+            return timeUntilExpiration < 5 * 60 * 1000;
+        } catch (error) {
+            console.error('Error parsing token:', error);
+            return true;
+        }
+    }
+
+    // Add this method to validate token on app load
+    validateToken(): Observable<boolean> {
+        const token = this.getToken();
+
+        if (!token) {
+            this.isAuthenticatedSubject.next(false);
+            this.currentUserSubject.next(null);
+            return of(false);
+        }
+
+        // Try to load profile to validate token
+        return this.getProfile().pipe(
+            map((user) => {
+                    this.isAuthenticatedSubject.next(true);
+                    this.currentUserSubject.next(user);
+                    return true;
+                }),
+                catchError((error) => {
+                    console.error('Token validation failed:', error);
+
+                    if(error.status === 401) {
+                        this.clearToken();
+                        this.isAuthenticatedSubject.next(false);
+                        this.currentUserSubject.next(null);
+                    }
+
+                    return of(false);
+                }
+            )
+        );
+    }
+
+
     private loadCurrentUser(): void {
         this.getProfile().subscribe({
             next: (user) => {
                 this.currentUserSubject.next(user);
+                this.isAuthenticatedSubject.next(true);
             },
             error: (error) => {
                 console.error('Failed to load user profile:', error);
                 // If profile load fails, user might not be authenticated
-                this.clearToken();
-                this.isAuthenticatedSubject.next(false);
-                this.currentUserSubject.next(null);
+                if (error.status === 401) {
+                    this.clearToken();
+                    this.isAuthenticatedSubject.next(false);
+                    this.currentUserSubject.next(null);
+                }
             }
         });
     }

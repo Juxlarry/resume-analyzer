@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Form, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService, User } from '../../services/auth.service';
 import { RouterLink } from '@angular/router';
 
-@Component({
+@Component({ 
   selector: 'app-user-profile',
   imports: [CommonModule, ReactiveFormsModule,RouterLink],
-  templateUrl: './user-profile.html',
-  styleUrl: './user-profile.css',
+  templateUrl: './user-profile.component.html',
+  styleUrl: './user-profile.component.css',
 })
 export class UserProfile {
   profile: User | null = null;
@@ -22,7 +22,8 @@ export class UserProfile {
 
   constructor(
     private fb: FormBuilder, 
-    private authService: AuthService
+    private authService: AuthService, 
+    private cdr: ChangeDetectorRef
   ){
     this.profileForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
@@ -47,11 +48,13 @@ export class UserProfile {
           email: data.email
         });
         this.isLoading = false;
+        this.cdr.detectChanges();
       }, 
       error: (error) => {
         console.error('Error loading profile:', error); 
         this.errorMessage = 'Failed to load profile. Please try again.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -72,11 +75,13 @@ export class UserProfile {
         if (this.profile) {
           this.profile.email = this.profileForm.value.email;
         }
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error updating email:', error);
         this.errorMessage = error.error?.errors?.join(', ') || 'Failed to update email';
         this.isSaving = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -97,11 +102,13 @@ export class UserProfile {
         this.isSaving = false;
         this.passwordForm.reset();
         this.showPasswordForm = false; 
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error updating password:', error);
         this.errorMessage = error.error?.errors?.join(', ') || 'Failed to update password';
         this.isSaving = false;
+        this.cdr.detectChanges();
       }
     });
   }

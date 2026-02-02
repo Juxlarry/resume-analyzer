@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { JobService, JobDescription, AnalysisStatusResponse } from '../../services/job.service';
@@ -26,7 +26,8 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private jobService: JobService
+    private jobService: JobService, 
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -48,6 +49,7 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.jobDescription = data;
         this.isLoading = false;
+        this.cdr.detectChanges();
 
         // Start polling if processing
         if (data.resume_analysis?.status === 'processing' || 
@@ -59,6 +61,7 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
         console.error('Error loading job description:', error);
         this.errorMessage = 'Failed to load analysis details. Please try again.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -82,20 +85,23 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (response: AnalysisStatusResponse) => {
-          if (response.status === 'completed' && this.jobDescription) {
-            this.jobDescription.resume_analysis = response.analysis!;
+          if (response.status === 'completed' && this.jobDescription && response.analysis) {
+            this.jobDescription.resume_analysis = response.analysis;
             this.isPolling = false;
             this.pollingSubscription?.unsubscribe();
+            this.cdr.detectChanges();
           } else if (response.status === 'failed') {
             this.errorMessage = response.error || "Analysis failed";
             this.isPolling = false;
             this.pollingSubscription?.unsubscribe();
+            this.cdr.detectChanges();
           }
         },
         error: (error) => {
           console.error('Polling error:', error);
           this.isPolling = false;
           this.pollingSubscription?.unsubscribe();
+          this.cdr.detectChanges();
         }
       });
   }

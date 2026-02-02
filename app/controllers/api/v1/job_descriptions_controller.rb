@@ -57,7 +57,7 @@ class Api::V1::JobDescriptionsController < ApplicationController
 
     # Check if analysis already exists
     analysis = @job_description.resume_analysis
-    
+     
     if analysis.nil?
       analysis = @job_description.create_resume_analysis!(status: :pending)
     end
