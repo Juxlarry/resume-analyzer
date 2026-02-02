@@ -8,7 +8,7 @@ export interface User {
     role: string; 
     created_at: string; 
     total_analyses: number; 
-    completed_analyses: number;
+    completed_analyses: number; 
 }
 
 export interface UpdateProfileData {

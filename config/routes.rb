@@ -3,13 +3,15 @@ Rails.application.routes.draw do
     defaults: { format: :json}, 
     controllers: {
       sessions: 'api/v1/sessions', 
-      registrations: 'api/v1/registrations'
+      registrations: 'api/v1/registrations', 
+      passwords: 'api/v1/passwords'
     }, 
     path: '',  # Removes /users prefix
     path_names: {
       sign_in: 'api/v1/login',
       sign_out: 'api/v1/logout',
-      registration: 'api/v1/signup'
+      registration: 'api/v1/signup', 
+      password: 'api/v1/passwords'
     }
 
   get "/up", to: proc { [200, {}, ["OK"]] }

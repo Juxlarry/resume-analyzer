@@ -3,12 +3,19 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router'; 
 import { JobService, JobDescription } from '../../services/job.service'; 
 import { RerunAnalysisModal } from '../rerun-analysis-modal/rerun-analysis-modal.component';
+import { Alert, AlertService } from '../../services/alert.service';
+import { ConfirmationModal } from '../confirmation-modal/confirmation-modal.component';
 
 
 @Component({
     selector: 'app-job-descriptions-list', 
     standalone: true, 
-    imports: [CommonModule, RouterLink, RerunAnalysisModal], 
+    imports: [
+        CommonModule, 
+        RouterLink, 
+        RerunAnalysisModal,
+        ConfirmationModal
+    ], 
     templateUrl: './job-descriptions-list.component.html', 
     styleUrls: ['./job-descriptions-list.component.css']
 })
@@ -21,10 +28,14 @@ export class JobDescriptionListComponent implements OnInit {
     isRerunModalOpen = false;
     selectedJobForRerun: JobDescription | null = null;
 
+    isDeleteConfirmOpen = false;
+    jobToDelete: JobDescription | null = null;
+
     constructor(
         private jobService: JobService, 
         private router: Router, 
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef, 
+        private alertService: AlertService
     ) {}
 
     ngOnInit(): void {
@@ -43,7 +54,8 @@ export class JobDescriptionListComponent implements OnInit {
             }, 
             error: (error) => {
                 console.error('Error loading job descriptions:', error);
-                this.errorMessage = 'Failed to load job descriptions.';
+
+                this.alertService.error("Failed to load job descriptions.");
                 this.isLoading = false;
                 this.cdr.detectChanges();
             }
@@ -74,13 +86,14 @@ export class JobDescriptionListComponent implements OnInit {
             const message = newResumeFile 
             ? 'Analysis restarted with new resume! Redirecting to details...'
             : 'Analysis restarted with existing resume! Redirecting to details...';
-            alert(message);
+            this.alertService.success(message);
             this.closeRerunModal();
             this.router.navigate(['/job-descriptions', jobId]);
         },
         error: (error) => {
             console.error('Error re-running analysis:', error);
-            alert('Failed to restart analysis. Please try again.');
+
+            this.alertService.error("Failed to restart analysis. Please try again.");
             this.closeRerunModal();
         }
         });
@@ -94,12 +107,14 @@ export class JobDescriptionListComponent implements OnInit {
 
         this.jobService.analyzeResume(job.id).subscribe({
             next: (response) => {
-                alert(`Analysis re-started  for "${job.title}". Redirecting to details page.`);
+                this.alertService.info(`Analysis re-started  for "${job.title}". Redirecting to details page.`);
+
                 this.router.navigate(['/job-descriptions', job.id]);
             },
             error: (error) => {
                 console.error('Error re-running analysis:', error);
-                alert('Failed to re-run analysis.');
+                
+                this.alertService.error("Failed to re-run analysis.");
             }
         }); 
     }
@@ -114,11 +129,12 @@ export class JobDescriptionListComponent implements OnInit {
             next: () => {
                 this.jobDescriptions = this.jobDescriptions.filter(j => j.id !== job.id); 
 
-                alert(`Analysis for "${job.title}" has been deleted.`);
+                this.alertService.success(`Analysis deleted for "${job.title}" has been deleted.`);
             }, 
             error: (error) => {
                 console.error('Error deleting job description:', error);
-                alert('Failed to delete analysis. Please try again.');
+
+                this.alertService.error("Failed to delete analysis. Please try again.");
             }
         });
     }
@@ -146,6 +162,33 @@ export class JobDescriptionListComponent implements OnInit {
         year: 'numeric', 
         month: 'short', 
         day: 'numeric' 
+        });
+    }
+
+    openDeleteConfirmation(job: JobDescription): void {
+        this.jobToDelete = job;
+        this.isDeleteConfirmOpen = true;
+    }
+
+    closeDeleteConfirmation(): void {
+        this.isDeleteConfirmOpen = false;
+        this.jobToDelete = null;
+    }
+
+    confirmDelete(): void {
+        if (!this.jobToDelete) return;
+
+        this.jobService.deleteJobDescription(this.jobToDelete.id).subscribe({
+        next: () => {
+            this.jobDescriptions = this.jobDescriptions.filter(j => j.id !== this.jobToDelete!.id);
+            this.alertService.success('Analysis deleted successfully');
+            this.closeDeleteConfirmation();
+        },
+        error: (error) => {
+            console.error('Error deleting job description:', error);
+            this.alertService.error('Failed to delete analysis. Please try again.');
+            this.closeDeleteConfirmation();
+        }
         });
     }
 }

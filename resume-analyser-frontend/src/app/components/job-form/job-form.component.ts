@@ -4,6 +4,7 @@ import { CommonModule } from "@angular/common";
 import { JobService } from "../../services/job.service";
 import { interval, Subscription } from "rxjs";
 import { max, switchMap, takeWhile } from "rxjs/operators";
+import { Alert, AlertService } from "../../services/alert.service";
 
 
 @Component({
@@ -33,7 +34,8 @@ export class JobFormComponent {
     constructor(
         private fb: FormBuilder,
         private jobService: JobService, 
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef, 
+        private alertService: AlertService
     ) {
         this.jobForm = this.fb.group({
             title: ["", Validators.required],
@@ -51,19 +53,20 @@ export class JobFormComponent {
 
         //validate file size (max 10MB)
         if(file.size > 10 * 1024 * 1024 || !allowedTypes.includes(file.type)){
-            alert("Invalid file. Please ensure it is a PDF/DOCX under 10MB.");
+            this.alertService.error("Invalid file. Please ensure it is a PDF/DOCX under 10MB.")
             this.selectedFile = null;
-            this.fileInput.nativeElement.value = '';
+            this.fileInput.nativeElement.value = ''; 
             return;
         }
 
         this.selectedFile = file;
         this.errorMessage = null;
+        this.alertService.success("File selected successfully!");
     }
 
     onSubmit(): void {
         if (this.jobForm.invalid || !this.selectedFile) {
-            alert("Please fill in all required fields and upload a resume.");
+            this.alertService.error("Please fill in all required fields and upload a resume.");
             return;
         }
 
@@ -82,12 +85,13 @@ export class JobFormComponent {
                    console.log("Job description created:", response);
                 this.loadingMessage = 'Starting analysis...';
                 
-                // Step 2: Trigger analysis
                 this.triggerAnalysis(response.id);
             },
             error: (err) => {
                 console.error("Submission failed:", err);
-                this.errorMessage = err.error?.errors?.join(", ") || "Failed to submit. Please try again.";
+                const errorMsg = err.error?.errors?.join(", ") || "Failed to submit. Please try again.";
+
+                this.alertService.error(errorMsg);
                 this.isLoading = false;
             }
         });
@@ -101,12 +105,12 @@ export class JobFormComponent {
                 this.isAnalyzing = true;
                 this.isLoading = true;
 
-                // Step 3: Poll for analysis result
                 this.pollAnalysisStatus(jobId);
             }, 
             error: (err) => {
                 console.error("Analysis trigger failed:", err);
-                this.errorMessage = "Failed to start analysis. Please try again.";
+
+                this.alertService.error("Failed to start analysis. Please try again.");
                 this.isLoading = false;
             }
         });
@@ -123,7 +127,7 @@ export class JobFormComponent {
                     pollCount++;
 
                     if (pollCount >= maxPolls) {
-                        this.errorMessage = "Analysis is taking longer than expected. Please try again later.";
+                        this.alertService.error("Analysis is taking longer than expected. Please try again later.");
                         return false;
                     }
 
@@ -142,8 +146,9 @@ export class JobFormComponent {
                         this.scrollToResults();
                         this.pollingSubscription?.unsubscribe();
                     } else if (response.status === 'failed') {
-                        this.errorMessage = response.error || "Analysis failed. Please try again.";
-                        this.isAnalyzing = false;
+                        const errorMsg = response.error ||"Analysis failed. Please try again.";
+                        this.alertService.error(errorMsg);
+                       this.isAnalyzing = false;
                         this.isLoading = false;
                         this.pollingSubscription?.unsubscribe();
                     }else if (response.status === 'processing') {
@@ -153,7 +158,8 @@ export class JobFormComponent {
                 }, 
                 error: (err) => {
                     console.error("Error while polling analysis status:", err);
-                    this.errorMessage = "Failed to fetch analysis status. Please refresh the page.";
+                
+                    this.alertService.error("Failed to fetch analysis status. Please refresh the page.");
                     this.isAnalyzing = false;
                     this.pollingSubscription?.unsubscribe();
                 }

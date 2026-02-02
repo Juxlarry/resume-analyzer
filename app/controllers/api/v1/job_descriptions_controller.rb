@@ -70,14 +70,6 @@ class Api::V1::JobDescriptionsController < ApplicationController
       }, status: :ok
     end
 
-    # Check status
-    # if analysis.completed?
-    #   return render json: { 
-    #     message: "Analysis already completed",
-    #     analysis: analysis
-    #   }, status: :ok
-    # end
-
     if analysis.processing?
       return render json: { 
         message: "Analysis already in progress",

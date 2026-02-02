@@ -5,11 +5,18 @@ import { JobService, JobDescription, AnalysisStatusResponse } from '../../servic
 import { RerunAnalysisModal } from '../rerun-analysis-modal/rerun-analysis-modal.component';
 import { Subscription, interval } from 'rxjs';
 import { switchMap, takeWhile } from 'rxjs/operators';
+import { ConfirmationModal } from '../confirmation-modal/confirmation-modal.component';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-job-description-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, RerunAnalysisModal],
+  imports: [
+    CommonModule, 
+    RouterLink, 
+    RerunAnalysisModal, 
+    ConfirmationModal
+  ],
   templateUrl: './job-description-detail.component.html',
   styleUrls: ['./job-description-detail.component.css']
 })
@@ -22,12 +29,14 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
 
   // Modal state
   isRerunModalOpen = false;
+  isDeleteConfirmOpen = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private jobService: JobService, 
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef, 
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -165,6 +174,34 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('Error deleting job description:', error);
         alert('Failed to delete analysis. Please try again.');
+      }
+    });
+  }
+
+  //Open delete confirmation
+  openDeleteConfirmation(): void {
+    this.isDeleteConfirmOpen = true;
+  }
+
+  //Close delete confirmation
+  closeDeleteConfirmation(): void {
+    this.isDeleteConfirmOpen = false;
+  }
+
+  //Confirm and delete
+  confirmDelete(): void {
+    if (!this.jobDescription) return;
+
+    this.jobService.deleteJobDescription(this.jobDescription.id).subscribe({
+      next: () => {
+        this.alertService.success('Analysis deleted successfully');
+        this.closeDeleteConfirmation();
+        this.router.navigate(['/job-descriptions']);
+      },
+      error: (error) => {
+        console.error('Error deleting job description:', error);
+        this.alertService.error('Failed to delete analysis. Please try again.');
+        this.closeDeleteConfirmation();
       }
     });
   }

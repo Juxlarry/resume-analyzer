@@ -6,13 +6,13 @@ class JobDescription < ApplicationRecord
 
     validates :title, presence: true
     validates :description, presence: true, length: { minimum: 50 }
-    # validates :validate_resume_format
+    validates :validate_resume_format
 
     # Delegate for easier access
     delegate :completed?, :processing?, :failed?, :pending?, to: :resume_analysis, prefix: true, allow_nil: true
 
     def extract_resume_text
-        return nil unless resume.attached?
+        return nil unless resume.attached? 
 
         ResumeParserService.extract_text(resume)
     end 
@@ -39,5 +39,27 @@ class JobDescription < ApplicationRecord
         if resume.byte_size > 10.megabytes
             errors.add(:resume, "is too large. Maximum size is 10MB.")
         end
+
+        #Validate actual file content (not just extension)
+        validate_file_signature
+    end
+
+    def validate_file_signature
+        return unless resume.attached?
+
+        resume.open do |file| 
+            signature = file.read(4)
+
+            is_pdf = signature&.start_with("%PDF")
+            is_docx = signature.&start_with("%PK")
+            is_doc = signture.&bytes&.first(4) = [0xD0, 0xCF, 0x11, 0xE0]
+
+            unless is_pdf || is_docx || is_doc
+                errors.add(:resume, "file appears to be corrupted or has an invalid format")
+            end 
+        end 
+    rescue => e
+        Rails.logger.error "File signature validation error: #{e.message}"
+        errors.add(:resume, "could not validate file format")
     end
 end 
