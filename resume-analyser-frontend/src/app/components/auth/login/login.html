@@ -58,9 +58,14 @@
                     type="submit"
                     [disabled]="loginForm.invalid || isLoading"
                     class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition">
-                    <span *ngIf="!isLoading">Sign In</span>
-                    <span *ngIf="isLoading">Signing In...</span>
+                    <span *ngIf="!isLoading">Log In</span>
+                    <span *ngIf="isLoading">Logging In...</span>
                 </button>
+                <div class="text-center mt-4">
+                    <a routerLink="/forgot-password" class="text-sm text-blue-600 hover:text-blue-700">
+                        Forgot your password?
+                    </a>
+                </div>
             </form>
 
             <!-- Divider -->

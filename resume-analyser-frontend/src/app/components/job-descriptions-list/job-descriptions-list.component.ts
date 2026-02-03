@@ -4,7 +4,7 @@ import { RouterLink, Router } from '@angular/router';
 import { JobService, JobDescription } from '../../services/job.service'; 
 import { RerunAnalysisModal } from '../rerun-analysis-modal/rerun-analysis-modal.component';
 import { Alert, AlertService } from '../../services/alert.service';
-import { ConfirmationModal } from '../confirmation-modal/confirmation-modal.component';
+import { ConfirmationModalComponent } from '../confirmation-modal/confirmation-modal.component';
 
 
 @Component({
@@ -14,7 +14,7 @@ import { ConfirmationModal } from '../confirmation-modal/confirmation-modal.comp
         CommonModule, 
         RouterLink, 
         RerunAnalysisModal,
-        ConfirmationModal
+        ConfirmationModalComponent
     ], 
     templateUrl: './job-descriptions-list.component.html', 
     styleUrls: ['./job-descriptions-list.component.css']

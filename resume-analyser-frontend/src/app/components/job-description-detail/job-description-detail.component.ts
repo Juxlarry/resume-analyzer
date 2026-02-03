@@ -5,7 +5,7 @@ import { JobService, JobDescription, AnalysisStatusResponse } from '../../servic
 import { RerunAnalysisModal } from '../rerun-analysis-modal/rerun-analysis-modal.component';
 import { Subscription, interval } from 'rxjs';
 import { switchMap, takeWhile } from 'rxjs/operators';
-import { ConfirmationModal } from '../confirmation-modal/confirmation-modal.component';
+import { ConfirmationModalComponent } from '../confirmation-modal/confirmation-modal.component';
 import { AlertService } from '../../services/alert.service';
 
 @Component({
@@ -15,7 +15,7 @@ import { AlertService } from '../../services/alert.service';
     CommonModule, 
     RouterLink, 
     RerunAnalysisModal, 
-    ConfirmationModal
+    ConfirmationModalComponent
   ],
   templateUrl: './job-description-detail.component.html',
   styleUrls: ['./job-description-detail.component.css']

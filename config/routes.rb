@@ -11,7 +11,7 @@ Rails.application.routes.draw do
       sign_in: 'api/v1/login',
       sign_out: 'api/v1/logout',
       registration: 'api/v1/signup', 
-      password: 'api/v1/passwords'
+      password: 'api/v1/password'
     }
 
   get "/up", to: proc { [200, {}, ["OK"]] }

@@ -2,13 +2,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-confirmation-modal.component',
+  selector: 'app-confirmation-modal',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './confirmation-modal.component.html',
   styleUrl: './confirmation-modal.component.css',
 })
-export class ConfirmationModal {
+export class ConfirmationModalComponent {
   @Input() isOpen = false; 
   @Input() title = 'Confirm Action';
   @Input() message = 'Are you sure you want to proceed?';

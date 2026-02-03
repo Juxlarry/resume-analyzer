@@ -21,6 +21,14 @@ export const routes: Routes = [
         loadComponent: () => import('./components/auth/signup/signup').then(m => m.Signup)
     },
     {
+        path: 'forgot-password',
+        loadComponent: () => import('./components/auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+    },
+    {
+        path: 'reset-password',
+        loadComponent: () => import('./components/auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+    },
+    {
         path: 'analyze',
         loadComponent: () => import('./components/job-form/job-form.component').then(m => m.JobFormComponent),
         canActivate: [authGuard]

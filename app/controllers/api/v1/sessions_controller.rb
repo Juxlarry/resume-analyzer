@@ -1,7 +1,7 @@
 class Api::V1::SessionsController < Devise::SessionsController
     respond_to :json
 
-    private
+    private 
 
     def respond_with(resource, _opts = {})
         # The token is automatically added to response headers by devise-jwt

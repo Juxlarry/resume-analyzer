@@ -45,13 +45,7 @@ export class AuthService {
     constructor(
         private http: HttpClient,
         private router: Router
-    ){
-        // if (this.hasToken()) {
-            // this.validateToken().subscribe();
-            // this.loadCurrentUser();
-
-        // }
-    }
+    ){}
 
     login(email: string, password: string): Observable<AuthResponse> {
         return this.http.post<AuthResponse>(`${this.apiUrl}/login`, {
@@ -100,6 +94,23 @@ export class AuthService {
         this.performLogout('/login');
     }
 
+    forgotPassword(email: string): Observable<any> {
+        console.log(`User Email to submit forgot password details: ${email}`)
+        return this.http.post(`${this.apiUrl}/password`, {
+            user: { email }
+        });
+    }
+
+    resetPassword(resetPasswordToken: string, password: string, passwordConfirmation: string): Observable<any> {
+        return this.http.put(`${this.apiUrl}/password`, {
+            user: {
+                reset_password_token: resetPasswordToken, 
+                password, 
+                password_conformation: passwordConfirmation
+            }
+        });
+    }
+
     private performLogout(redirectTo: string = '/'): void {
         this.clearToken();
         this.isAuthenticatedSubject.next(false);
@@ -122,7 +133,6 @@ export class AuthService {
             })
         );
     }
-
 
     isTokenExpiringSoon(): boolean {
         const token = this.getToken();
@@ -174,7 +184,6 @@ export class AuthService {
             )
         );
     }
-
 
     private loadCurrentUser(): void {
         this.getProfile().subscribe({

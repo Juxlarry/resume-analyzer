@@ -6,7 +6,8 @@ class JobDescription < ApplicationRecord
 
     validates :title, presence: true
     validates :description, presence: true, length: { minimum: 50 }
-    validates :validate_resume_format
+
+    validate :validate_resume_format, if: :resume_attached?
 
     # Delegate for easier access
     delegate :completed?, :processing?, :failed?, :pending?, to: :resume_analysis, prefix: true, allow_nil: true
@@ -20,6 +21,10 @@ class JobDescription < ApplicationRecord
     def analysis_ready? 
         resume_analysis&.completed? && resume_analysis.match_score.present?
     end 
+
+    def resume_attached?
+        resume.attached?
+    end
 
     private 
 
@@ -50,9 +55,9 @@ class JobDescription < ApplicationRecord
         resume.open do |file| 
             signature = file.read(4)
 
-            is_pdf = signature&.start_with("%PDF")
-            is_docx = signature.&start_with("%PK")
-            is_doc = signture.&bytes&.first(4) = [0xD0, 0xCF, 0x11, 0xE0]
+            is_pdf = signature&.start_with?("%PDF")
+            is_docx = signature&.start_with?("PK")
+            is_doc = signature&.bytes&.first(4) == [0xD0, 0xCF, 0x11, 0xE0]
 
             unless is_pdf || is_docx || is_doc
                 errors.add(:resume, "file appears to be corrupted or has an invalid format")

@@ -100,12 +100,12 @@
                     </label>
                     <input 
                         type="password"
-                        formControlName="passwordConfirmation"
+                        formControlName="confirmPassword" 
                         class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         placeholder="••••••••"
-                        [class.border-red-500]="signupForm.hasError('passwordMismatch') && signupForm.get('passwordConfirmation')?.touched"
+                        [class.border-red-500]="signupForm.hasError('passwordMismatch') && signupForm.get('confirmPassword')?.touched"
                     />
-                    <p *ngIf="signupForm.hasError('passwordMismatch') && signupForm.get('passwordConfirmation')?.touched" 
+                    <p *ngIf="signupForm.hasError('passwordMismatch') && signupForm.get('confirmPassword')?.touched" 
                        class="text-red-500 text-sm mt-1">
                         Passwords do not match
                     </p>

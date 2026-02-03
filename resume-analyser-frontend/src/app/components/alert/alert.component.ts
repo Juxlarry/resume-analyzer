@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Alert, AlertService } from '../../services/alert.service';
 
 @Component({
-  selector: 'app-alert.component',
+  selector: 'app-alert',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './alert.component.html',
