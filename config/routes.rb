@@ -14,6 +14,10 @@ Rails.application.routes.draw do
       password: 'api/v1/password'
     }
 
+  devise_scope :user do
+    post '/api/v1/login/verify_otp', to: 'api/v1/sessions#verify_otp'
+  end
+
   get "/up", to: proc { [200, {}, ["OK"]] }
 
   namespace :api do 
@@ -29,6 +33,16 @@ Rails.application.routes.draw do
       #User Profiles 
       get '/profile', to: 'users#show'
       put '/profile', to: 'users#update'
+
+      # Two-Factor Authentication
+      get '/two_factor/setup', to: 'two_factor#setup'
+      post '/two_factor/enable', to: 'two_factor#enable'
+      delete '/two_factor/disable', to: 'two_factor#disable'
+      get '/two_factor/status', to: 'two_factor#status'
+      post '/two_factor/regenerate_backup_codes', to: 'two_factor#regenerate_backup_codes'
+
+      # OTP verification for login
+      # post '/login/verify_otp', to: 'sessions#verify_otp'
 
 
       # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

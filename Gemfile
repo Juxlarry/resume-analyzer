@@ -9,7 +9,6 @@ gem "puma", ">= 5.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 
-
 #Authentication
 gem 'devise'
 gem 'devise-jwt'
@@ -20,7 +19,6 @@ gem 'sidekiq-cron' #for scheduled tasks
 
 #rate limiting 
 gem 'rack-attack'
-
 
 #ENV gem 
 gem 'dotenv', groups: [:development, :test]
@@ -63,6 +61,10 @@ gem 'docx'
 
 #API Documentation - Swagger/OpenAPI Docs
 gem 'rswag'
+
+# Two-Factor Authentication
+gem 'rotp'  # Generate and verify TOTP codes
+gem 'rqrcode'  # Generate QR codes
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"

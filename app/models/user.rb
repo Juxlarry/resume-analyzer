@@ -4,8 +4,8 @@ class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable,
-         :jwt_authenticatable, jwt_revocation_strategy: JwtBlacklist
+  :recoverable, :rememberable, :validatable,
+  :jwt_authenticatable, jwt_revocation_strategy: JwtBlacklist
 
   has_many :job_descriptions, dependent: :destroy 
   has_many :resume_analyses, through: :job_descriptions
@@ -19,6 +19,85 @@ class User < ApplicationRecord
   # after_initialize :set_default_role, if: :new_record?
 
   validate :password_complexity
+
+  # Serialize backup codes
+  serialize :otp_backup_codes, coder: JSON
+
+  #Generate a new OTP Secret
+  def generate_otp_secret
+    self.otp_secret = ROTP::Base32.random 
+  end 
+
+  #Get the current OTP code (for testing/verification)
+  def current_otp
+    return nil unless otp_secret.present?
+
+    totp = ROTP::TOTP.new(otp_secret, issuer: 'Resume Analyser')
+    totp.now 
+  end 
+
+  #Verify an OTP code 
+  def verify_otp_code(code)
+    return false unless otp_secret.present?
+
+    totp = ROTP::TOTP.new(otp_secret, issuer: 'Resume Analyser')
+    #Allow 30 second drift (one period before and after)
+
+    on_verify = totp.verify(code, drift_behind: 30, drift_ahead: 30)
+  end 
+
+  #Generate backup codes
+  def generate_otp_backup_codes
+    codes = 10.times.map {SecureRandom.hex(4)}
+
+    encrypted_codes = codes.map do |code| 
+      Devise::Encryptor.digest(self.class, code).to_s
+    end 
+    self.otp_backup_codes = encrypted_codes
+    codes
+  end 
+
+  #Verify backup code 
+  def verify_backup_code(code)
+    return false unless otp_backup_codes.present?
+
+    hashed_input = Devise::Encryptor.digest(self.class, code)
+
+    self.with_lock do
+      otp_backup_codes.each_with_index do |stored_hashed, index|
+        if Devise.secure_compare(stored_hashed, hashed_input)
+          codes = otp_backup_codes.dup 
+          codes.delete_at(index)
+          update!(otp_backup_codes: codes)
+          return true 
+        end 
+      end 
+    end
+
+    false
+  end
+
+  #Get provisioning URI for QR code 
+  def otp_provisioning_uri
+    return nil unless otp_secret.present?
+
+    totp = ROTP::TOTP.new(otp_secret, issuer: 'Resume Analyser')
+    totp.provisioning_uri(email)
+  end 
+
+  #Enable 2FA
+  def enable_two_factor!
+    update(otp_required_for_login: true)
+  end 
+
+  #Disable 2FA
+  def disable_two_factor!
+    update(
+      otp_required_for_login: false,
+      otp_secret: nil, 
+      otp_backup_codes: nil
+    )
+  end 
 
   private 
 
