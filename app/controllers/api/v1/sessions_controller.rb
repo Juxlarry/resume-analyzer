@@ -3,7 +3,7 @@ class Api::V1::SessionsController < Devise::SessionsController
 
     def create 
         user = User.find_by(email: params[:user][:email])
-        token = request.env['warden-jwt_auth.token']
+        # token = request.env['warden-jwt_auth.token']
 
         unless user&.valid_password?(params[:user][:password])
             return render json: { error: 'Invalid email or password' }, status: :unauthorized
@@ -30,7 +30,6 @@ class Api::V1::SessionsController < Devise::SessionsController
         return render json: { error: 'Invalid User ID' }, status: :unauthorized unless user
 
         #Verify with OTP or backup code 
-
         if user.verify_otp_code(code) || user.verify_backup_code(code)
             request.env['warden'].set_user(user, scope: :user, store: false)
             Rails.logger.info request.env['warden-jwt_auth.token']

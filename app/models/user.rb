@@ -16,8 +16,6 @@ class User < ApplicationRecord
     moderator: 2 
   }, default: :user
 
-  # after_initialize :set_default_role, if: :new_record?
-
   validate :password_complexity
 
   # Serialize backup codes

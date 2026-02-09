@@ -6,7 +6,6 @@ class JobDescription < ApplicationRecord
 
     validates :title, presence: true
     validates :description, presence: true, length: { minimum: 50 }
-
     validate :validate_resume_format, if: :resume_attached?
 
     # Delegate for easier access

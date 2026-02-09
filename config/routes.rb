@@ -6,7 +6,7 @@ Rails.application.routes.draw do
       registrations: 'api/v1/registrations', 
       passwords: 'api/v1/passwords'
     }, 
-    path: '',  # Removes /users prefix
+    path: '', 
     path_names: {
       sign_in: 'api/v1/login',
       sign_out: 'api/v1/logout',
