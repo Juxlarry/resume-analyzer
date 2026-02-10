@@ -1,4 +1,4 @@
-# require_dependency 'jwt_blacklist' if Rails.env.development?
+require 'bcrypt'
 
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
@@ -39,7 +39,6 @@ class User < ApplicationRecord
     return false unless otp_secret.present?
 
     totp = ROTP::TOTP.new(otp_secret, issuer: 'Resume Analyser')
-    #Allow 30 second drift (one period before and after)
 
     on_verify = totp.verify(code, drift_behind: 30, drift_ahead: 30)
   end 
@@ -49,8 +48,9 @@ class User < ApplicationRecord
     codes = 10.times.map {SecureRandom.hex(4)}
 
     encrypted_codes = codes.map do |code| 
-      Devise::Encryptor.digest(self.class, code).to_s
+      BCrypt::Password.create(code).to_s
     end 
+
     self.otp_backup_codes = encrypted_codes
     codes
   end 
@@ -58,20 +58,34 @@ class User < ApplicationRecord
   #Verify backup code 
   def verify_backup_code(code)
     return false unless otp_backup_codes.present?
-
-    hashed_input = Devise::Encryptor.digest(self.class, code)
+  
+    Rails.logger.info "Verifying backup code: #{code}"
+    Rails.logger.info "Total backup codes: #{otp_backup_codes.length}"
 
     self.with_lock do
       otp_backup_codes.each_with_index do |stored_hashed, index|
-        if Devise.secure_compare(stored_hashed, hashed_input)
-          codes = otp_backup_codes.dup 
-          codes.delete_at(index)
-          update!(otp_backup_codes: codes)
-          return true 
-        end 
+        Rails.logger.info "Stored_Hash -- #{stored_hashed}"
+        Rails.logger.info "Index -- #{index}"
+        begin 
+          bcrypt_password = BCrypt::Password.new(stored_hashed)
+
+          #BCrypt's == operator handles the comparison correctly
+          if bcrypt_password == code 
+            Rails.logger.info "✅ Backup code verified! Removing code at index #{index}"
+
+            codes = otp_backup_codes.dup 
+            codes.delete_at(index)
+            update!(otp_backup_codes: codes)
+            return true  
+          end 
+        rescue BCrypt::Errors::InvalidHash => e
+          Rails.logger.error "Invalid BCrypt hash at index #{index}: #{e.message}"
+          next
+        end
       end 
     end
-
+    
+    Rails.logger.info "❌ No matching backup code found"
     false
   end
 

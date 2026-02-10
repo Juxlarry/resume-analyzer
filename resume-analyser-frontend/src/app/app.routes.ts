@@ -1,5 +1,17 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth-guard';
+import { WelcomeComponent } from './components/welcome/welcome.component';
+import { Login } from './components/auth/login/login';
+import { Signup } from './components/auth/signup/signup';
+import { ForgotPasswordComponent } from './components/auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './components/auth/reset-password/reset-password.component';
+import { JobDescriptionDetailComponent } from './components/job-description-detail/job-description-detail.component';
+import { JobDescriptionListComponent } from './components/job-descriptions-list/job-descriptions-list.component';
+import { JobFormComponent } from './components/job-form/job-form.component';
+import { UserProfile } from './components/user-profile/user-profile.component';
+import { TwoFactorSettingsComponent } from './components/two-factor-settings/two-factor-settings.component';
+import { TwoFactorSetupComponent } from './components/two-factor-setup/two-factor-setup.component'; 
+import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 // import { adminGuard } from './guards/admin-guard.__t_s';
 
 export const routes: Routes = [
@@ -10,47 +22,57 @@ export const routes: Routes = [
     },
     {
         path: 'welcome',
-        loadComponent: () => import('./components/welcome/welcome.component').then(m => m.WelcomeComponent)
+        component: WelcomeComponent,
     },
     {
         path: 'login',
-        loadComponent: () => import('./components/auth/login/login').then(m => m.Login)
+        component: Login,
     },
     {
         path: 'signup',
-        loadComponent: () => import('./components/auth/signup/signup').then(m => m.Signup)
+        component: Signup,
     },
     {
         path: 'forgot-password',
-        loadComponent: () => import('./components/auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+        component: ForgotPasswordComponent,
     },
     {
         path: 'reset-password',
-        loadComponent: () => import('./components/auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+        component: ResetPasswordComponent,
     },
     {
         path: 'analyze',
-        loadComponent: () => import('./components/job-form/job-form.component').then(m => m.JobFormComponent),
+        component: JobFormComponent,
         canActivate: [authGuard]
     },
     {
         path: 'job-descriptions',
-        loadComponent: () => import('./components/job-descriptions-list/job-descriptions-list.component').then(m => m.JobDescriptionListComponent),
+        component: JobDescriptionListComponent,
         canActivate: [authGuard]
     },
     {
         path: 'job-descriptions/:id',
-        loadComponent: () => import('./components/job-description-detail/job-description-detail.component').then(m => m.JobDescriptionDetailComponent),
+        component: JobDescriptionDetailComponent,
         canActivate: [authGuard]
     },
     {
         path: 'profile',
-        loadComponent: () => import('./components/user-profile/user-profile.component').then(m => m.UserProfile),
+        component: UserProfile,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'two-factor/setup',
+        component: TwoFactorSetupComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'two-factor/settings',
+        component: TwoFactorSettingsComponent,
         canActivate: [authGuard]
     },
     {
         path: 'admin',
-        loadComponent: () => import('./components/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+        component: AdminDashboardComponent,
         canActivate: [authGuard] // Will add admin guard later
     },
     {

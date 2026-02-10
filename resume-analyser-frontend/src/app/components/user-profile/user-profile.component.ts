@@ -14,11 +14,13 @@ export class UserProfile {
   profile: User | null = null;
   profileForm: FormGroup;
   passwordForm: FormGroup;
-  isLoading = true;
+  isLoading = false;
   isSaving = false;
   errorMessage: string | null = null
   successMessage: string | null = null; 
   showPasswordForm = false; 
+  twoFactorEnabled = false; 
+  isLoading2FA = true;
 
   constructor(
     private fb: FormBuilder, 
@@ -37,24 +39,45 @@ export class UserProfile {
 
   ngOnInit(): void {
     this.loadUserProfile();
+    // this.load2FAStatus();
   }
 
   loadUserProfile(): void {
     this.isLoading = true;
+    this.isLoading2FA = true; 
     this.authService.getProfile().subscribe({
       next: (data) => {
         this.profile = data;
         this.profileForm.patchValue({
           email: data.email
         });
+        this.twoFactorEnabled = data.two_factor_enabled;
+        this.isLoading2FA = false; 
         this.isLoading = false;
         this.cdr.detectChanges();
+        console.log(`2FA enabled status: ${this.twoFactorEnabled}` );
       }, 
       error: (error) => {
         console.error('Error loading profile:', error); 
         this.errorMessage = 'Failed to load profile. Please try again.';
         this.isLoading = false;
+        this.isLoading2FA = false; 
         this.cdr.detectChanges();
+      }
+    });
+  }
+
+  load2FAStatus(): void{
+    this.isLoading2FA = true; 
+    this.authService.getTwoFactorStatus().subscribe({
+      next: (status)=> {
+        this.twoFactorEnabled = status.enabled;
+        console.log(`2FA enabled status: ${this.twoFactorEnabled}` );
+        this.isLoading2FA = false; 
+      }, 
+      error: (error)=> {
+        console.error('Error loading 2FA status: ', error); 
+        this.isLoading2FA = false;
       }
     });
   }

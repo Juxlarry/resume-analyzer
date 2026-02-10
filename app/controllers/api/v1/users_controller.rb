@@ -10,7 +10,8 @@ class Api::V1::UsersController < ApplicationController
         role: current_user.role,
         created_at: current_user.created_at, 
         total_analyses: current_user.job_descriptions.count,
-        completed_analyses: current_user.resume_analyses.completed.count
+        completed_analyses: current_user.resume_analyses.completed.count, 
+        two_factor_enabled: current_user.otp_required_for_login
       }
       else
         render json: { error: 'Not authenticated' }, status: :unauthorized

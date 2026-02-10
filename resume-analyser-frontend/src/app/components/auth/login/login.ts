@@ -22,6 +22,7 @@ export class Login {
   otpForm: FormGroup;
   isSubmitting = false;
   showOtpInput = false; 
+  verify_user_id: string = '';
 
   errorMessage: string | null = null;
   isLoading: boolean = false;
@@ -51,32 +52,18 @@ export class Login {
       return;
     }
 
-    // this.isLoading = true;
+    // this.isSubmitting = true;
     // this.errorMessage = null; 
 
     const { email, password } = this.loginForm.value;
-
-    /** Old Login Auth without 2FA */
-
-    // this.authService.login(email, password).subscribe({
-    //   next: (response) => {
-    //     console.log('Login successful: ', response);
-    //     // this.isLoading = false;
-    //     this.router.navigate(['/welcome']);
-    //   }, 
-    //   error: (err) => {
-    //     console.error('Login failed: ', err);
-    //     this.isLoading = false;
-    //     this.errorMessage = err.error?.error || 'Invalid email or password.';
-    //   }
-    // });
 
     /** New Login checking 2FA */
     this.authService.login(email, password).subscribe({
       next: (response: any) => {
         if (response.requires_otp){
           this.showOtpInput = true; 
-          this.isSubmitting = true; 
+          this.isSubmitting = false; 
+          this.verify_user_id = response.otp_user_id;
           this.alertService.info('Please enter your two-factor authentication code');
         }else {
           //Normal Login success 
@@ -101,10 +88,14 @@ export class Login {
 
     this.isSubmitting = true; 
     const code = this.otpForm.value.code;
+    const otp_user_id = this.verify_user_id;
 
-    this.authService.verifyOtp(code).subscribe({
+    console.log(`000OTP Code: ${code} \n User_id -- ${this.verify_user_id}`);
+
+    this.authService.verifyOtp(code, otp_user_id).subscribe({
       next: (response) => {
         this.alertService.success('Login Successful'); 
+        this.isSubmitting = false; 
         this.router.navigate(['welcome']);
       }, 
       error: (error) => {

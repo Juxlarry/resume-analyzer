@@ -3,7 +3,7 @@
   <div 
     *ngFor="let alert of alerts$ | async"
     [class]="getAlertClasses(alert.type)"
-    [@slideIn]>
+    class="animate-slide-in">
     
     <!-- Icon -->
     <div [class]="getIconClasses(alert.type)" class="flex-shrink-0">
@@ -30,7 +30,8 @@
 
     <!-- Message -->
     <div class="flex-1 min-w-0">
-      <p class="text-sm font-medium">{{ alert.message }}</p>
+      <!-- ✅ IMPORTANT: Make sure this line is correct -->
+      <p class="text-sm font-medium break-words">{{ alert.message }}</p>
     </div>
 
     <!-- Close Button -->

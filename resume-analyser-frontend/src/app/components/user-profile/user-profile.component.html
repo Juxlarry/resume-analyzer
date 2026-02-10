@@ -44,6 +44,56 @@
         </div>
       </div>
 
+      <!-- Two-Factor Authentication -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-xl font-semibold text-gray-900">Two-Factor Authentication</h2>
+            <p class="text-sm text-gray-600 mt-1">Add an extra layer of security to your account</p>
+          </div>
+          <div *ngIf="!isLoading2FA">
+            <span 
+              *ngIf="twoFactorEnabled"
+              class="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+              <span class="w-2 h-2 bg-green-600 rounded-full"></span>
+              Enabled
+            </span>
+            <span 
+              *ngIf="!twoFactorEnabled"
+              class="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">
+              <span class="w-2 h-2 bg-gray-600 rounded-full"></span>
+              Disabled
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="isLoading2FA" class="flex justify-center py-4">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+
+        <div *ngIf="!isLoading2FA" class="flex gap-3">
+          <a 
+            *ngIf="!twoFactorEnabled"
+            routerLink="/two-factor/setup"
+            class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition font-medium">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Enable 2FA
+          </a>
+          <a 
+            *ngIf="twoFactorEnabled"
+            routerLink="/two-factor/settings"
+            class="inline-flex items-center gap-2 border border-gray-300 px-6 py-2 rounded hover:bg-gray-50 transition font-medium">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Manage 2FA
+          </a>
+        </div>
+      </div>
+
       <!-- Email Settings -->
       <div class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-xl font-semibold text-gray-900 mb-4">Email Settings</h2>

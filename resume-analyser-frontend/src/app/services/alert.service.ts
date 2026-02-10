@@ -8,7 +8,7 @@ export interface Alert {
   duration?: number;
 }
 
-@Injectable({
+@Injectable({ 
   providedIn: 'root',
 })
 export class AlertService {
@@ -33,8 +33,24 @@ export class AlertService {
 
 
   private addAlert(type: Alert['type'], message: string, duration: number): void {
+    console.log('Adding alert:', { type, message, duration }); 
+
+    if (!message || typeof message !== 'string') {
+      console.warn(`Invalid alert message:`, message);
+      message = 'An error occurred';
+    }
+
+    message = message.trim();
+    
+    if (message.length === 0) {
+      console.warn('Empty alert message provided');
+      message = 'An error occurred';
+    }
+
     const id = this.generateId();
     const alert: Alert = {id, type, message, duration}
+
+    console.log('Alert created:', alert);
 
     const currentAlerts = this.alertSubject.value; 
     this.alertSubject.next([...currentAlerts, alert]);

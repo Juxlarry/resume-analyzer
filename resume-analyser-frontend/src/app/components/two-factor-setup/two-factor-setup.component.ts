@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -32,7 +32,8 @@ export class TwoFactorSetupComponent implements OnInit {
     private authService: AuthService,
     private alertService: AlertService,
     private sanitizer: DomSanitizer,
-    private router: Router
+    private router: Router, 
+    private cdr: ChangeDetectorRef
   ) {
     this.setupForm = this.fb.group({
       code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
@@ -45,17 +46,20 @@ export class TwoFactorSetupComponent implements OnInit {
 
   loadSetup(): void {
     this.isLoading = true;
+    console.log('Loading Setup');
 
     this.authService.getTwoFactorSetup().subscribe({
       next: (data) => {
         this.setupData = data;
         this.qrCodeSvg = this.sanitizer.bypassSecurityTrustHtml(data.qr_code);
-        this.isLoading = false;
         this.currentStep = 'verify';
+        this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error loading 2FA setup:', error);
-        this.alertService.error('Failed to load 2FA setup. Please try again.');
+        const errorMessage = this.extractErrorMessage(error);
+        this.alertService.error(errorMessage);
         this.isLoading = false;
       }
     });
@@ -78,7 +82,8 @@ export class TwoFactorSetupComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error enabling 2FA:', error);
-        this.alertService.error(error.error?.error || 'Invalid verification code');
+        const errorMessage = this.extractErrorMessage(error);
+        this.alertService.error(errorMessage);
         this.isEnabling = false;
       }
     });
@@ -121,5 +126,33 @@ export class TwoFactorSetupComponent implements OnInit {
 
   finish(): void {
     this.router.navigate(['/profile']);
+  }
+
+  private extractErrorMessage(error: any): string {
+    // Try different error formats
+    if (error.error?.error) {
+      return error.error.error;
+    }
+    if (error.error?.errors) {
+      if (Array.isArray(error.error.errors)) {
+        return error.error.errors.join(', ');
+      }
+      return error.error.errors;
+    }
+    if (error.error?.message) {
+      return error.error.message;
+    }
+    if (error.message) {
+      return error.message;
+    }
+    if (typeof error.error === 'string') {
+      return error.error;
+    }
+    
+    // Default messages based on context
+    if (this.isEnabling) {
+      return 'Invalid verification code. Please try again.';
+    }
+    return 'An error occurred. Please try again.';
   }
 }

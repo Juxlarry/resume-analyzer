@@ -11,6 +11,7 @@ export interface User {
     created_at: string; 
     total_analyses: number; 
     completed_analyses: number;
+    two_factor_enabled: boolean
 }
 
 export interface UpdateProfileData {
@@ -102,9 +103,10 @@ export class AuthService {
         );
     }
 
-    verifyOtp(code: string): Observable<AuthResponse> {
+    verifyOtp(code: string, otp_user_id: string): Observable<AuthResponse> {
         return this.http.post<AuthResponse>(`${this.apiUrl}/login/verify_otp`, {
-            code 
+            code, 
+            otp_user_id
         }).pipe (
             tap(response => {
                 this.setToken(response.token); 

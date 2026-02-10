@@ -24,10 +24,14 @@ class Api::V1::SessionsController < Devise::SessionsController
 
     #POST /api/v1/login/verify_otp
     def verify_otp
-        user = User.find_by(id: params[:otp_user_id])
+        Rails.logger.info "verify opt params -- #{params}"
+        user = User.find(params[:otp_user_id])
         code = params[:code]
+        Rails.logger.info "User found -- #{user}"
 
-        return render json: { error: 'Invalid User ID' }, status: :unauthorized unless user
+        unless user 
+            return render json: { error: 'Invalid User ID' }, status: :unauthorized
+        end 
 
         #Verify with OTP or backup code 
         if user.verify_otp_code(code) || user.verify_backup_code(code)
