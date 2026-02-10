@@ -31,6 +31,23 @@ export interface AuthResponse {
 }
 
 
+export interface TwoFactorSetupResponse{
+    secret: string;
+    qr_code: string;
+    provisioning_uri: string;
+}
+
+export interface TwoFactorStatusResponse{
+    enabled: boolean; 
+    has_backup_codes: boolean;
+}
+
+export interface TwoFactorEnableResponse{
+    message: string; 
+    backup_codes: string[];
+}
+
+
 @Injectable({
     providedIn: "root"
 })
@@ -42,6 +59,9 @@ export class AuthService {
     private currentUserSubject = new BehaviorSubject<User | null>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
 
+    private requires2FAsubject = new BehaviorSubject<boolean>(false); 
+    public requires2FA$ = this.requires2FAsubject.asObservable();
+
     constructor(
         private http: HttpClient,
         private router: Router
@@ -52,9 +72,14 @@ export class AuthService {
             user: { email, password }
         }).pipe(
             tap(response => {
-                this.setToken(response.token);
-                this.isAuthenticatedSubject.next(true);
-                this.loadCurrentUser();
+                //check 2FA required
+                if ((response as any).requires_otp){
+                    this.requires2FAsubject.next(true);
+                }else {
+                    this.setToken(response.token);
+                    this.isAuthenticatedSubject.next(true);
+                    this.loadCurrentUser();
+                }
             })
       ); 
     }
@@ -72,6 +97,19 @@ export class AuthService {
                 tap(response => {
                 this.setToken(response.token);
                 this.isAuthenticatedSubject.next(true);
+                this.loadCurrentUser();
+            })
+        );
+    }
+
+    verifyOtp(code: string): Observable<AuthResponse> {
+        return this.http.post<AuthResponse>(`${this.apiUrl}/login/verify_otp`, {
+            code 
+        }).pipe (
+            tap(response => {
+                this.setToken(response.token); 
+                this.isAuthenticatedSubject.next(true); 
+                this.requires2FAsubject.next(false); 
                 this.loadCurrentUser();
             })
         );
@@ -111,10 +149,37 @@ export class AuthService {
         });
     }
 
+    getTwoFactorSetup(): Observable<TwoFactorSetupResponse> {
+        return this.http.get<TwoFactorSetupResponse>(`${this.apiUrl}/two_factor/setup`);
+    }
+
+    enableTwoFactor(code: string): Observable<TwoFactorEnableResponse> {
+        return this.http.post<TwoFactorEnableResponse>(`${this.apiUrl}/two_factor/enable`, {
+            code
+        });
+    }
+
+    disableTwoFactor(code: string): Observable<any>{
+        return this.http.request('delete', `${this.apiUrl}/two_factor/disable`, {
+            body: { code }
+        });
+    }
+
+    getTwoFactorStatus(): Observable<TwoFactorStatusResponse>{
+        return this.http.get<TwoFactorStatusResponse>(`${this.apiUrl}/two_factor/status`);
+    }
+
+    regenerateBackupCodes(code: string): Observable<TwoFactorEnableResponse>{
+        return this.http.post<TwoFactorEnableResponse>(`${this.apiUrl}/two_factor/regenerate_backup_codes`, {
+            code
+        });
+    }
+
     private performLogout(redirectTo: string = '/'): void {
         this.clearToken();
         this.isAuthenticatedSubject.next(false);
         this.currentUserSubject.next(null);
+        this.requires2FAsubject.next(false);
         this.router.navigate([redirectTo]);
     }
 
@@ -139,7 +204,6 @@ export class AuthService {
         if (!token) return true;
         
         try {
-            // Decode JWT token (basic parsing - for production use a library like jwt-decode)
             const payload = JSON.parse(atob(token.split('.')[1]));
             const expirationTime = payload.exp * 1000; // Convert to milliseconds
             const currentTime = Date.now();
@@ -153,7 +217,7 @@ export class AuthService {
         }
     }
 
-    // Add this method to validate token on app load
+
     validateToken(): Observable<boolean> {
         const token = this.getToken();
 
@@ -163,7 +227,6 @@ export class AuthService {
             return of(false);
         }
 
-        // Try to load profile to validate token
         return this.getProfile().pipe(
             map((user) => {
                     this.isAuthenticatedSubject.next(true);

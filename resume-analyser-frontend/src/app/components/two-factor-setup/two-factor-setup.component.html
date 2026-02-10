@@ -1,0 +1,193 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="container mx-auto px-6 max-w-2xl">
+    
+    <!-- Back Button -->
+    <div class="mb-6">
+      <a 
+        routerLink="/profile"
+        class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Profile
+      </a>
+    </div>
+
+    <!-- Header -->
+    <div class="mb-8 text-center">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Enable Two-Factor Authentication</h1>
+      <p class="text-gray-600">Add an extra layer of security to your account</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+
+    <!-- Step 1: QR Code Scan -->
+    <div *ngIf="!isLoading && currentStep === 'verify'" class="bg-white rounded-lg shadow-md p-8">
+      <div class="space-y-6">
+        <!-- Step Indicator -->
+        <div class="flex items-center justify-center gap-4 mb-8">
+          <div class="flex items-center">
+            <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">
+              1
+            </div>
+            <span class="ml-2 text-sm font-medium text-gray-900">Scan QR Code</span>
+          </div>
+          <div class="w-12 h-0.5 bg-gray-300"></div>
+          <div class="flex items-center">
+            <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold">
+              2
+            </div>
+            <span class="ml-2 text-sm font-medium text-gray-500">Verify Code</span>
+          </div>
+          <div class="w-12 h-0.5 bg-gray-300"></div>
+          <div class="flex items-center">
+            <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold">
+              3
+            </div>
+            <span class="ml-2 text-sm font-medium text-gray-500">Backup Codes</span>
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+          <h3 class="font-semibold text-blue-900 mb-2">Instructions:</h3>
+          <ol class="list-decimal list-inside space-y-1 text-sm text-blue-800">
+            <li>Install an authenticator app (Google Authenticator, Authy, etc.)</li>
+            <li>Scan the QR code below with your app</li>
+            <li>Enter the 6-digit code shown in your app</li>
+          </ol>
+        </div>
+
+        <!-- QR Code -->
+        <div class="flex flex-col items-center">
+          <div class="bg-white p-4 rounded-lg border-2 border-gray-200">
+            <div [innerHTML]="qrCodeSvg"></div>
+          </div>
+          
+          <!-- Manual Entry Option -->
+          <details class="mt-4 text-center">
+            <summary class="text-sm text-gray-600 cursor-pointer hover:text-gray-900">
+              Can't scan? Enter manually
+            </summary>
+            <div class="mt-2 p-4 bg-gray-50 rounded">
+              <p class="text-xs text-gray-600 mb-2">Secret Key:</p>
+              <div class="flex items-center justify-center gap-2">
+                <code class="px-3 py-2 bg-white border rounded text-sm font-mono">
+                  {{ setupData?.secret }}
+                </code>
+                <button
+                  (click)="copyToClipboard(setupData?.secret || '')"
+                  class="p-2 text-gray-600 hover:text-gray-900">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Verification Form -->
+        <form [formGroup]="setupForm" (ngSubmit)="onEnable()" class="mt-8">
+          <div>
+            <label for="code" class="block text-sm font-medium text-gray-700 text-center mb-2">
+              Enter 6-digit code from your app
+            </label>
+            <input
+              id="code"
+              type="text"
+              formControlName="code"
+              maxlength="6"
+              placeholder="000000"
+              class="block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm text-center text-2xl tracking-widest focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="setupForm.get('code')?.invalid && setupForm.get('code')?.touched"
+            />
+            <p *ngIf="setupForm.get('code')?.invalid && setupForm.get('code')?.touched" 
+               class="mt-1 text-sm text-red-600 text-center">
+              Please enter a valid 6-digit code
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            [disabled]="setupForm.invalid || isEnabling"
+            class="mt-6 w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
+            <span *ngIf="!isEnabling">Enable Two-Factor Authentication</span>
+            <span *ngIf="isEnabling">Enabling...</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Step 2: Backup Codes -->
+    <div *ngIf="currentStep === 'backup'" class="bg-white rounded-lg shadow-md p-8">
+      <div class="text-center mb-6">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+          <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">2FA Enabled Successfully!</h2>
+        <p class="text-gray-600">Save your backup codes in a safe place</p>
+      </div>
+
+      <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mb-6">
+        <div class="flex">
+          <svg class="w-5 h-5 text-yellow-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div>
+            <p class="text-sm text-yellow-800 font-medium">Important:</p>
+            <p class="text-sm text-yellow-700">Each backup code can only be used once. Store them securely!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Backup Codes Display -->
+      <div class="bg-gray-50 rounded-lg p-6 mb-6">
+        <div class="grid grid-cols-2 gap-3">
+          <div *ngFor="let code of backupCodes; let i = index" 
+               class="flex items-center justify-between bg-white p-3 rounded border">
+            <span class="font-mono text-sm">{{ i + 1 }}. {{ code }}</span>
+            <button
+              (click)="copyToClipboard(code)"
+              class="p-1 text-gray-600 hover:text-gray-900">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3">
+        <button
+          (click)="copyAllBackupCodes()"
+          class="flex-1 flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          Copy All
+        </button>
+        <button
+          (click)="downloadBackupCodes()"
+          class="flex-1 flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Download
+        </button>
+      </div>
+
+      <button
+        (click)="finish()"
+        class="mt-6 w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition font-medium">
+        Done
+      </button>
+    </div>
+  </div>
+</div>
