@@ -2,6 +2,14 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, interval, switchMap, takeWhile } from "rxjs";
 
+export interface ResumeFile {
+  filename: string; 
+  size: number; 
+  content_type: string; 
+  url: string;
+  download_url: string; 
+  created_at: string;
+}
 
 export interface JobDescription {
   id: number;
@@ -9,6 +17,7 @@ export interface JobDescription {
   description: string;
   has_resume: boolean;
   created_at: string;
+  resume_file?: ResumeFile;
   resume_analysis?: ResumeAnalysis;
 }
 
@@ -46,14 +55,6 @@ export class JobService {
   createJobDescription(jobData: FormData): Observable<JobDescription> {
     return this.http.post<JobDescription>(`${this.apiUrl}/job_descriptions`, jobData);
   }
-
-  //Old analyze function. 
-  // analyzeResume(jobId: number): Observable<any> {
-  //   return this.http.post(
-  //     `${this.apiUrl}/job_descriptions/${jobId}/analyze`, 
-  //     {}
-  //   );
-  // }
 
   analyzeResume(jobId: number, resumeFile?: File | null): Observable<any> {
     const formData = new FormData();
@@ -93,6 +94,12 @@ export class JobService {
 
   deleteJob(jobId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/job_descriptions/${jobId}`);
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
   }
 
   pollAnalysisStatus(jobId: number, intervalMs: number = 5000): Observable<AnalysisStatusResponse> {

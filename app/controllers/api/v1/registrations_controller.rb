@@ -1,6 +1,6 @@
 class Api::V1::RegistrationsController < Devise::RegistrationsController 
   respond_to :json
-  # skip_before_action :verify_authenticity_token, only: [:create]
+  # skip_before_action 
 
   # Override to prevent automatic sign in after registration
   def create
@@ -11,7 +11,7 @@ class Api::V1::RegistrationsController < Devise::RegistrationsController
     
     if resource.persisted?
       render json: {
-        message: 'Signed up successfully. Please login.',
+        message: 'Signed up successfully.',
         user: {
           id: resource.id,
           email: resource.email,

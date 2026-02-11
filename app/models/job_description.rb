@@ -1,4 +1,5 @@
 class JobDescription < ApplicationRecord
+
     belongs_to :user
 
     has_one_attached :resume
@@ -44,7 +45,6 @@ class JobDescription < ApplicationRecord
             errors.add(:resume, "is too large. Maximum size is 10MB.")
         end
 
-        #Validate actual file content (not just extension)
         validate_file_signature
     end
 

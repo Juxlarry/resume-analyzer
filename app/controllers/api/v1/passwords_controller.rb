@@ -1,7 +1,5 @@
 class Api::V1::PasswordsController < Devise::PasswordsController
     respond_to :json 
-    # skip_before_action :verify_authenticity_token
-    # skip_before_action :verify_authentication_token, raise: false
 
     #POST /api/v1/password
     def create 

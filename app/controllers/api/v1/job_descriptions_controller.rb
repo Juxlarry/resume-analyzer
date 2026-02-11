@@ -1,6 +1,8 @@
 class Api::V1::JobDescriptionsController < ApplicationController
+  include Rails.application.routes.url_helpers
   before_action :authenticate_user!
   before_action :set_job_description, only: %i[ show analyze analysis_status destroy ]
+  
 
   # GET /api/v1/job_descriptions
   def index
@@ -11,7 +13,19 @@ class Api::V1::JobDescriptionsController < ApplicationController
 
   # GET /api/v1/job_descriptions/:id
   def show
-    render json: @job_description, include: :resume_analysis
+
+    render json: {
+      id: @job_description.id,
+      title: @job_description.title,
+      description: @job_description.description,
+      has_resume: @job_description.resume.attached?,
+      created_at: @job_description.created_at,
+      resume_file: resume_file_data(@job_description),
+      resume_analysis: @job_description.resume_analysis&.as_json(
+        only: [:id, :match_score, :verdict, :summary, :strengths, :weaknesses,:recommendations, :missing_keywords, :status, :ai_model_used, :created_at, :updated_at]
+      )
+    }
+
   end
 
   # POST /api/v1/job_descriptions
@@ -19,7 +33,7 @@ class Api::V1::JobDescriptionsController < ApplicationController
     @job_description = current_user.job_descriptions.new(job_description_params)
 
     if @job_description.save
-      #Create initial resume analysis record with pending status
+      #Creates initial resume analysis record with pending status
       @job_description.create_resume_analysis!(status: 'pending')
 
       render json: {
@@ -144,6 +158,19 @@ class Api::V1::JobDescriptionsController < ApplicationController
 
     def job_description_params
       params.require(:job_description).permit(:title, :description, :resume)
+    end
+
+    def resume_file_data(job_description)
+      return nil unless job_description.resume.attached?
+
+      {
+        filename: job_description.resume.filename.to_s,
+        size: job_description.resume.byte_size.to_i,
+        content_type: job_description.resume.content_type,
+        url: rails_blob_url(job_description.resume, host: request.base_url),
+        download_url: rails_blob_url(job_description.resume, disposition: "attachment", host: request.base_url),
+        created_at: job_description.resume.created_at
+      }
     end
 end
  

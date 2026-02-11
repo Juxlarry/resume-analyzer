@@ -5,8 +5,6 @@ class ResumeAnalysis < ApplicationRecord
 
     validates :job_description_id, presence: true, uniqueness: true
 
-    # after_initialize :set_default_status, if: :new_record?
-
     # Serialize missing_keywords as array
     serialize :missing_keywords, coder: JSON
 
@@ -45,7 +43,4 @@ class ResumeAnalysis < ApplicationRecord
 
     private 
 
-    # def set_default_status
-    #     self.status ||= :pending
-    # end 
 end

@@ -1,6 +1,8 @@
 require 'bcrypt'
 
 class User < ApplicationRecord
+  before_validation :set_default_role, on: :create
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -9,6 +11,7 @@ class User < ApplicationRecord
 
   has_many :job_descriptions, dependent: :destroy 
   has_many :resume_analyses, through: :job_descriptions
+
 
   enum :role, { 
     user: 0, 
@@ -48,7 +51,7 @@ class User < ApplicationRecord
     on_verify = totp.verify(code, drift_behind: 30, drift_ahead: 30)
 
     Rails.logger.info "on Verify #{on_verify}"
-  end 
+  end  
 
   #Generate backup codes
   def generate_otp_backup_codes
@@ -67,18 +70,21 @@ class User < ApplicationRecord
     return false unless otp_backup_codes.present?
   
     Rails.logger.info "Verifying backup code: #{code}"
+
     Rails.logger.info "Total backup codes: #{otp_backup_codes.length}"
 
     self.with_lock do
       otp_backup_codes.each_with_index do |stored_hashed, index|
+
         Rails.logger.info "Stored_Hash -- #{stored_hashed}"
         Rails.logger.info "Index -- #{index}"
+
         begin 
           bcrypt_password = BCrypt::Password.new(stored_hashed)
 
-          #BCrypt's == operator handles the comparison correctly
           if bcrypt_password == code 
-            Rails.logger.info "✅ Backup code verified! Removing code at index #{index}"
+
+            Rails.logger.info "Backup code verified! Removing code at index #{index}"
 
             codes = otp_backup_codes.dup 
             codes.delete_at(index)
@@ -92,7 +98,7 @@ class User < ApplicationRecord
       end 
     end
     
-    Rails.logger.info "❌ No matching backup code found"
+    Rails.logger.info "No matching backup code found"
     false
   end
 
@@ -127,5 +133,9 @@ class User < ApplicationRecord
     errors.add(:password, 'must contain at least one uppercase letter') unless password =~ /[A-Z]/
     errors.add(:password, 'must contain at least one number') unless password =~ /\d/
     errors.add(:password, 'must contain at least one special character') unless password =~ /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
+  end
+
+  def set_default_role
+    self.role ||= "user"
   end
 end

@@ -237,4 +237,32 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
     if (score >= 50) return 'bg-yellow-50';
     return 'bg-red-50';
   }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
+
+  getFileExtension(filename: string): string {
+    return filename.split('.').pop()?.toUpperCase() || 'FILE';
+  }
+
+  downloadResume(): void {
+    if (!this.jobDescription?.resume_file) {
+      this.alertService.warning('No resume file available');
+      return;
+    }
+    
+    window.open(this.jobDescription.resume_file.download_url, '_blank');
+  }
+
+  previewResume(): void {
+    if (!this.jobDescription?.resume_file) {
+      this.alertService.warning('No resume file available');
+      return;
+    }
+    
+    window.open(this.jobDescription.resume_file.url, '_blank');
+  }
 }

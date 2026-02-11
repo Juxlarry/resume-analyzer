@@ -58,14 +58,6 @@
               </svg>
             </button>
             
-            <!--<button
-              (click)="deleteAnalysis()"
-              class="px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition"
-              title="Delete analysis">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button> -->
             <button
               (click)="openDeleteConfirmation()"
               class="px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition"
@@ -81,6 +73,80 @@
         <div class="border-t pt-4">
           <h3 class="font-semibold text-lg text-gray-800 mb-2">Job Description</h3>
           <p class="text-gray-700 whitespace-pre-wrap">{{ jobDescription.description }}</p>
+        </div>
+
+        <!-- Resume File Section -->
+        <div *ngIf="jobDescription.resume_file" class="border-t pt-4 mt-4">
+          <h3 class="font-semibold text-lg text-gray-800 mb-3">Resume File</h3>
+          
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div class="flex items-center justify-between">
+              <!-- File Info -->
+              <div class="flex items-center gap-4 flex-1">
+                <!-- File Icon -->
+                <div class="flex-shrink-0">
+                  <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <svg *ngIf="jobDescription.resume_file.content_type === 'application/pdf'" 
+                        class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
+                    </svg>
+                    <svg *ngIf="jobDescription.resume_file.content_type !== 'application/pdf'" 
+                        class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- File Details -->
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-gray-900 truncate">
+                    {{ jobDescription.resume_file.filename }}
+                  </p>
+                  <div class="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                    <span class="inline-flex items-center gap-1">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      {{ getFileExtension(jobDescription.resume_file.filename) }}
+                    </span>
+                    <span class="inline-flex items-center gap-1">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                      </svg>
+                      {{ formatFileSize(jobDescription.resume_file.size) }}
+                    </span>
+                    <span class="inline-flex items-center gap-1">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Uploaded {{ formatDate(jobDescription.resume_file.created_at) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex gap-2 ml-4">
+                <button
+                  (click)="previewResume()"
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm font-medium">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  Preview
+                </button>
+                <button
+                  (click)="downloadResume()"
+                  class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition text-sm font-medium">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -173,6 +239,7 @@
 
         <!-- Analysis Metadata -->
         <div class="border-t pt-4 text-sm text-gray-500">
+          <p>File Used here -</p>
           <p>AI Model: {{ jobDescription.resume_analysis?.ai_model_used }}</p>
           <p>Analyzed on: {{ formatDate(jobDescription.resume_analysis?.updated_at ?? jobDescription.created_at) }}</p>
         </div>

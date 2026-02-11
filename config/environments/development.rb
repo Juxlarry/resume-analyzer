@@ -37,6 +37,10 @@ Rails.application.configure do
 
   config.action_mailer.delivery_method = :smtp
 
+  #  For Active Storage URLs
+  config.action_controller.default_url_options = { host: 'localhost', port: 3000 }
+
+
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
