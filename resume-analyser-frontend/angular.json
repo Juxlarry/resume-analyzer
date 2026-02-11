@@ -51,7 +51,12 @@
               }
             ],
             "styles": [
+              "node_modules/swagger-ui-dist/swagger-ui.css",
               "src/styles.css"
+            ], 
+            "scripts": [
+              "node_modules/swagger-ui-dist/swagger-ui-bundle.js",
+              "node_modules/swagger-ui-dist/swagger-ui-standalone-preset.js"
             ]
           },
           "configurations": {

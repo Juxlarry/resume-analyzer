@@ -38,6 +38,12 @@ module ResumeAnalyser
 
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.
+    # config/application.rb
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore
+
+    # config/application.rb
+    # Forcefully remove the crashing CSP middleware
 
     # Enabling Rack Attack middleware
     config.middleware.use Rack::Attack

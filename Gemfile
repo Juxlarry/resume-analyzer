@@ -60,7 +60,7 @@ gem 'pdf-reader'
 gem 'docx'
 
 #API Documentation - Swagger/OpenAPI Docs
-gem 'rswag'
+gem 'rswag-api'
 
 # Two-Factor Authentication
 gem 'rotp'  # Generate and verify TOTP codes
@@ -75,6 +75,9 @@ group :development, :test do
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false
+
+  gem 'rspec-rails'
+  gem 'rswag-specs'
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false

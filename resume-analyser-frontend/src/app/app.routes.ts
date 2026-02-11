@@ -12,6 +12,7 @@ import { UserProfile } from './components/user-profile/user-profile.component';
 import { TwoFactorSettingsComponent } from './components/two-factor-settings/two-factor-settings.component';
 import { TwoFactorSetupComponent } from './components/two-factor-setup/two-factor-setup.component'; 
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
+import { SwaggerDocsComponent } from './components/swagger-docs/swagger-docs.components';
 // import { adminGuard } from './guards/admin-guard.__t_s';
 
 export const routes: Routes = [
@@ -74,6 +75,9 @@ export const routes: Routes = [
         path: 'admin',
         component: AdminDashboardComponent,
         canActivate: [authGuard] // Will add admin guard later
+    },
+    {   path: 'docs', 
+        component: SwaggerDocsComponent 
     },
     {
         path: '**',

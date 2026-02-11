@@ -1,0 +1,34 @@
+---
+openapi: 3.0.1
+info:
+  title: Resume Analyser API
+  version: v1
+  description: API for analyzing resumes against job descriptions
+paths:
+  "/api/v1/health":
+    get:
+      summary: Health check
+      tags:
+      - Health
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                required:
+                - status
+servers:
+- url: http://localhost:3000
+  description: Local development server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Authorization header using the Bearer scheme
