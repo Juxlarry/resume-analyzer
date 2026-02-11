@@ -36,11 +36,18 @@ class User < ApplicationRecord
 
   #Verify an OTP code 
   def verify_otp_code(code)
+    Rails.logger.info "in verify otp method"
     return false unless otp_secret.present?
+
+    Rails.logger.info "continuing verify otp method"
 
     totp = ROTP::TOTP.new(otp_secret, issuer: 'Resume Analyser')
 
+    Rails.logger.info "totp:: #{totp}"
+
     on_verify = totp.verify(code, drift_behind: 30, drift_ahead: 30)
+
+    Rails.logger.info "on Verify #{on_verify}"
   end 
 
   #Generate backup codes

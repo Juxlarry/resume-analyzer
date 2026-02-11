@@ -13,6 +13,7 @@ RSpec.configure do |config|
         version: 'v1',
         description: 'API for analyzing resumes against job descriptions'
       },
+      security: [ { bearerAuth: [] } ],
       paths: {},
       servers: [
         {
@@ -27,6 +28,25 @@ RSpec.configure do |config|
             scheme: :bearer,
             bearerFormat: 'JWT',
             description: 'JWT Authorization header using the Bearer scheme'
+          }
+        },
+        schemas: {
+          job_description: {
+            type: :object,
+            properties: {
+              id: { type: :integer },
+              title: { type: :string },
+              description: { type: :string },
+              created_at: { type: :string, format: 'date-time' },
+              resume_analysis: {
+                type: :object,
+                nullable: true,
+                properties: {
+                  status: { type: :string },
+                  match_score: { type: :integer }
+                }
+              }
+            }
           }
         }
       }

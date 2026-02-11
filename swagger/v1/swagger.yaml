@@ -4,7 +4,242 @@ info:
   title: Resume Analyser API
   version: v1
   description: API for analyzing resumes against job descriptions
+security:
+- bearerAuth: []
 paths:
+  "/api/v1/job_descriptions/{id}/analyze":
+    parameters:
+    - name: id
+      in: path
+      description: id
+      required: true
+      schema:
+        type: string
+    post:
+      summary: Analyze Resume
+      tags:
+      - Analysis
+      description: Uploads a new resume or uses the existing one to start AI analysis
+      parameters: []
+      responses:
+        '202':
+          description: analysis started
+        '200':
+          description: Analysis already in progress
+        '422':
+          description: resume missing or attachment failed
+        '404':
+          description: Job Description not found
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: file
+        description: 'Optional: Upload a new resume file (PDF/Docx)'
+  "/api/v1/job_descriptions/{id}/analysis_status":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Get Analysis Status and Results
+      tags:
+      - Analysis
+      description: Returns the current status (pending, processing, completed, failed)
+        and the AI feedback if finished.
+      responses:
+        '200':
+          description: status retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: completed
+                  estimated_wait_time:
+                    type: string
+                    nullable: true
+                    example: Approximately 2-3 minutes
+                  analysis:
+                    type: object
+                    nullable: true
+                    properties:
+                      match_score:
+                        type: integer
+                        example: 85
+                      verdict:
+                        type: string
+                        example: Strong Match
+                      summary:
+                        type: string
+                      strengths:
+                        type: string
+                      weaknesses:
+                        type: string
+                      recommendations:
+                        type: string
+                      missing_keywords:
+                        type: string
+                        example: Docker, Kubernetes
+                      completed_at:
+                        type: string
+                        format: date-time
+                  error:
+                    type: string
+                    nullable: true
+                    description: Present if status is failed
+        '404':
+          description: analysis not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: not_started
+                  message:
+                    type: string
+  "/api/v1/signup":
+    post:
+      summary: User Registration
+      tags:
+      - Authentication
+      security: []
+      parameters: []
+      responses:
+        '200':
+          description: Signed up successfully
+          headers:
+            Authorization:
+              schema:
+                type: string
+              description: Bearer JWT token
+        '422':
+          description: Invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
+                    role:
+                      type: string
+                      enum:
+                      - user
+                      - admin
+                      default: user
+                  required:
+                  - email
+                  - password
+                  - password_confirmation
+  "/api/v1/login":
+    post:
+      summary: User Login
+      tags:
+      - Authentication
+      security: []
+      parameters: []
+      description: If 2FA is enabled, returns a requirement for OTP. Otherwise returns
+        JWT in header.
+      responses:
+        '200':
+          description: Logged in (or OTP required)
+          headers:
+            Authorization:
+              schema:
+                type: string
+              description: Bearer JWT token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                    password:
+                      type: string
+                  required:
+                  - email
+                  - password
+  "/api/v1/login/verify_otp":
+    post:
+      summary: Verify 2FA Token
+      tags:
+      - Authentication
+      parameters: []
+      responses:
+        '200':
+          description: OTP Verified
+          headers:
+            Authorization:
+              schema:
+                type: string
+              description: Bearer JWT token
+        '401':
+          description: Invalid OTP
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                otp_user_id:
+                  type: integer
+                code:
+                  type: string
+                  description: The 6-digit code from Google Authenticator
+              required:
+              - otp_user_id
+              - code
+  "/api/v1/logout":
+    delete:
+      summary: User Logout
+      tags:
+      - Authentication
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Logged out successfully
+  "/api/v1/password":
+    post:
+      summary: Request password reset
+      tags:
+      - Authentication
+      security: []
+      parameters: []
+      responses:
+        '200':
+          description: Instructions sent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
   "/api/v1/health":
     get:
       summary: Health check
@@ -22,6 +257,134 @@ paths:
                     type: string
                 required:
                 - status
+  "/api/v1/job_descriptions":
+    get:
+      summary: List all job descriptions
+      tags:
+      - Job Descriptions
+      responses:
+        '200':
+          description: job descriptions found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/job_description"
+    post:
+      summary: Create a job description
+      tags:
+      - Job Descriptions
+      parameters: []
+      responses:
+        '201':
+          description: job description created
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                job_description:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    description:
+                      type: string
+                  required:
+                  - title
+                  - description
+  "/api/v1/two_factor/setup":
+    get:
+      summary: Start 2FA Setup
+      tags:
+      - Two-Factor Authentication
+      description: Generates a new OTP secret and returns a QR code in SVG format.
+      responses:
+        '200':
+          description: Setup data generated
+  "/api/v1/two_factor/enable":
+    post:
+      summary: Enable 2FA
+      tags:
+      - Two-Factor Authentication
+      parameters: []
+      responses:
+        '200':
+          description: 2FA Enabled
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 6-digit OTP from app
+              required:
+              - code
+  "/api/v1/two_factor/status":
+    get:
+      summary: Check 2FA Status
+      tags:
+      - Two-Factor Authentication
+      responses:
+        '200':
+          description: Status retrieved
+  "/api/v1/profile":
+    get:
+      summary: Retrieve user profile
+      tags:
+      - User Profile
+      responses:
+        '200':
+          description: Profile found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  role:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                  total_analyses:
+                    type: integer
+                  completed_analyses:
+                    type: integer
+                  two_factor_enabled:
+                    type: boolean
+    put:
+      summary: Update user profile
+      tags:
+      - User Profile
+      parameters: []
+      responses:
+        '200':
+          description: Profile updated
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
 servers:
 - url: http://localhost:3000
   description: Local development server
@@ -32,3 +395,24 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: JWT Authorization header using the Bearer scheme
+  schemas:
+    job_description:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        resume_analysis:
+          type: object
+          nullable: true
+          properties:
+            status:
+              type: string
+            match_score:
+              type: integer
