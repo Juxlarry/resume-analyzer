@@ -70,7 +70,6 @@ export class AlertService {
     this.alertSubject.next([]);
   }
 
-
   private generateId(): string {
     return `alert-${Date.now()}-${Math.random().toString(36).substring(2,9)}`;
   }

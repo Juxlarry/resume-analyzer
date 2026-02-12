@@ -39,8 +39,6 @@ export class Login {
       password: ['', Validators.required],
     });
 
-    // this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/welcome';
-
     this.otpForm = this.fb.group({
       code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(8)]]
     });
@@ -51,9 +49,6 @@ export class Login {
       this.loginForm.markAllAsTouched();
       return;
     }
-
-    // this.isSubmitting = true;
-    // this.errorMessage = null; 
 
     const { email, password } = this.loginForm.value;
 

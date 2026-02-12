@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth-guard';
+import { adminGuard } from './guards/admin-guard';
 import { WelcomeComponent } from './components/welcome/welcome.component';
 import { Login } from './components/auth/login/login';
 import { Signup } from './components/auth/signup/signup';
@@ -11,9 +12,10 @@ import { JobFormComponent } from './components/job-form/job-form.component';
 import { UserProfile } from './components/user-profile/user-profile.component';
 import { TwoFactorSettingsComponent } from './components/two-factor-settings/two-factor-settings.component';
 import { TwoFactorSetupComponent } from './components/two-factor-setup/two-factor-setup.component'; 
-import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { SwaggerDocsComponent } from './components/swagger-docs/swagger-docs.components';
-// import { adminGuard } from './guards/admin-guard.__t_s';
+import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
+import { AdminUsersComponent } from './components/admin/admin-users/admin-users.component';
+import { AdminJobsComponent } from './components/admin/admin-jobs/admin-jobs.component';
 
 export const routes: Routes = [
     {
@@ -74,7 +76,22 @@ export const routes: Routes = [
     {
         path: 'admin',
         component: AdminDashboardComponent,
-        canActivate: [authGuard] // Will add admin guard later
+        canActivate: [adminGuard] // Will add admin guard later
+    },
+    {
+        path: 'admin/dashboard',
+        redirectTo: 'admin',
+        pathMatch: 'full'
+    },
+    {
+        path: 'admin/users',
+        canActivate: [adminGuard],
+        component: AdminUsersComponent
+    },
+    {
+        path: 'admin/jobs',
+        canActivate: [adminGuard],
+        component: AdminJobsComponent
     },
     {   path: 'docs', 
         component: SwaggerDocsComponent 

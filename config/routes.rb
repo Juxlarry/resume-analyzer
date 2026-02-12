@@ -44,6 +44,12 @@ Rails.application.routes.draw do
 
 
       get '/health', to: 'health#show'
+
+      namespace :admin do
+        get 'dashboard/stats', to: 'dashboard#stats'
+        resources :users, only: [:index, :show, :update, :destroy]
+        resources :jobs, only: [:index, :destroy] # Manages JobDescriptions & Analyses
+      end
     end 
   end 
 

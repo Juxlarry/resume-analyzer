@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router,  RouterLink } from '@angular/router';
 import { JobService, JobDescription, AnalysisStatusResponse } from '../../services/job.service';
 import { RerunAnalysisModal } from '../rerun-analysis-modal/rerun-analysis-modal.component';
 import { Subscription, interval } from 'rxjs';

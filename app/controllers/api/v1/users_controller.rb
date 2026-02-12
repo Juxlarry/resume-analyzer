@@ -23,7 +23,7 @@ class Api::V1::UsersController < ApplicationController
       if current_user.update(user_params)
         render json: {
           message: 'Profile updated successfully',
-          user: {
+          user: { 
             id: current_user.id,
             email: current_user.email,
             role: current_user.role

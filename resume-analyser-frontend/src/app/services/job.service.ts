@@ -48,7 +48,7 @@ export interface AnalysisStatusResponse {
   providedIn: "root",
 })
 export class JobService {
-  private apiUrl = "http://localhost:3000/api/v1";
+  private apiUrl = "http://localhost:3000/api/v1"; 
 
   constructor(private http: HttpClient) {}
 

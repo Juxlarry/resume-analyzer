@@ -6,7 +6,11 @@ import { RouterLink } from '@angular/router';
 
 @Component({ 
   selector: 'app-user-profile',
-  imports: [CommonModule, ReactiveFormsModule,RouterLink],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule,
+    RouterLink
+  ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css',
 })
@@ -25,7 +29,7 @@ export class UserProfile {
   constructor(
     private fb: FormBuilder, 
     private authService: AuthService, 
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef 
   ){
     this.profileForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
