@@ -13,6 +13,7 @@ import { UserProfile } from './components/user-profile/user-profile.component';
 import { TwoFactorSettingsComponent } from './components/two-factor-settings/two-factor-settings.component';
 import { TwoFactorSetupComponent } from './components/two-factor-setup/two-factor-setup.component'; 
 import { SwaggerDocsComponent } from './components/swagger-docs/swagger-docs.components';
+import { AdminLayoutComponent } from './components/admin/admin-layout/admin-layout.component';
 import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
 import { AdminUsersComponent } from './components/admin/admin-users/admin-users.component';
 import { AdminJobsComponent } from './components/admin/admin-jobs/admin-jobs.component';
@@ -73,25 +74,31 @@ export const routes: Routes = [
         component: TwoFactorSettingsComponent,
         canActivate: [authGuard]
     },
+
+    //Admin Routes Layout
     {
         path: 'admin',
-        component: AdminDashboardComponent,
-        canActivate: [adminGuard] // Will add admin guard later
-    },
-    {
-        path: 'admin/dashboard',
-        redirectTo: 'admin',
-        pathMatch: 'full'
-    },
-    {
-        path: 'admin/users',
+        component: AdminLayoutComponent,
         canActivate: [adminGuard],
-        component: AdminUsersComponent
-    },
-    {
-        path: 'admin/jobs',
-        canActivate: [adminGuard],
-        component: AdminJobsComponent
+        children: [
+            {
+                path: '',
+                component: AdminDashboardComponent
+            },
+            {
+                path: 'dashboard',
+                redirectTo: '',
+                pathMatch: 'full'
+            },
+            {
+                path: 'users',
+                component: AdminUsersComponent
+            },
+            {
+                path: 'jobs',
+                component: AdminJobsComponent
+            }
+        ]
     },
     {   path: 'docs', 
         component: SwaggerDocsComponent 

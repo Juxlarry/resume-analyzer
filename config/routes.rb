@@ -47,8 +47,25 @@ Rails.application.routes.draw do
 
       namespace :admin do
         get 'dashboard/stats', to: 'dashboard#stats'
-        resources :users, only: [:index, :show, :update, :destroy]
-        resources :jobs, only: [:index, :destroy] # Manages JobDescriptions & Analyses
+        resources :users, only: [:index, :show, :update, :destroy] do
+          collection do 
+            get :export
+          end 
+        end
+
+        resources :jobs, only: [:index, :destroy] do
+          collection do
+            get :export
+          end 
+        end 
+
+
+        # Activity logs
+        resources :activity_logs, only: [:index] do
+          collection do
+            get :stats
+          end
+        end
       end
     end 
   end 

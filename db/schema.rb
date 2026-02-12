@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_03_164405) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_12_132506) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_03_164405) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "admin_activity_logs", force: :cascade do |t|
+    t.string "action", null: false
+    t.datetime "created_at", null: false
+    t.jsonb "details", default: {}
+    t.string "ip_address"
+    t.integer "target_id"
+    t.string "target_type"
+    t.bigint "user_id", null: false
+    t.index ["action"], name: "index_admin_activity_logs_on_action"
+    t.index ["created_at"], name: "index_admin_activity_logs_on_created_at"
+    t.index ["target_type", "target_id"], name: "index_admin_activity_logs_on_target_type_and_target_id"
+    t.index ["user_id"], name: "index_admin_activity_logs_on_user_id"
   end
 
   create_table "job_descriptions", force: :cascade do |t|
@@ -84,7 +98,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_03_164405) do
     t.datetime "last_sign_in_at"
     t.string "last_sign_in_ip"
     t.text "otp_backup_codes"
-    t.boolean "otp_required_for_login",  default: false
+    t.boolean "otp_required_for_login", default: false
     t.string "otp_secret"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
@@ -99,4 +113,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_03_164405) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "admin_activity_logs", "users"
 end

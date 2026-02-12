@@ -1,16 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AdminService } from '../../../services/admin.service';
 import { AlertService } from '../../../services/alert.service';
 
-
-interface AnalysisStats {
-    total_analyses: number;
-    today_analyses: number;
-    avg_match_score: number;
-    total_users: number;
-}
 
 @Component({
     selector: 'app-admin-dashboard',
@@ -25,13 +18,25 @@ interface AnalysisStats {
 export class AdminDashboardComponent implements OnInit {
 
     stats: any = {
+        total_users: 0,
+        active_users: 0,
         total_analyses: 0,
         today_analyses: 0,
+        week_analyses: 0,
         avg_match_score: 0,
-        total_users: 0
+        success_rate: 0,
+        users_with_2fa: 0
+  };
+
+    statusBreakdown: any = {
+        pending: 0,
+        processing: 0,
+        completed: 0,
+        failed: 0
     };
     
     recentAnalyses: any[] = [];
+    weeklyTrend: any[] = [];
     isLoading = true;
 
     constructor( 
@@ -45,20 +50,43 @@ export class AdminDashboardComponent implements OnInit {
         this.loadDashboardAnalytics();  
     }
 
-    loadDashboardAnalytics(): void{
+    loadDashboardAnalytics(): void {
+        this.isLoading = true;
+        
         this.adminService.getDashboardStats().subscribe({
-            next: (data) => {
+        next: (data) => {
             this.stats = data.stats;
-            console.log(`${JSON.stringify(this.stats)}`);
+            this.statusBreakdown = data.status_breakdown;
             this.recentAnalyses = data.recent_activity;
+            this.weeklyTrend = data.weekly_trend;
             this.isLoading = false;
             this.cdr.detectChanges();
-            },
-            error: (error) => {
-            console.error(error);
+        },
+        error: (error) => {
+            console.error('Error loading dashboard:', error);
+            this.alertService.error('Failed to load dashboard data');
             this.isLoading = false;
-            }
+        }
         });
     }
+
+
+    getStatusPercentage(status: string): number {
+        const values = Object.values(this.statusBreakdown) as number[];
+        const total = values.reduce((sum, value) => sum + value, 0);
+        
+        if (total === 0) return 0;
+        
+        return Math.round((this.statusBreakdown[status] / total) * 100);
+    }
+
+    formatDate(dateString: string): string {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+        });
+    }
+
 
 }

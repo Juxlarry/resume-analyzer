@@ -124,6 +124,16 @@ class User < ApplicationRecord
     )
   end 
 
+  def total_job_descriptions
+    job_descriptions.count
+  end
+
+  def completed_analyses_count
+    job_descriptions.joins(:resume_analysis)
+    .where(resume_analyses: { status: :completed })
+    .count
+  end
+
   private 
 
   def password_complexity
