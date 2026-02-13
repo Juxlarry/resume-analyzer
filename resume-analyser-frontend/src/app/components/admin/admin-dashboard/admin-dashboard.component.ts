@@ -1,8 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AdminService } from '../../../services/admin.service';
 import { AlertService } from '../../../services/alert.service';
+import { Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
 
 
 @Component({
@@ -16,6 +19,8 @@ import { AlertService } from '../../../services/alert.service';
     styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
+    @ViewChild('weeklyChart') weeklyChartRef!: ElementRef;
+    @ViewChild('statusChart') statusChartRef!: ElementRef; 
 
     stats: any = {
         total_users: 0,
@@ -39,6 +44,9 @@ export class AdminDashboardComponent implements OnInit {
     weeklyTrend: any[] = [];
     isLoading = true;
 
+    private weeklyChart: any; 
+    private statusChart: any;
+
     constructor( 
         private adminService: AdminService, 
         private alertService: AlertService, 
@@ -48,6 +56,10 @@ export class AdminDashboardComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadDashboardAnalytics();  
+    }
+
+    ngAfterViewInit(): void {
+        // Charts will be created after data is loaded
     }
 
     loadDashboardAnalytics(): void {
@@ -61,11 +73,108 @@ export class AdminDashboardComponent implements OnInit {
             this.weeklyTrend = data.weekly_trend;
             this.isLoading = false;
             this.cdr.detectChanges();
+
+            // Create charts after data is loaded
+            setTimeout(() => {
+                this.createWeeklyChart();
+                this.createStatusChart();
+            }, 100);
         },
         error: (error) => {
             console.error('Error loading dashboard:', error);
             this.alertService.error('Failed to load dashboard data');
             this.isLoading = false;
+        }
+        });
+    }
+
+    createWeeklyChart(): void {
+        if (!this.weeklyChartRef) return;
+
+        const ctx = this.weeklyChartRef.nativeElement.getContext('2d');
+        
+        if (this.weeklyChart) {
+        this.weeklyChart.destroy();
+        }
+
+        this.weeklyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: this.weeklyTrend.map((d: any) => {
+            const date = new Date(d.date);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }),
+            datasets: [{
+            label: 'Analyses',
+            data: this.weeklyTrend.map((d: any) => d.count),
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false
+            }
+            },
+            scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                stepSize: 1
+                }
+            }
+            }
+        }
+        });
+    }
+
+    createStatusChart(): void {
+        if (!this.statusChartRef) return;
+
+        const ctx = this.statusChartRef.nativeElement.getContext('2d');
+        
+        if (this.statusChart) {
+        this.statusChart.destroy();
+        }
+
+        this.statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'Processing', 'Pending', 'Failed'],
+            datasets: [{
+            data: [
+                this.statusBreakdown.completed,
+                this.statusBreakdown.processing,
+                this.statusBreakdown.pending,
+                this.statusBreakdown.failed
+            ],
+            backgroundColor: [
+                'rgb(34, 197, 94)',
+                'rgb(59, 130, 246)',
+                'rgb(234, 179, 8)',
+                'rgb(239, 68, 68)'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+            legend: {
+                position: 'bottom'
+            }
+            }
         }
         });
     }
@@ -87,6 +196,4 @@ export class AdminDashboardComponent implements OnInit {
         day: 'numeric'
         });
     }
-
-
 }

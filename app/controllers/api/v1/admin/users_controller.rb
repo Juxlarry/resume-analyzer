@@ -52,10 +52,13 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::BaseController
     end 
 
     def update 
+        if @user.id == current_user.id && params[:user][:role] != current_user.role
+            return render json: { error: "You cannot change your own role" }, status: :forbidden
+        end
+
         old_role = @user.role 
 
         if @user.update(user_params)
-            # Log activity
             AdminActivityLog.log_action(
                 user: current_user,
                 action: :role_changed,
@@ -73,7 +76,14 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::BaseController
     end 
 
     def destroy 
-        # Log activity before deletion
+        if @user.id == current_user.id
+            return render json: { error: "You cannot delete your own account" }, status: :forbidden
+        end
+
+        if @user.admin? && User.where(role: :admin).count <= 1
+            return render json: { error: "Cannot delete the last admin account" }, status: :forbidden
+        end
+
         AdminActivityLog.log_action(
             user: current_user,
             action: :user_deleted,

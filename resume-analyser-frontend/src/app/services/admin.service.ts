@@ -37,10 +37,14 @@ export class AdminService {
         return this.http.get(`${this.apiUrl}/dashboard/stats`);
     }
 
-    getUsers(page: number = 1, perPage: number = 20): Observable<any> {
-        const params = new HttpParams()
+    getUsers(page: number = 1, perPage: number = 20, search: string = '' ): Observable<any> {
+        let params = new HttpParams()
         .set('page', page.toString())
         .set('per_page', perPage.toString());
+
+        if (search) {
+            params = params.set('search', search);
+        }
 
         return this.http.get<any>(`${this.apiUrl}/users`, { params });
     }
@@ -53,11 +57,51 @@ export class AdminService {
         return this.http.delete(`${this.apiUrl}/users/${userId}`);
     }
 
-    getJobs(): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/jobs`);
+    exportUsers(search: string = ''): Observable<Blob> {
+        let params = new HttpParams();
+        if (search) {
+            params = params.set('search', search);
+        }
+        
+        return this.http.get(`${this.apiUrl}/users/export`, {
+            params,
+            responseType: 'blob'
+        });
+    }
+
+    getJobs(status: string = 'all'): Observable<any[]> {
+        let params = new HttpParams();
+        if (status !== 'all'){
+            params = params.set('status', status);
+        }
+
+        return this.http.get<any[]>(`${this.apiUrl}/jobs`, { params });
     }
 
     deleteJob(jobId: number): Observable<any> {
         return this.http.delete(`${this.apiUrl}/jobs/${jobId}`);
+    }
+
+    exportJobs(): Observable<Blob> {
+        return this.http.get(`${this.apiUrl}/jobs/export`, {
+            responseType: 'blob'
+        });
+    }
+
+    // Activity Logs
+    getActivityLogs(page: number = 1, perPage: number = 50, action: string = 'all'): Observable<any> {
+        let params = new HttpParams()
+            .set('page', page.toString())
+            .set('per_page', perPage.toString());
+        
+        if (action !== 'all') {
+            params = params.set('action', action);
+        }
+        
+        return this.http.get<any>(`${this.apiUrl}/activity_logs`, { params });
+    }
+
+    getActivityLogStats(): Observable<any> {
+        return this.http.get(`${this.apiUrl}/activity_logs/stats`);
     }
 }

@@ -4,6 +4,7 @@ import { AdminService } from '../../../services/admin.service';
 import { AlertService } from '../../../services/alert.service';
 import { ConfirmationModalComponent } from '../../confirmation-modal/confirmation-modal.component';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-jobs',
@@ -11,6 +12,7 @@ import { RouterLink } from '@angular/router';
   imports: [
     CommonModule, 
     RouterLink, 
+    FormsModule,
     ConfirmationModalComponent
   ],
   templateUrl: './admin-jobs.component.html',
@@ -19,6 +21,8 @@ import { RouterLink } from '@angular/router';
 export class AdminJobsComponent implements OnInit {
   jobs: any[] = [];
   isLoading = true;
+
+  isExporting = false;
 
   isDeleteConfirmOpen = false; 
   jobToDelete: any = null;
@@ -121,5 +125,28 @@ export class AdminJobsComponent implements OnInit {
     if (score >= 70) return 'text-green-600 font-semibold';
     if (score >= 50) return 'text-yellow-600 font-semibold';
     return 'text-red-600 font-semibold';
+  }
+
+  exportJobs(): void {
+    this.isExporting = true;
+    
+    this.adminService.exportJobs().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `jobs_export_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        
+        this.alertService.success('Jobs exported successfully');
+        this.isExporting = false;
+      },
+      error: (error) => {
+        console.error('Export error:', error);
+        this.alertService.error('Failed to export jobs');
+        this.isExporting = false;
+      }
+    });
   }
 }

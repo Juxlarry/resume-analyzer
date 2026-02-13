@@ -73,6 +73,26 @@
       </div>
     </div>
 
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- Weekly Trend Chart -->
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Weekly Analysis Trend</h3>
+        <div class="h-64">
+          <canvas #weeklyChart></canvas>
+        </div>
+      </div>
+
+      <!-- Status Distribution Chart -->
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Status Distribution</h3>
+        <div class="h-64 flex items-center justify-center">
+          <canvas #statusChart></canvas>
+        </div>
+      </div>
+    </div>
+
     <!-- Two Column Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       

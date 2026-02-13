@@ -17,6 +17,7 @@ import { AdminLayoutComponent } from './components/admin/admin-layout/admin-layo
 import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
 import { AdminUsersComponent } from './components/admin/admin-users/admin-users.component';
 import { AdminJobsComponent } from './components/admin/admin-jobs/admin-jobs.component';
+import { AdminActivityLogsComponent } from './components/admin/admin-activity-logs/admin-activity-logs.component';
 
 export const routes: Routes = [
     {
@@ -97,6 +98,10 @@ export const routes: Routes = [
             {
                 path: 'jobs',
                 component: AdminJobsComponent
+            }, 
+            {
+                path: 'activity-logs',
+                component: AdminActivityLogsComponent
             }
         ]
     },
