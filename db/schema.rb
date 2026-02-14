@@ -95,7 +95,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_132506) do
     t.string "current_sign_in_ip"
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
-    t.datetime "last_sign_in_at"
+    t.datetime "last_sign_in_at" 
     t.string "last_sign_in_ip"
     t.text "otp_backup_codes"
     t.boolean "otp_required_for_login", default: false

@@ -13,6 +13,9 @@ class Api::V1::Admin::ActivityLogsController < Api::V1::Admin::BaseController
     total_count = logs.count
     logs = logs.offset((page - 1) * per_page).limit(per_page)
 
+    Rails.logger.info "Logs count  -- #{total_count}"
+    Rails.logger.info "Logs generated -- #{logs}"
+
     render json: {
       logs: logs.as_json(
         include: {

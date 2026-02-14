@@ -5,6 +5,7 @@ import { JobService, JobDescription } from '../../services/job.service';
 import { RerunAnalysisModal } from '../rerun-analysis-modal/rerun-analysis-modal.component';
 import { Alert, AlertService } from '../../services/alert.service';
 import { ConfirmationModalComponent } from '../confirmation-modal/confirmation-modal.component';
+import { AuthService } from '../../services/auth.service';
 
 
 @Component({
@@ -23,6 +24,7 @@ export class JobDescriptionListComponent implements OnInit {
     jobDescriptions: JobDescription[] = []; 
     isLoading = true; 
     errorMessage: string | null = null
+    isAdmin = false;
 
     // Modal state
     isRerunModalOpen = false;
@@ -34,12 +36,17 @@ export class JobDescriptionListComponent implements OnInit {
     constructor(
         private jobService: JobService, 
         private router: Router, 
+        private authService: AuthService,
         private cdr: ChangeDetectorRef, 
         private alertService: AlertService
     ) {}
 
     ngOnInit(): void {
         this.loadJobDescriptions(); 
+
+        this.authService.currentUser$.subscribe(user => {
+            this.isAdmin = user?.role === 'admin';
+        });
     }
 
     loadJobDescriptions(): void {

@@ -64,8 +64,9 @@
       </a>
 
       <a 
-        routerLink="/sidekiq"
+        href="http://localhost:3000/sidekiq"
         target="_blank"
+        rel="noopener noreferrer"
         class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -76,15 +77,17 @@
 
     <!-- User Menu -->
     <div class="p-4 border-t border-gray-800">
+      <!-- Exit Admin Mode Button -->
       <a 
         routerLink="/welcome"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition mb-2">
+        class="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition mb-2 text-white">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
-        <span *ngIf="isSidebarOpen" class="font-medium">Main App</span>
+        <span *ngIf="isSidebarOpen" class="font-medium">Exit Admin Mode</span>
       </a>
 
+      <!-- Logout Button -->
       <button 
         (click)="logout()"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition text-left">
@@ -94,9 +97,10 @@
         <span *ngIf="isSidebarOpen" class="font-medium">Logout</span>
       </button>
 
+      <!-- User Info -->
       <div *ngIf="isSidebarOpen && currentUser" class="mt-4 pt-4 border-t border-gray-800">
         <p class="text-xs text-gray-400 truncate">{{ currentUser.email }}</p>
-        <p class="text-xs text-gray-500 uppercase mt-1">{{ currentUser.role }}</p>
+        <p class="text-xs text-red-400 uppercase mt-1 font-semibold">{{ currentUser.role }}</p>
       </div>
     </div>
   </aside>

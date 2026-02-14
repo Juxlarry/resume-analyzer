@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
-@Component({
+@Component({ 
   selector: 'app-welcome',
   standalone: true,
   imports: [CommonModule, RouterLink],
@@ -13,6 +12,7 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./welcome.component.css'],
 })
 export class WelcomeComponent {
+
   features = [
     {
       icon: '🎯',
@@ -38,20 +38,27 @@ export class WelcomeComponent {
 
   isAuthenticated$: Observable<boolean>;
 
+  isLoggedIn = false;
+  userEmail: string | null = null;
+  currentUserRole: string = 'user';
+  isAdmin = false;
+  isModerator = false;
+  isDropdownOpen = false;
+
   constructor( 
     private authService: AuthService,
+    private router: Router
   ){
     this.isAuthenticated$ = this.authService.isAuthenticated$;
   }
 
-  // isAuthenticated$ = this.authService.isAuthenticated$;
-  // isAdmin$ = this.authService.currentUser$.pipe(
-  //   map(user => user?.role === 'admin')
-  // );
-
-  // constructor(private authService: AuthService) {} 
-
-  logout(): void {
-    this.authService.logout();
+  navigateToAnalyze(): void {
+    this.isAuthenticated$.subscribe(isAuth => {
+      if (isAuth) {
+        this.router.navigate(['/analyze']);
+      } else {
+        this.router.navigate(['/login']);
+      }
+    }).unsubscribe();
   }
 }

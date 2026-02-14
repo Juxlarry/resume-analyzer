@@ -31,6 +31,9 @@ export class AdminActivityLogsComponent implements OnInit {
     action_breakdown: {}
   };
 
+  Object = Object;
+  Math = Math;
+
   constructor(
     private adminService: AdminService,
     private alertService: AlertService,
@@ -117,5 +120,10 @@ export class AdminActivityLogsComponent implements OnInit {
     return action.split('_').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
+  }
+
+  getMostCommonAction(): string {
+    const keys = Object.keys(this.stats.action_breakdown);
+    return keys.length > 0 ? this.formatAction(keys[0]) : 'None';
   }
 }

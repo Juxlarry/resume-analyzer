@@ -25,6 +25,7 @@ export class UserProfile {
   showPasswordForm = false; 
   twoFactorEnabled = false; 
   isLoading2FA = true;
+  isAdmin = false;
 
   constructor(
     private fb: FormBuilder, 
@@ -44,6 +45,10 @@ export class UserProfile {
   ngOnInit(): void {
     this.loadUserProfile();
     // this.load2FAStatus();
+
+    this.authService.currentUser$.subscribe(user => {
+      this.isAdmin = user?.role === 'admin';
+    });
   }
 
   loadUserProfile(): void {

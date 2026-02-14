@@ -1,27 +1,4 @@
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-    <!-- Nav Section
-     <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-        <h2 class="text-2xl font-bold text-gray-900">Resume Analyser</h2>
-        <div class="flex gap-4 items-center">
-            <ng-container *ngIf="(isAuthenticated$ | async) === false; else loggedIn">
-                <a routerLink="/login" class="text-gray-700 hover:text-blue-600 transition font-medium">
-                    Sign In
-                </a>
-                <a routerLink="/signup" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
-                    Sign Up
-                </a>
-            </ng-container>
-
-            <ng-template #loggedIn>
-                <button 
-                    (click)="logout()" 
-                    class="text-red-600 hover:text-red-700 transition font-medium">
-                    Logout
-                </button>
-            </ng-template>
-        </div>
-    </nav> -->
-
     <!-- Hero Section -->
     <div class="container mx-auto px-6 py-16">
         <div class="text-center">
@@ -33,11 +10,11 @@
                 instant feedback to improve your chances of landing your dream job.
             </p>
             <div class="flex gap-4 justify-center">
-                <a 
-                    routerLink="/analyze" 
+                <button
+                    (click)="navigateToAnalyze()"
                     class="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                     Start Analysis
-                </a>
+                </button>
                 <a 
                     href="#features" 
                     class="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 transition border-2 border-blue-600">
@@ -60,7 +37,7 @@
             </div>
         </div>
 
-        <!-- How It Works -->
+        <!-- How It Works --> 
         <div class="mt-24">
             <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
                 How It Works
@@ -96,11 +73,11 @@
             <p class="text-xl mb-8 opacity-90">
                 Join thousands of job seekers who have improved their applications
             </p>
-            <a 
-                routerLink="/analyze" 
+            <button
+                (click)="navigateToAnalyze()"
                 class="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block">
                 Get Started Free
-            </a>
+            </button>
         </div>
     </div>
 
@@ -109,12 +86,6 @@
         <div class="container mx-auto px-6 text-center">
             <p>&copy; 2025 Resume Analyser. All rights reserved.</p>
             <div class="mt-4 space-x-4">
-                <!-- Only show admin link to admins 
-                <a *ngIf="isAdmin$ | async" 
-                routerLink="/admin" 
-                class="hover:text-blue-400 transition">
-                    Admin
-                </a> -->
                 <a href="#" class="hover:text-blue-400 transition">Privacy</a>
                 <a href="#" class="hover:text-blue-400 transition">Terms</a>
             </div>

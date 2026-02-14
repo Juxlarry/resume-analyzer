@@ -18,6 +18,7 @@ import { AdminDashboardComponent } from './components/admin/admin-dashboard/admi
 import { AdminUsersComponent } from './components/admin/admin-users/admin-users.component';
 import { AdminJobsComponent } from './components/admin/admin-jobs/admin-jobs.component';
 import { AdminActivityLogsComponent } from './components/admin/admin-activity-logs/admin-activity-logs.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 export const routes: Routes = [
     {
@@ -109,7 +110,11 @@ export const routes: Routes = [
         component: SwaggerDocsComponent 
     },
     {
+        path: 'not-found', 
+        component: NotFoundComponent
+    },
+    {
         path: '**',
-        redirectTo: ''
+        component: NotFoundComponent
     }
 ];

@@ -18,6 +18,7 @@ import { AuthService } from '../../../services/auth.service';
 export class AdminLayoutComponent implements OnInit {
   isSidebarOpen = true;
   currentUser: any = null;
+  sidekiqUrl = 'http://localhost:3000/sidekiq';
 
   constructor(
     private authService: AuthService,
@@ -28,6 +29,12 @@ export class AdminLayoutComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });
+
+    if (window.location.hostname === 'localhost'){
+      this.sidekiqUrl;
+    }else {
+      this.sidekiqUrl = `${window.location.protocol}//${window.location.hostname}/sidekiq`;
+    };
   }
 
   toggleSidebar(): void {

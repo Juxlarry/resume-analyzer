@@ -6,7 +6,7 @@ class AdminActivityLog < ApplicationRecord
     scope :by_user, ->(user_id) { where(user_id: user_id) }
 
 
-    enum action: {
+    enum :action, {
         user_created: 0,
         user_updated: 1,
         user_deleted: 2,
@@ -15,7 +15,7 @@ class AdminActivityLog < ApplicationRecord
         analysis_viewed: 5,
         settings_changed: 6
     }
-
+ 
     # Log an admin action
     def self.log_action(user:, action:, target: nil, details: {}, ip_address: nil)
         create!(

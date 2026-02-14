@@ -62,6 +62,9 @@ gem 'docx'
 #API Documentation - Swagger/OpenAPI Docs
 gem 'rswag-api'
 
+#csv
+gem 'csv'
+
 # Two-Factor Authentication
 gem 'rotp'  # Generate and verify TOTP codes
 gem 'rqrcode'  # Generate QR codes

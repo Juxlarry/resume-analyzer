@@ -64,7 +64,7 @@ export class AdminUsersComponent implements OnInit {
       next: (response: any) => {
         if (response.users){
           this.users = response.users; 
-          this.totalCount = response.pagination?.total_coount || this.users.length;
+          this.totalCount = response.pagination?.total_count || this.users.length;
           this.totalPages = response.pagination?.total_pages || 1
         } else{
           this.users = response; 
@@ -99,7 +99,7 @@ export class AdminUsersComponent implements OnInit {
         const link = document.createElement('a');
         link.href = url;
         link.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
-        link.click();
+        link.click(); 
         window.URL.revokeObjectURL(url);
         
         this.alertService.success('Users exported successfully');

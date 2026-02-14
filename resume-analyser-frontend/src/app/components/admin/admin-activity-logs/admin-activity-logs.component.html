@@ -35,7 +35,7 @@
         <div>
           <p class="text-sm font-medium text-gray-600">Most Common</p>
           <p class="text-xl font-bold text-gray-900 mt-1">
-            {{ formatAction(Object.keys(stats.action_breakdown)[0] || 'None') }}
+            {{ getMostCommonAction() }}
           </p>
         </div>
         <div class="p-3 bg-purple-100 rounded-lg">

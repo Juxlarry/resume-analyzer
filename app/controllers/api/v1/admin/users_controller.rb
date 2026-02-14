@@ -5,15 +5,11 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::BaseController
         page = params[:page]&.to_i || 1
         per_page = params[:per_page]&.to_i || 20
         search = params[:search]
-        
-        # users = User.order(created_at: :desc)
-        #             .offset((page - 1) * per_page)
-        #             .limit(per_page)
 
         users = User.order(created_at: :desc)
 
         if search.present?
-            users. users.where('email ILIKE ?', "%#{search}")
+            users = users.where('email ILIKE ?', "%#{search}")
         end 
 
         total_count = users.count
@@ -104,7 +100,7 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::BaseController
         
         if params[:search].present?
             users = users.where('email ILIKE ?', "%#{params[:search]}%")
-        end
+        end 
 
         csv_data = CSV.generate(headers: true) do |csv|
             csv << ['ID', 'Email', 'Role', 'Sign In Count', 'Last Sign In', '2FA Enabled', 'Created At']
