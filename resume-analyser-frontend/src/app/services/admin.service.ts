@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { APP_CONFIG } from '../config/app-config';
 
 export interface User {
     id: number;
@@ -29,7 +30,7 @@ export interface UpdateProfileData {
     providedIn: 'root'
 })
 export class AdminService {
-    private apiUrl = "http://localhost:3000/api/v1/admin";
+    private apiUrl = APP_CONFIG.apiAdminBaseUrl;
 
     constructor(private http: HttpClient) {}
 

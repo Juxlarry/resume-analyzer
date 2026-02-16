@@ -119,14 +119,25 @@ Login with the SIDEKIQ_USERNAME and SIDEKIQ_PASSWORD you set.
 
 ## Step 9: Update Your Angular Frontend
 
-Update your Angular app's API URL to point to:
-```typescript
-// environment.prod.ts
-export const environment = {
-  production: true,
-  apiUrl: 'https://resume-analyser-api.onrender.com/api/v1'
-};
+Deploy the Angular app from `resume-analyser-frontend/` to Vercel and set:
+
+### Vercel Project Settings
+- Root Directory: `resume-analyser-frontend`
+- Install Command: `npm ci`
+- Build Command: `npm run build`
+- Output Directory: `dist/resume-analyser-frontend/browser`
+
+### Vercel Environment Variables
+Set these in Vercel (Production, and Preview if needed):
+
+```bash
+API_BASE_URL=https://resume-analyser-api.onrender.com/api/v1
+API_ADMIN_BASE_URL=https://resume-analyser-api.onrender.com/api/v1/admin
+API_DOCS_URL=https://resume-analyser-api.onrender.com/api-docs/v1/swagger.yaml
+SIDEKIQ_URL=https://resume-analyser-api.onrender.com/sidekiq
 ```
+
+The frontend reads these values at build time via `scripts/generate-env.mjs`.
 
 ## Important Notes
 

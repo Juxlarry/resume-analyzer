@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
-# exit on error
-set -o errexit
+set -euo pipefail
 
-bundle install
-bundle exec rake assets:precompile
-bundle exec rake assets:clean
+echo "==> Installing gems"
+bundle check || bundle install --jobs 4 --retry 3
 
-# Run database migrations
-bundle exec rake db:migrate
+echo "==> Precompiling assets"
+bundle exec rails assets:precompile
+bundle exec rails assets:clean
 
-# Create cache, queue, and cable databases if they don't exist
-bundle exec rake db:create:cache
-bundle exec rake db:create:queue
-bundle exec rake db:create:cable
+if [[ "${RUN_DB_PREPARE:-false}" == "true" ]]; then
+  echo "==> Preparing database"
+  bundle exec rails db:prepare
+else
+  echo "==> Skipping database preparation (RUN_DB_PREPARE is not true)"
+fi
 
-# Run migrations for solid_cache, solid_queue, solid_cable
-bundle exec rake db:migrate:cache
-bundle exec rake db:migrate:queue
-bundle exec rake db:migrate:cable
-
-# Seed the database (creates admin user)
-bundle exec rake db:seed
+if [[ "${RUN_DB_SEED:-false}" == "true" ]]; then
+  echo "==> Seeding database"
+  bundle exec rails db:seed
+else
+  echo "==> Skipping database seeding (RUN_DB_SEED is not true)"
+fi

@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, interval, switchMap, takeWhile } from "rxjs";
+import { APP_CONFIG } from "../config/app-config";
 
 export interface ResumeFile {
   filename: string; 
@@ -48,7 +49,7 @@ export interface AnalysisStatusResponse {
   providedIn: "root",
 })
 export class JobService {
-  private apiUrl = "http://localhost:3000/api/v1"; 
+  private apiUrl = APP_CONFIG.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
 

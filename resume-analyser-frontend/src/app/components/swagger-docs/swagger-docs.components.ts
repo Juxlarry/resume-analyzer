@@ -1,4 +1,5 @@
 import { Component, AfterViewInit } from '@angular/core';
+import { APP_CONFIG } from '../../config/app-config';
 
 // Declare BOTH globals from the scripts we added to angular.json
 declare const SwaggerUIBundle: any;
@@ -21,7 +22,7 @@ declare const SwaggerUIStandalonePreset: any;
 export class SwaggerDocsComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     SwaggerUIBundle({
-      url: 'http://localhost:3000/api-docs/v1/swagger.yaml',
+      url: APP_CONFIG.apiDocsUrl,
       dom_id: '#swagger-ui',
       deepLinking: true,
       presets: [

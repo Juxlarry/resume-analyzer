@@ -7,7 +7,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 To start a local development server, run:
 
 ```bash
-ng serve
+npm start
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
@@ -31,10 +31,34 @@ ng generate --help
 To build the project run:
 
 ```bash
-ng build
+npm run build
 ```
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Environment variables
+
+This project uses `scripts/generate-env.mjs` to generate `src/environments/environment.generated.ts` before `start` and `build`.
+
+Supported variables:
+
+```bash
+API_BASE_URL=https://your-api.onrender.com/api/v1
+API_ADMIN_BASE_URL=https://your-api.onrender.com/api/v1/admin
+API_DOCS_URL=https://your-api.onrender.com/api-docs/v1/swagger.yaml
+SIDEKIQ_URL=https://your-api.onrender.com/sidekiq
+```
+
+If these are not set, local defaults pointing to `http://localhost:3000` are used.
+
+## Vercel deployment
+
+Set these values in Vercel:
+
+- Root Directory: `resume-analyser-frontend`
+- Install Command: `npm ci`
+- Build Command: `npm run build`
+- Output Directory: `dist/resume-analyser-frontend/browser`
 
 ## Running unit tests
 

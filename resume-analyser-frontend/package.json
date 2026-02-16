@@ -2,6 +2,8 @@
   "name": "resume-analyser-frontend",
   "version": "0.0.0",
   "scripts": {
+    "prestart": "node scripts/generate-env.mjs",
+    "prebuild": "node scripts/generate-env.mjs",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",

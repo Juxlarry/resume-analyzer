@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { Observable, BehaviorSubject, of } from "rxjs";
 import { catchError, map, tap } from "rxjs/operators";
 import { Router } from "@angular/router";
+import { APP_CONFIG } from "../config/app-config";
 
 export interface User {
     id: number;
@@ -53,7 +54,7 @@ export interface TwoFactorEnableResponse{
     providedIn: "root"
 })
 export class AuthService {
-    private apiUrl = "http://localhost:3000/api/v1"; 
+    private apiUrl = APP_CONFIG.apiBaseUrl;
     private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
     public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 

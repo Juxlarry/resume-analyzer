@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { APP_CONFIG } from '../../../config/app-config';
 
 @Component({
   selector: 'app-admin-layout',
@@ -18,23 +19,14 @@ import { AuthService } from '../../../services/auth.service';
 export class AdminLayoutComponent implements OnInit {
   isSidebarOpen = true;
   currentUser: any = null;
-  sidekiqUrl = 'http://localhost:3000/sidekiq';
+  sidekiqUrl = APP_CONFIG.sidekiqUrl;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });
-
-    if (window.location.hostname === 'localhost'){
-      this.sidekiqUrl;
-    }else {
-      this.sidekiqUrl = `${window.location.protocol}//${window.location.hostname}/sidekiq`;
-    };
   }
 
   toggleSidebar(): void {

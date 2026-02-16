@@ -42,7 +42,8 @@ OPENAI_API_KEY=<same-as-web>
 ## After Deployment
 - [ ] Test API: `https://your-app.onrender.com/up`
 - [ ] Test Sidekiq: `https://your-app.onrender.com/sidekiq`
-- [ ] Update Angular frontend API URL
+- [ ] Deploy Angular frontend to Vercel using root directory `resume-analyser-frontend`
+- [ ] Set Vercel env vars: `API_BASE_URL`, `API_ADMIN_BASE_URL`, `API_DOCS_URL`, `SIDEKIQ_URL`
 - [ ] Test file uploads
 - [ ] Test resume analysis job
 
