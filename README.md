@@ -1,5 +1,5 @@
 # Create README.md
-cat > README.md << 'EOF'
+
 # CV Analysis Tool
 
 A full-stack application that analyzes CVs/resumes against job descriptions using AI.
