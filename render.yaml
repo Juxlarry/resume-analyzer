@@ -5,6 +5,7 @@ services:
     env: ruby
     plan: starter # Free tier available
     region: oregon
+    ipAllowList: [] #Allow all
 
   # Redis for Sidekiq
   - type: redis
