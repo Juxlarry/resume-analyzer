@@ -11,12 +11,18 @@ services:
     region: oregon
     plan: starter
     maxmemoryPolicy: noeviction
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: allow all
 
   - type: web
     name: resume-analyser-api
     env: ruby
     region: oregon
     plan: starter
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: allow all
     buildCommand: ./bin/render-build.sh
     startCommand: bundle exec puma -C config/puma.rb
     healthCheckPath: /up
@@ -64,6 +70,9 @@ services:
     env: ruby
     region: oregon
     plan: starter
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: allow all
     buildCommand: ./bin/render-build.sh
     startCommand: bundle exec sidekiq -C config/sidekiq.yml
     envVars:
