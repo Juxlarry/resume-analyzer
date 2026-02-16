@@ -5,10 +5,6 @@ services:
     env: ruby
     plan: starter # Free tier available
     region: oregon
-    databases:
-      - name: resume_analyser_production
-        databaseName: resume_analyser_production
-        user: resume_analyser
 
   # Redis for Sidekiq
   - type: redis
