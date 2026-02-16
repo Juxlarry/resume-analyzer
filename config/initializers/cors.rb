@@ -7,13 +7,25 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins "http://localhost:4200", 
-            "http://127.0.0.1:4200" #Angular dev server
+    # Development origins
+    dev_origins = [
+      "http://localhost:4200", 
+      "http://127.0.0.1:4200"
+    ]
+    
+    # Production origin from environment variable
+    prod_origin = ENV['FRONTEND_URL']
+    
+    # Combine all origins
+    allowed_origins = dev_origins
+    allowed_origins << prod_origin if prod_origin.present?
+
+    origins(*allowed_origins)
 
     resource "*",
       headers: :any,
       methods: [:get, :post, :put, :patch, :delete, :options, :head],
-      credentials: false,
+      credentials: true, # Changed to true for JWT auth
       expose: ['Authorization']
   end
 end

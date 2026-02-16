@@ -3,7 +3,7 @@ class ResumeAnalysisJob < ApplicationJob
   sidekiq_options retry: 3, dead: false 
 
   def perform(job_description_id)
-    Rails.logger.info "=== Starting ResumeAnalysisJob for JD ##{job_description_id} ==="
+    Rails.logger.info "=== Starting  ResumeAnalysisJob for JD ##{job_description_id} ==="
 
     job_description = JobDescription.find(job_description_id)
     analysis = job_description.resume_analysis

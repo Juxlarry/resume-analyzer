@@ -1,0 +1,25 @@
+---
+:concurrency: 5
+:timeout: 25
+:verbose: false
+:queues:
+  - default
+  - mailers
+  - active_storage_analysis
+  - active_storage_purge
+
+# Retry configuration
+:max_retries: 3
+
+# Production-specific settings
+production:
+  :concurrency: 10
+  :timeout: 30
+
+
+#  Development/Test settings
+development:
+  :concurrency: 2
+  
+test:
+  :concurrency: 1
