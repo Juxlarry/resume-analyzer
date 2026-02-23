@@ -8,11 +8,25 @@ const defaults = {
   sidekiqUrl: 'http://localhost:3000/sidekiq',
 };
 
+function normalizeUrl(value, fallback) {
+  const raw = (value || fallback).trim();
+
+  if (/^https?:\/\//i.test(raw)) {
+    return raw.replace(/\/+$/, '');
+  }
+
+  if (raw.startsWith('//')) {
+    return `https:${raw}`.replace(/\/+$/, '');
+  }
+
+  return `https://${raw}`.replace(/\/+$/, '');
+}
+
 const appConfig = {
-  apiBaseUrl: process.env.API_BASE_URL || defaults.apiBaseUrl,
-  apiAdminBaseUrl: process.env.API_ADMIN_BASE_URL || defaults.apiAdminBaseUrl,
-  apiDocsUrl: process.env.API_DOCS_URL || defaults.apiDocsUrl,
-  sidekiqUrl: process.env.SIDEKIQ_URL || defaults.sidekiqUrl,
+  apiBaseUrl: normalizeUrl(process.env.API_BASE_URL, defaults.apiBaseUrl),
+  apiAdminBaseUrl: normalizeUrl(process.env.API_ADMIN_BASE_URL, defaults.apiAdminBaseUrl),
+  apiDocsUrl: normalizeUrl(process.env.API_DOCS_URL, defaults.apiDocsUrl),
+  sidekiqUrl: normalizeUrl(process.env.SIDEKIQ_URL, defaults.sidekiqUrl),
 };
 
 const targetFile = resolve('src/environments/environment.generated.ts');

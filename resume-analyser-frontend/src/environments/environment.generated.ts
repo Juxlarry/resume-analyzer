@@ -6,8 +6,8 @@ export interface AppConfig {
 }
 
 export const environment: AppConfig = {
-  "apiBaseUrl": "http://localhost:3000/api/v1",
-  "apiAdminBaseUrl": "http://localhost:3000/api/v1/admin",
-  "apiDocsUrl": "http://localhost:3000/api-docs/v1/swagger.yaml",
-  "sidekiqUrl": "http://localhost:3000/sidekiq"
+  "apiBaseUrl": "https://resume-analyser-api-production.up.railway.app/api/v1",
+  "apiAdminBaseUrl": "https://resume-analyser-api-production.up.railway.app/api/v1/admin",
+  "apiDocsUrl": "https://resume-analyser-api-production.up.railway.app/api-docs/v1/swagger.yaml",
+  "sidekiqUrl": "https://resume-analyser-api-production.up.railway.app/sidekiq"
 } as const;

@@ -9,18 +9,39 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     # Development origins
     dev_origins = [
-      "http://localhost:4200", 
+      "http://localhost:4200",
       "http://127.0.0.1:4200"
     ]
-    
-    # Production origin from environment variable
-    prod_origin = ENV['FRONTEND_URL']
-    
-    # Combine all origins
-    allowed_origins = dev_origins
-    allowed_origins << prod_origin if prod_origin.present?
 
-    origins(*allowed_origins)
+    # Production origins from environment variables.
+    # FRONTEND_URL supports one origin, FRONTEND_URLS supports comma-separated origins.
+    configured_origins = []
+    configured_origins << ENV["FRONTEND_URL"] if ENV["FRONTEND_URL"].present?
+
+    if ENV["FRONTEND_URLS"].present?
+      configured_origins.concat(ENV["FRONTEND_URLS"].split(","))
+    end
+
+    configured_origins = configured_origins
+      .map { |origin| origin.to_s.strip.sub(%r{/\z}, "") }
+      .reject(&:empty?)
+
+    # Combine all origins
+    allowed_origins = (dev_origins + configured_origins).uniq
+
+    # Optional Vercel preview support:
+    # VERCEL_PROJECT_PREFIX=resume-analyzer will allow
+    # https://resume-analyzer-*.vercel.app
+    vercel_project_prefix = ENV["VERCEL_PROJECT_PREFIX"].to_s.strip
+    vercel_preview_regex = if vercel_project_prefix.present?
+      /\Ahttps:\/\/#{Regexp.escape(vercel_project_prefix)}(?:-[a-z0-9-]+)?\.vercel\.app\z/i
+    end
+
+    if vercel_preview_regex
+      origins(*allowed_origins, vercel_preview_regex)
+    else
+      origins(*allowed_origins)
+    end
 
     resource "*",
       headers: :any,
