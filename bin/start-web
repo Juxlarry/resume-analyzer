@@ -3,6 +3,11 @@ set -euo pipefail
 
 cd /rails
 
+if [ -z "${DATABASE_URL:-}" ]; then
+  echo "DATABASE_URL is not set. Configure Railway Postgres and expose DATABASE_URL to this service."
+  exit 1
+fi
+
 if [ "${RUN_DB_PREPARE:-true}" = "true" ]; then
   echo "Running db:prepare..."
   bin/rails db:prepare
