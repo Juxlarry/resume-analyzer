@@ -1,19 +1,5 @@
 #!/bin/bash
-set -e
-
-echo "Database Setup Starting..."
+set -euo pipefail
 
 cd /rails
-
-# Prepare database
-echo "Running db:prepare..."
-bin/rails db:prepare
-
-# Seed database
-echo "Running db:seed..."
-bin/rails db:seed
-
-echo "Database Ready!"
-
-# Start the application
 exec "$@"

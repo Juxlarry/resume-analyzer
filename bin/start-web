@@ -1,0 +1,18 @@
+#!/bin/bash
+set -euo pipefail
+
+cd /rails
+
+if [ "${RUN_DB_PREPARE:-true}" = "true" ]; then
+  echo "Running db:prepare..."
+  bin/rails db:prepare
+else
+  echo "Skipping db:prepare (RUN_DB_PREPARE=${RUN_DB_PREPARE:-unset})"
+fi
+
+if [ "${RUN_DB_SEED:-false}" = "true" ]; then
+  echo "Running db:seed..."
+  bin/rails db:seed
+fi
+
+exec ./bin/thrust ./bin/rails server
