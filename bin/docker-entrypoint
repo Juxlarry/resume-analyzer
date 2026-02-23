@@ -1,8 +1,27 @@
 #!/bin/bash -e
 
-# If running the rails server then create or migrate existing database
-if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
-  ./bin/rails db:prepare
+# Enable jemalloc for reduced memory usage and latency
+if [ -z "${LD_PRELOAD+x}" ]; then
+  LD_PRELOAD=$(find /usr/lib -name libjemalloc.so.2 -print -quit)
+  export LD_PRELOAD
+fi
+
+# If running the rails server (via Thruster or directly), prepare the database
+if [[ "${*}" == *"rails server"* ]] || [[ "${*}" == *"./bin/thrust"* ]]; then
+  echo "🔄 Preparing database..."
+  
+  # Create database if it doesn't exist (for first-time setup)
+  bin/rails db:prepare 2>/dev/null || bin/rails db:create
+  
+  # Run migrations
+  echo "🔄 Running migrations..."
+  bin/rails db:migrate
+  
+  # Run seeds (only creates admin if doesn't exist)
+  echo "🌱 Running seeds..."
+  bin/rails db:seed
+  
+  echo "✅ Database ready!"
 fi
 
 exec "${@}"
