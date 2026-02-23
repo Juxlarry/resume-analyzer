@@ -91,12 +91,13 @@ Rails.application.configure do
   config.hosts << /.*\.railway\.app/
   config.hosts << /.*\.up\.railway\.app/
 
-  if ENV["FRONTEND_URL"].present?
+  frontend_url = ENV["FRONTEND_URL"].to_s.strip
+  if frontend_url.present?
     begin
-      frontend_host = URI.parse(ENV["FRONTEND_URL"]).host
+      frontend_host = URI.parse(frontend_url).host
       config.hosts << frontend_host if frontend_host.present?
     rescue URI::InvalidURIError
-      Rails.logger.warn("FRONTEND_URL is not a valid URL: #{ENV['FRONTEND_URL']}")
+      $stderr.puts("FRONTEND_URL is not a valid URL: #{frontend_url.inspect}")
     end
   end
 
