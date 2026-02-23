@@ -37,4 +37,4 @@ jobs:
         RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
 
     - name: Success
-      run: echo "✅ Build successful!"
+      run: echo "Build successful!"
