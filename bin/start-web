@@ -20,4 +20,6 @@ if [ "${RUN_DB_SEED:-false}" = "true" ]; then
   bin/rails db:seed
 fi
 
-exec ./bin/thrust ./bin/rails server
+export PORT="${PORT:-8080}"
+echo "Starting Puma on PORT=${PORT}..."
+exec bundle exec puma -C config/puma.rb
