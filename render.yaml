@@ -1,6 +1,6 @@
 databases:
   - name: resume-analyser-db
-    plan: starter
+    plan: free
     region: oregon
     databaseName: resume_analyser_production
     user: resume_analyser
@@ -9,7 +9,7 @@ services:
   - type: redis
     name: resume-analyser-redis
     region: oregon
-    plan: starter
+    plan: free
     maxmemoryPolicy: noeviction
     ipAllowList:
       - source: 0.0.0.0/0
@@ -19,7 +19,7 @@ services:
     name: resume-analyser-api
     env: ruby
     region: oregon
-    plan: starter
+    plan: free
     ipAllowList:
       - source: 0.0.0.0/0
         description: allow all

@@ -1,0 +1,40 @@
+name: Build Check
+
+# This is a minimal CI that just checks if your app builds
+# Good for getting started - no tests required
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3.0'
+        bundler-cache: true
+
+    - name: Install dependencies
+      run: bundle install
+
+    - name: Check bundle
+      run: bundle check
+
+    - name: Precompile assets
+      run: bundle exec rails assets:precompile
+      env:
+        RAILS_ENV: production
+        SECRET_KEY_BASE: dummy_secret_for_ci
+        RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+
+    - name: Success
+      run: echo "✅ Build successful!"
