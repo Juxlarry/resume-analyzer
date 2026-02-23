@@ -43,10 +43,10 @@ This project uses `scripts/generate-env.mjs` to generate `src/environments/envir
 Supported variables:
 
 ```bash
-API_BASE_URL=https://your-api.onrender.com/api/v1
-API_ADMIN_BASE_URL=https://your-api.onrender.com/api/v1/admin
-API_DOCS_URL=https://your-api.onrender.com/api-docs/v1/swagger.yaml
-SIDEKIQ_URL=https://your-api.onrender.com/sidekiq
+API_BASE_URL=https://your-api.up.railway.app/api/v1
+API_ADMIN_BASE_URL=https://your-api.up.railway.app/api/v1/admin
+API_DOCS_URL=https://your-api.up.railway.app/api-docs/v1/swagger.yaml
+SIDEKIQ_URL=https://your-api.up.railway.app/sidekiq
 ```
 
 If these are not set, local defaults pointing to `http://localhost:3000` are used.

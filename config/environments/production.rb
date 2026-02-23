@@ -1,4 +1,5 @@
 require "active_support/core_ext/integer/time"
+require "uri"
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
@@ -56,11 +57,14 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
+  public_host = ENV["APP_HOST"].presence ||
+                ENV["RAILWAY_PUBLIC_DOMAIN"].presence ||
+                "localhost"
+
   # Set host to be used by links generated in mailer templates.
-  # config.action_mailer.default_url_options = { host: "example.com" }
-  config.action_mailer.default_url_options = { 
-    host: ENV.fetch('RENDER_EXTERNAL_HOSTNAME', 'resume-analyser-api.onrender.com'),
-    protocol: 'https' 
+  config.action_mailer.default_url_options = {
+    host: public_host,
+    protocol: "https"
   }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
@@ -83,16 +87,25 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [ :id ]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
-  # Allow requests from Render domain
-  config.hosts << ENV.fetch('RENDER_EXTERNAL_HOSTNAME', 'resume-analyser-api.onrender.com')
-  config.hosts << /.*\.onrender\.com/ # Allow all Render subdomains
+  config.hosts << public_host
+  config.hosts << /.*\.railway\.app/
+  config.hosts << /.*\.up\.railway\.app/
+
+  if ENV["FRONTEND_URL"].present?
+    begin
+      frontend_host = URI.parse(ENV["FRONTEND_URL"]).host
+      config.hosts << frontend_host if frontend_host.present?
+    rescue URI::InvalidURIError
+      Rails.logger.warn("FRONTEND_URL is not a valid URL: #{ENV['FRONTEND_URL']}")
+    end
+  end
 
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
-   # Action Controller default URL options
-  config.action_controller.default_url_options = { 
-    host: ENV.fetch('RENDER_EXTERNAL_HOSTNAME', 'resume-analyser-api.onrender.com'),
-    protocol: 'https' 
+  # Action Controller default URL options
+  config.action_controller.default_url_options = {
+    host: public_host,
+    protocol: "https"
   }
 end

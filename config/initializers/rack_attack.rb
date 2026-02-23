@@ -71,7 +71,8 @@ class Rack::Attack
 
   # Block suspicious requests
   blocklist('block-bad-actors') do |req|
-    # Block if User-Agent is missing or looks suspicious
-    req.user_agent.blank? || req.user_agent =~ /curl|wget|python/i
+    # Keep this focused on common scanner signatures to avoid false positives.
+    user_agent = req.user_agent.to_s
+    user_agent.match?(/sqlmap|nikto|nmap|masscan/i)
   end
 end
