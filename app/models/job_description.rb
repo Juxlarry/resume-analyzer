@@ -62,8 +62,11 @@ class JobDescription < ApplicationRecord
                 errors.add(:resume, "file appears to be corrupted or has an invalid format")
             end 
         end 
+    rescue ActiveStorage::FileNotFoundError => e
+        Rails.logger.error "File signature validation storage error: #{e.class} - #{e.message}"
+        errors.add(:resume, "uploaded file could not be read from storage. Check ACTIVE_STORAGE_SERVICE and AWS_* variables.")
     rescue => e
-        Rails.logger.error "File signature validation error: #{e.message}"
-        errors.add(:resume, "could not validate file format")
+        Rails.logger.error "File signature validation error: #{e.class} - #{e.message}"
+        errors.add(:resume, "could not validate file format due to storage/read error")
     end
 end 
