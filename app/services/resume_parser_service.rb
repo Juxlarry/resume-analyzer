@@ -4,7 +4,7 @@ class ResumeParserService
     end 
 
     def self.extract_text(resume_file)
-        return "No resume provided/attached" if  resume_file.blank?
+        return "No resume provided/attached" if resume_file.blank?
 
         #download the file to temp location 
         tempfile = Tempfile.new(['resume', File.extname(resume_file.filename.to_s)])
@@ -15,6 +15,14 @@ class ResumeParserService
                 tempfile.write(chunk)
         end 
         tempfile.rewind
+
+        # Signature check happens here — file is already on disk, no extra S3 call
+        unless valid_file_signature?(tempfile, resume_file.content_type)
+        Rails.logger.error "Resume signature mismatch for #{resume_file.filename}"
+        return "Could not process resume: file appears corrupted or format is invalid"
+        end
+
+        tempfile.rewind  # rewind again after signature read
 
         #Extract text based on content type
         case resume_file.content_type
@@ -35,6 +43,22 @@ class ResumeParserService
 
     private 
 
+    def self.valid_file_signature?(tempfile, content_type)
+        signature = tempfile.read(4)
+        tempfile.rewind
+
+        case content_type
+        when "application/pdf"
+            signature&.start_with?("%PDF")
+        when "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            signature&.start_with?("PK")  # DOCX is a zip
+        when "application/msword"
+            signature&.bytes&.first(4) == [0xD0, 0xCF, 0x11, 0xE0]  # legacy DOC
+        else
+            false
+        end
+    end
+
     def self.extract_text_from_pdf(file_path)
         reader = PDF::Reader.new(file_path)
         text = reader.pages.map(&:text).join("\n").strip
@@ -54,7 +78,7 @@ class ResumeParserService
         return text   
     rescue => e
         Rails.logger.error "PDF parsing error: #{e.class} - #{e.message}"
-        "Could not extract text from PDF: #{e.message}"
+        "Could not extract text from PDF: #{e.message}" 
     end 
 
     def self.extract_text_from_docx(file_path)

@@ -32,8 +32,8 @@ class JobDescription < ApplicationRecord
         return unless resume.attached?
 
         acceptable_types = [
-            "application/pdf", 
-            "application/msword", 
+            "application/pdf",
+            "application/msword",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ]
 
@@ -44,29 +44,5 @@ class JobDescription < ApplicationRecord
         if resume.byte_size > 10.megabytes
             errors.add(:resume, "is too large. Maximum size is 10MB.")
         end
-
-        validate_file_signature
-    end
-
-    def validate_file_signature
-        return unless resume.attached?
-
-        resume.open do |file| 
-            signature = file.read(4)
-
-            is_pdf = signature&.start_with?("%PDF")
-            is_docx = signature&.start_with?("PK")
-            is_doc = signature&.bytes&.first(4) == [0xD0, 0xCF, 0x11, 0xE0]
-
-            unless is_pdf || is_docx || is_doc
-                errors.add(:resume, "file appears to be corrupted or has an invalid format")
-            end 
-        end 
-    rescue ActiveStorage::FileNotFoundError => e
-        Rails.logger.error "File signature validation storage error: #{e.class} - #{e.message}"
-        errors.add(:resume, "uploaded file could not be read from storage. Check ACTIVE_STORAGE_SERVICE and AWS_* variables.")
-    rescue => e
-        Rails.logger.error "File signature validation error: #{e.class} - #{e.message}"
-        errors.add(:resume, "could not validate file format due to storage/read error")
     end
 end 
