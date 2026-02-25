@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { AlertComponent } from './components/alert/alert.component';
+import { injectSpeedInsights } from '@vercel/speed-insights';
 
 @Component({
   selector: 'app-root',
@@ -20,4 +21,8 @@ import { AlertComponent } from './components/alert/alert.component';
 })
 export class App {
   protected readonly title = signal('resume-analyser-frontend');
+
+  constructor() {
+    injectSpeedInsights();
+  }
 }
