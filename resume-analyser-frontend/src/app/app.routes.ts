@@ -9,6 +9,7 @@ import { ResetPasswordComponent } from './components/auth/reset-password/reset-p
 import { JobDescriptionDetailComponent } from './components/job-description-detail/job-description-detail.component';
 import { JobDescriptionListComponent } from './components/job-descriptions-list/job-descriptions-list.component';
 import { JobFormComponent } from './components/job-form/job-form.component';
+import { ResumeRewriteComponent } from './components/resume-rewrite/resume-rewrite.component';
 import { UserProfile } from './components/user-profile/user-profile.component';
 import { TwoFactorSettingsComponent } from './components/two-factor-settings/two-factor-settings.component';
 import { TwoFactorSetupComponent } from './components/two-factor-setup/two-factor-setup.component'; 
@@ -59,6 +60,11 @@ export const routes: Routes = [
     {
         path: 'job-descriptions/:id',
         component: JobDescriptionDetailComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'job-descriptions/:id/rewrite',
+        component: ResumeRewriteComponent,
         canActivate: [authGuard]
     },
     {

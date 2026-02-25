@@ -19,6 +19,8 @@ Rails.application.routes.draw do
     post '/api/v1/login/verify_otp', to: 'api/v1/sessions#verify_otp'
   end
 
+  instance_eval(File.read(Rails.root.join("config/routes_resume_rewrites.rb")))
+
   get "/up", to: proc { [200, {}, ["OK"]] }
 
   namespace :api do 

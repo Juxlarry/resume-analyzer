@@ -1,5 +1,6 @@
 class ResumeAnalysis < ApplicationRecord
     belongs_to :job_description
+    has_many :resume_rewrites, dependent: :destroy
 
     enum :status, {pending: 0, processing: 1, completed: 2, failed: 3 }, default: :pending
 

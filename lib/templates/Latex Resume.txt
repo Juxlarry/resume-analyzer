@@ -1,0 +1,253 @@
+%-------------------------
+% Resume in Latex
+% Author : Jake Gutierrez
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+
+%----------FONT OPTIONS----------
+% sans-serif
+% \usepackage[sfdefault]{FiraSans}
+% \usepackage[sfdefault]{roboto}
+% \usepackage[sfdefault]{noto-sans}
+% \usepackage[default]{sourcesanspro}
+
+% serif
+% \usepackage{CormorantGaramond}
+% \usepackage{charter}
+
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+%----------HEADING----------
+% \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+%   \textbf{\href{http://sourabhbajaj.com/}{\Large Sourabh Bajaj}} & Email : \href{mailto:sourabh@sourabhbajaj.com}{sourabh@sourabhbajaj.com}\\
+%   \href{http://sourabhbajaj.com/}{http://www.sourabhbajaj.com} & Mobile : +1-123-456-7890 \\
+% \end{tabular*}
+
+\begin{center}
+    \textbf{\Huge \scshape Lawrence Danso} \\ \vspace{1pt}
+    \small +233-200-079-9993 $|$ \href{mailto:x@x.com}{\underline{lawrencedanso.jnr@gmail.com}} $|$ 
+    \href{https://linkedin.com/in/...}{\underline{linkedin.com/in/kadlj}} $|$
+    \href{https://github.com/...}{\underline{github.com/Juxlarry}}
+\end{center}
+
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Accra Institute of Technology}{Accra, Ghana}
+      {Bachelor of Science in Information Technology} {}
+      \emph \newline \newline{\textit{Major in Software Engineering}} {}
+ \resumeSubheading
+      {Prempeh College}{Kumasi, Ghana}
+      {General Science} {}
+  \resumeSubHeadingListEnd
+
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+
+    \resumeSubheading
+      {Senior Software Engineer}{Sept 2024 -- Oct 2025}
+      {4th-IR}{Tse Addo, Ghana}
+      \resumeItemListStart
+        \resumeItem{Contributed to the build and Architecture of a Data Modeling tool integrated with an LLM }
+        \resumeItem{Contributed to the Development of a full-stack Resume Management Application }
+        \resumeItem{Led Development of projects as Associate Product Owner, clarifying application requirements and resolving development bottlenecks }
+        \resumeItem{Built scripts and developer tools to streamline application development workflows, increasing sprint efficiency by 20 percent }
+        \resumeItem{Automated Risk Audit workflows to automatically ensure security best practices and transaction workflows }
+      \resumeItemListEnd
+      
+% -----------Multiple Positions Heading-----------
+%    \resumeSubSubheading
+%     {Software Engineer I}{Oct 2014 - Sep 2016}
+%     \resumeItemListStart
+%        \resumeItem{Apache Beam}
+%          {Apache Beam is a unified model for defining both batch and streaming data-parallel processing pipelines}
+%     \resumeItemListEnd
+%    \resumeSubHeadingListEnd
+%-------------------------------------------
+
+    \resumeSubheading
+      {Senior Software \& Automation Engineer}{Dec. 2021 -- Sept 2024}
+      {Enterprise Computing Ltd}{Tema, Ghana}
+      \resumeItemListStart
+        \resumeItem{Contributed and Built enterprise application platforms for Employee, Visitors, Insurance and Health  industries serving multiple business units in production}
+        \resumeItem{Integrated AI agents for intelligent task routing and processing, reducing manual operational effort by \~40\% and improving turnaround times by \~25\%}
+        \resumeItem{Developed GitHub collaboration visualizations, cutting code review times from 7 days to 2 days and increasing weekly pull requests from 10 to 25.}
+        \resumeItem{ Participated in code reviews as both author and reviewer, maintaining high standards for code quality, test coverage, and maintainability. }
+    \resumeItemListEnd
+
+    \resumeSubheading
+      {Software Developer}{Jan 2019 -- Nov 2021}
+      {Devdex Software}{Tema, Ghana}
+      \resumeItemListStart
+        \resumeItem{Contributed to design and build of Subscription-based Electronic Medical Records System serving 8+ health institutions with 150+ concurrent healthcare providers processing 2,000+ patient transactions weekly. }
+        \resumeItem{ Contributed to scaling of Rails monolithic application scaled to support 50K+ patient records and 120K+ annual recurring revenue }
+        \resumeItem{Designed transactional workflows ensuring ACID compliance for sensitive medical records, financial billing data, and audit trails. }
+        \resumeItem{Monitored production systems, debugged issues, and iterated on features based on user feedback and institutional requirements. }
+      \resumeItemListEnd
+
+  \resumeSubHeadingListEnd
+
+
+%-----------PROJECTS-----------
+\section{Projects}
+    \resumeSubHeadingListStart
+      \resumeProjectHeading
+          {\textbf{Risk Assessment Suite} $|$ \emph{.Net, ER Framework, MS Power Automate}}{Oct 2024 -- Oct 2025}
+          \resumeItemListStart
+            \resumeItem{Contributed and developed new features in the Risk Assessment Suite Application of Zurich Insurance in .Net 8.0 with ER Framework. Integrated application with Microsoft Suite of Applications such as Power Automate, Co-Pilot and Power Apps to streamline automated and intelligent tasks. }
+          \resumeItemListEnd
+        \resumeProjectHeading
+          {\textbf{Resume Scanning Application} $|$ \emph{Python, Django, React, Nextjs, MongoDB, MySQL, PyTorch, Pydantic, LLM }}{Oct 2024 -- Oct 2025}
+          \resumeItemListStart
+            \resumeItem{Contributed to design, development and deployment of HR Resume Scanning application for institutions following the APS Resume standard. Application integrated Python Django backend to a React Frontend, connected to a MySQL Database and MongoDB NoSQL for file management. Application interacts with LLM data model trained to intelligent scan and recommend resumes. Acted as Associate Product Owner for the Project, helping to resolve development bottlenecks, documentation and resource allocation.  }
+          \resumeItemListEnd
+        \resumeProjectHeading
+          {\textbf{}  \emph{}}{}
+          \resumeItemListStart
+          \resumeItemListEnd
+      \resumeProjectHeading
+          {\textbf{Insurance Suite Application} $|$ \emph{ASP .Net, Angular, RESTAPI, Javascript, C#, MySQL }}{Jan 2022 -- May 2023}
+          \resumeItemListStart
+            \resumeItem{Contributed and built an insurance application to handle all insurance suite activities from clients on-boarding to policy subscription. Involved in application build from design stage to development and production. Application has transactional workflows, security best practices and payment integrations. Application integrated with core insurance systems and applications.   }
+          \resumeItemListEnd
+        \resumeProjectHeading
+          {\textbf{Employee \& HR Management Application} $|$ \emph{Javascript, Nodejs, Expressjs, Angular, GraphQL, Firebase}}{May 2022 -- Feb 2024}
+          \resumeItemListStart
+            \resumeItem{An HR Management application to manage employees and HR services for institutions, scaled to handle institutions with 10k+ users. The application built with Express js and Angular, implements real-time notifcation system, Leave Management, Client Salary Management and integrations with 3rd party Pension or Fund Management institutions. In addition, it tracks company inventory and stays up to date with data integrity principles and security best practices. }
+          \resumeItemListEnd
+        \resumeProjectHeading
+          {\textbf{Financial RPA \& Banking Automation } $|$ \emph{Python, OpenPyxl, ASP.Net, Core Banking Applications}}{Sep 2022 -- Sep 2024}
+          \resumeItemListStart
+            \resumeItem{ Automation platform processing 10K+ daily banking transactions across multiple institutions. Built reconciliation workflows reducing manual processing time by 25-35\%. Integrated with core banking APIs for real-time account synchronization. Developed data pipelines ensuring financial accuracy and regulatory compliance. Automation scripts built in Python and ASP.Net }
+          \resumeItemListEnd
+        \resumeProjectHeading
+          {\textbf{Yarysa EMR} $|$ \emph{Ruby on Rails, Ruby, PostgresQL, Sidekiq, Redis, Javascript, }}{Mar 2019 -- Nov 2021}
+          \resumeItemListStart
+            \resumeItem{ Contributor to subscription-based healthcare platform serving multiple institutions. Built subscription billing workflows managing recurring revenue across institutional accounts. Developed transactional patient management system requiring financial-grade data integrity. Implemented background job processing for async billing and notification workflows. Deployed and scaled on Heroku with PostgreSQL and Redis. Owned and developed the Stock and Inventory management module of the application to help track over 1000+ inventory items and improve operational efficiency by reducing wastage and inventory bottlenecks. Built a Customer Feedback Application integrated with the Monolith application to allow clients to give honest anonymous feedback, improving customer satisfaction and increasing customer retention by 35\%.  }
+          \resumeItemListEnd
+        \resumeProjectHeading
+          {\textbf{Vinylfinery Online Store } $|$ \emph{Wordpress, PHP, WooCommerce, Javascript}}{Sep 2021 -- Dec 2021}
+          \resumeItemListStart
+            \resumeItem{ Developed and Provided technical support and optimization for WordPress e-commerce platform. Implemented custom payment gateway configurations and checkout flow improvements. Optimized site performance and database queries for improved customer experience. }
+          \resumeItemListEnd
+        
+    \resumeSubHeadingListEnd
+
+
+
+%
+%-----------PROGRAMMING SKILLS-----------
+\section{Technical Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+     \textbf{Languages}{: Ruby, Python, C#, SQL (MySQL, Postgres), JavaScript, HTML/CSS, NoSQL (MongoDB) } \\
+     \textbf{Frameworks}{: Ruby on Rails, Angular, Node.js, ASP .Net, Django, WordPress, Material-UI, FastAPI, TailwinCSS, Bootstrap, Express js, } \\
+     \textbf{Developer Tools}{: GraphQl, RESTAPI, Postman, Git, Docker, Microsoft Azure, Google Cloud Platform, VS Code, Visual Studio, PyCharm, IntelliJ, Eclipse} \\
+     \textbf{Libraries}{: pandas, NumPy, Matplotlib }
+    }}
+ \end{itemize}
+
+\section{Certificates}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+    \textbf{AWS Cloud}{: AWS Cloud Practitioner } \\
+     \textbf{Certified Application Security Engineer}{: Java (EC-Council) - Security best practices } \\
+     \textbf{Microsoft Azure}{: Azure Fundamentals } \\
+     \textbf{PMI-ACP}{: PMI Agile Certified Practitioner } \\
+     \textbf{Microsoft Power Platform}{: Power Platform Architect, Power Automate Expert  } \\
+    }}
+ \end{itemize}
+%-------------------------------------------
+\end{document}
