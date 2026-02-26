@@ -7,6 +7,7 @@ import { Subscription, interval } from 'rxjs';
 import { switchMap, takeWhile } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../confirmation-modal/confirmation-modal.component';
 import { AlertService } from '../../services/alert.service';
+import { ResumeRewriteListItem, ResumeRewriteService } from '../../services/resume-rewrite.service';
 
 @Component({
   selector: 'app-job-description-detail',
@@ -30,13 +31,17 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
   // Modal state
   isRerunModalOpen = false;
   isDeleteConfirmOpen = false;
+  latestRewriteId: number | null = null;
+  hasCompletedRewrite = false;
+  isDownloadingRewrite = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private jobService: JobService, 
     private cdr: ChangeDetectorRef, 
-    private alertService: AlertService
+    private alertService: AlertService,
+    private resumeRewriteService: ResumeRewriteService
   ) {}
 
   ngOnInit(): void {
@@ -58,6 +63,8 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.jobDescription = data;
         this.isLoading = false;
+        this.latestRewriteId = null;
+        this.hasCompletedRewrite = false;
         this.cdr.detectChanges();
 
         // Start polling if processing
@@ -65,6 +72,8 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
             data.resume_analysis?.status === 'pending') {
           this.startPolling(jobId);
         }
+
+        this.loadLatestRewrite();
       },
       error: (error) => {
         console.error('Error loading job description:', error);
@@ -73,6 +82,90 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  loadLatestRewrite(): void {
+    const analysisId = this.jobDescription?.resume_analysis?.id;
+    if (!analysisId || this.jobDescription?.resume_analysis?.status !== 'completed') return;
+
+    this.resumeRewriteService.listRewrites(analysisId).subscribe({
+      next: (rewrites: ResumeRewriteListItem[]) => {
+        if (!rewrites.length) return;
+
+        const latest = rewrites[0];
+        this.latestRewriteId = latest.id;
+        this.hasCompletedRewrite = latest.status === 'completed';
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        // non-blocking; rewrite button still works
+      }
+    });
+  }
+
+  downloadLatestRewritePdf(): void {
+    if (!this.latestRewriteId) {
+      this.alertService.warning('No generated rewrite found yet.');
+      return;
+    }
+
+    this.isDownloadingRewrite = true;
+    this.resumeRewriteService.downloadPdf(this.latestRewriteId).subscribe({
+      next: (response) => {
+        this.handleRewriteDownload(response.body, response.headers.get('content-disposition'), 'pdf');
+        this.isDownloadingRewrite = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        this.isDownloadingRewrite = false;
+        const apiError = error?.error?.error || 'Failed to download generated PDF.';
+        this.alertService.error(apiError);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  downloadLatestRewriteLatex(): void {
+    if (!this.latestRewriteId) {
+      this.alertService.warning('No generated rewrite found yet.');
+      return;
+    }
+
+    this.isDownloadingRewrite = true;
+    this.resumeRewriteService.downloadLatex(this.latestRewriteId).subscribe({
+      next: (response) => {
+        this.handleRewriteDownload(response.body, response.headers.get('content-disposition'), 'tex');
+        this.isDownloadingRewrite = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        this.isDownloadingRewrite = false;
+        const apiError = error?.error?.error || 'Failed to download generated LaTeX.';
+        this.alertService.error(apiError);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private handleRewriteDownload(blob: Blob | null, disposition: string | null, extension: 'pdf' | 'tex'): void {
+    if (!blob) {
+      this.alertService.error('No file data returned.');
+      return;
+    }
+
+    const filename = this.extractDownloadFilename(disposition) || `resume_rewrite.${extension}`;
+    const objectUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = filename;
+    link.click();
+    window.URL.revokeObjectURL(objectUrl);
+  }
+
+  private extractDownloadFilename(disposition: string | null): string | null {
+    if (!disposition) return null;
+    const match = disposition.match(/filename="?([^";]+)"?/i);
+    return match?.[1] ?? null;
   }
 
   startPolling(jobId: number): void {

@@ -146,6 +146,9 @@ class LlmAnalyzerService
 
         Provide match_score, summary, strengths, weaknesses, recommendations, missing_keywords, and verdict.
 
+        Make the recommendations actionable and specific. 
+        Use the scoring guide to determine the verdict.
+
         Remember: Respond ONLY with the JSON object. No additional text.
         PROMPT
     end

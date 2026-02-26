@@ -9,6 +9,7 @@ import { JobDescription, JobService } from '../../services/job.service';
 import {
   AdditionalProject,
   CreateResumeRewritePayload,
+  ResumeRewriteListItem,
   ResumeRewriteService,
   ResumeRewriteStatusResponse
 } from '../../services/resume-rewrite.service';
@@ -80,6 +81,8 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
         this.availableSuggestions = this.extractSuggestions(job.resume_analysis?.recommendations);
         this.isLoading = false;
         this.cdr.detectChanges();
+
+        this.restoreLatestRewrite();
       },
       error: () => {
         this.errorMessage = 'Failed to load analysis details.';
@@ -176,8 +179,11 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
         this.rewriteId = response.id;
         this.rewriteStatus = response.status;
         this.isSubmitting = false;
+        this.hasPdfDownload = false;
+        this.latexCode = '';
+        this.rewriteError = '';
         this.cdr.detectChanges();
-        this.startPolling();
+        this.startPolling(true);
       },
       error: (error) => {
         this.isSubmitting = false;
@@ -236,7 +242,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
     });
   }
 
-  private startPolling(): void {
+  private startPolling(notifyOnCompletion: boolean = true): void {
     if (!this.rewriteId) return;
 
     this.pollingSubscription?.unsubscribe();
@@ -249,18 +255,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (response: ResumeRewriteStatusResponse) => {
-          this.rewriteStatus = response.status;
-
-          if (response.status === 'completed') {
-            this.latexCode = response.result?.latex_code ?? '';
-            this.hasPdfDownload = response.result?.has_pdf ?? false;
-            this.alertService.success('Resume rewrite completed.');
-            this.cdr.detectChanges();
-          } else if (response.status === 'failed') {
-            this.rewriteError = response.error || 'Rewrite failed.';
-            this.alertService.error(this.rewriteError);
-            this.cdr.detectChanges();
-          }
+          this.applyRewriteStatus(response, notifyOnCompletion);
         },
         error: () => {
           this.rewriteError = 'Failed to poll rewrite status.';
@@ -272,6 +267,61 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
 
   private hasCompletedAnalysis(): boolean {
     return this.jobDescription?.resume_analysis?.status === 'completed';
+  }
+
+  private restoreLatestRewrite(): void {
+    const analysisId = this.jobDescription?.resume_analysis?.id;
+    if (!analysisId || this.jobDescription?.resume_analysis?.status !== 'completed') return;
+
+    this.rewriteService.listRewrites(analysisId).subscribe({
+      next: (rewrites: ResumeRewriteListItem[]) => {
+        if (!rewrites.length) return;
+
+        const latest = rewrites[0];
+        this.rewriteId = latest.id;
+        this.rewriteStatus = latest.status;
+        this.cdr.detectChanges();
+
+        if (latest.status === 'pending' || latest.status === 'processing') {
+          this.startPolling(false);
+          return;
+        }
+
+        this.loadRewriteStatus(latest.id);
+      },
+      error: () => {
+        // non-blocking; user can still create a fresh rewrite
+      }
+    });
+  }
+
+  private loadRewriteStatus(rewriteId: number): void {
+    this.rewriteService.getRewriteStatus(rewriteId).subscribe({
+      next: (response: ResumeRewriteStatusResponse) => {
+        this.applyRewriteStatus(response, false);
+      },
+      error: () => {
+        // non-blocking
+      }
+    });
+  }
+
+  private applyRewriteStatus(response: ResumeRewriteStatusResponse, notifyOnCompletion: boolean): void {
+    this.rewriteStatus = response.status;
+
+    if (response.status === 'completed') {
+      this.latexCode = response.result?.latex_code ?? '';
+      this.hasPdfDownload = response.result?.has_pdf ?? false;
+      this.rewriteError = '';
+      if (notifyOnCompletion) {
+        this.alertService.success('Resume rewrite completed.');
+      }
+    } else if (response.status === 'failed') {
+      this.rewriteError = response.error || 'Rewrite failed.';
+      this.alertService.error(this.rewriteError);
+    }
+
+    this.cdr.detectChanges();
   }
 
   private extractSuggestions(recommendationsHtml: string | undefined): string[] {

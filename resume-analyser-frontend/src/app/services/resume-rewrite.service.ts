@@ -57,6 +57,14 @@ export interface ResumeRewriteStatusResponse {
   error?: string;
 }
 
+export interface ResumeRewriteListItem {
+  id: number;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  created_at: string;
+  improvements_summary: string | null;
+  completed: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -72,6 +80,12 @@ export class ResumeRewriteService {
     return this.http.post<ResumeRewriteCreateResponse>(
       `${this.apiUrl}/resume_analyses/${resumeAnalysisId}/rewrites`,
       payload
+    );
+  }
+
+  listRewrites(resumeAnalysisId: number): Observable<ResumeRewriteListItem[]> {
+    return this.http.get<ResumeRewriteListItem[]>(
+      `${this.apiUrl}/resume_analyses/${resumeAnalysisId}/rewrites`
     );
   }
 

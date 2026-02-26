@@ -35,7 +35,10 @@ class ResumeRewriteJob < ApplicationJob
   private
 
   def attach_pdf_if_possible(rewrite)
-    pdf_result = ResumePdfGeneratorService.generate_pdf_from_latex(rewrite.latex_code)
+    pdf_result = LatexOnlinePdfGeneratorService.generate_pdf_from_latex(
+      rewrite.latex_code,
+      rewrite.id
+    )
 
     unless pdf_result[:success]
       Rails.logger.warn "ResumeRewriteJob PDF generation skipped for #{rewrite.id}: #{pdf_result[:error]}"

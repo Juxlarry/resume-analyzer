@@ -126,6 +126,11 @@ class LatexResumeGeneratorService
       LaTeX Template to Follow:
       #{template}
 
+      Make improvements to the resume based on the accepted suggestions, additional keywords, and projects. Make sure these suggestions and keywords are naturally integrated into the resume content and are actionable for the user. Follow the structure and style of the provided LaTeX template closely. If there is the possiblity to improve Professional Summary, Skills, or Project descriptions, please do so while maintaining a clear and concise format.
+
+      Where there is additional projects added, if they are professional experience, please add them in the experience section. Follow the order of professional experience and align new projects with the existing ones, keeping the most recent relevant experience above. If they are not professional experience, add a new section for "Additional Projects" at the end of the resume.
+      Follow the template structure but feel free to add new sections if needed (e.g. "Additional Projects") to fit the new content.
+
       Return the full LaTeX document only.
     PROMPT
   end
