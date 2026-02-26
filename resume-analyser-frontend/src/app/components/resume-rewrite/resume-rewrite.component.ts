@@ -58,6 +58,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
     if (!Number.isFinite(routeJobId) || routeJobId <= 0) {
       this.errorMessage = 'Invalid job description id.';
       this.isLoading = false;
+      this.cdr.detectChanges();
       return;
     }
 
@@ -183,6 +184,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
         const apiError = error?.error?.error || error?.error?.errors?.join(', ') || 'Failed to start rewrite.';
         this.rewriteError = apiError;
         this.alertService.error(apiError);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -209,6 +211,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
         if (!blob) {
           this.alertService.error('No file data was returned.');
           this.isDownloading = false;
+          this.cdr.detectChanges();
           return;
         }
 
@@ -221,12 +224,14 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
         link.click();
         window.URL.revokeObjectURL(objectUrl);
         this.isDownloading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.isDownloading = false;
         const fileType = format === 'pdf' ? 'PDF' : 'LaTeX';
         const apiError = error?.error?.error || `Failed to download ${fileType} file.`;
         this.alertService.error(apiError);
+        this.cdr.detectChanges();
       }
     });
   }
