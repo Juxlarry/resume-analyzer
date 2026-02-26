@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -48,6 +48,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private jobService: JobService,
     private rewriteService: ResumeRewriteService,
+    private cdr: ChangeDetectorRef,
     private alertService: AlertService
   ) {}
 
@@ -77,10 +78,12 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
         this.jobDescription = job;
         this.availableSuggestions = this.extractSuggestions(job.resume_analysis?.recommendations);
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'Failed to load analysis details.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -172,6 +175,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
         this.rewriteId = response.id;
         this.rewriteStatus = response.status;
         this.isSubmitting = false;
+        this.cdr.detectChanges();
         this.startPolling();
       },
       error: (error) => {
@@ -246,14 +250,17 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
             this.latexCode = response.result?.latex_code ?? '';
             this.hasPdfDownload = response.result?.has_pdf ?? false;
             this.alertService.success('Resume rewrite completed.');
+            this.cdr.detectChanges();
           } else if (response.status === 'failed') {
             this.rewriteError = response.error || 'Rewrite failed.';
             this.alertService.error(this.rewriteError);
+            this.cdr.detectChanges();
           }
         },
         error: () => {
           this.rewriteError = 'Failed to poll rewrite status.';
           this.alertService.error(this.rewriteError);
+          this.cdr.detectChanges();
         }
       });
   }
