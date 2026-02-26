@@ -3,6 +3,12 @@
   animation: fadeIn 0.2s ease-in-out;
 }
 
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -1,94 +1,144 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-    <!-- Hero Section -->
-    <div class="container mx-auto px-6 py-16">
-        <div class="text-center">
-            <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
-                Resume Analyser Tool
-            </h1>
-            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                Leverage AI to match your resume against job descriptions and get 
-                instant feedback to improve your chances of landing your dream job.
-            </p>
-            <div class="flex gap-4 justify-center">
-                <button
-                    (click)="navigateToAnalyze()"
-                    class="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                    Start Analysis
-                </button>
-                <a 
-                    href="#features" 
-                    class="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 transition border-2 border-blue-600">
-                    Learn More
-                </a>
-            </div>
+<div class="min-h-screen welcome-shell">
+  <div class="brand-orb brand-orb-one"></div>
+  <div class="brand-orb brand-orb-two"></div>
+
+  <div class="container mx-auto px-4 sm:px-6 py-10 sm:py-14 relative z-10">
+    <section class="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
+      <div>
+        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-700">
+          AI Resume Intelligence
+        </span>
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-900 mt-4 sm:mt-5 animate-fade-in leading-tight">
+          Build Better Applications Faster
+        </h1>
+        <p class="text-base sm:text-lg text-slate-600 mt-4 sm:mt-6 max-w-xl">
+          Analyze role fit, select targeted improvements, and generate a polished resume rewrite
+          ready for recruiter review.
+        </p>
+
+        <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 mt-6 sm:mt-8">
+          <button
+            (click)="navigateToAnalyze()"
+            class="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 transition shadow-lg hover:shadow-xl">
+            Start Analysis
+          </button>
+          <a
+            href="#how-it-works"
+            class="w-full sm:w-auto text-center bg-white text-blue-700 px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-sm sm:text-base font-semibold hover:bg-slate-50 transition border border-blue-200">
+            See Workflow
+          </a>
         </div>
 
-        <!-- Features Grid -->
-        <div id="features" class="mt-24 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div *ngFor="let feature of features" 
-                 class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-2">
-                <div class="text-4xl mb-4">{{ feature.icon }}</div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">
-                    {{ feature.title }}
-                </h3>
-                <p class="text-gray-600">
-                    {{ feature.description }}
-                </p>
-            </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-7 sm:mt-10">
+          <div class="bg-white/90 border border-slate-100 rounded-lg p-4">
+            <p class="text-sm text-slate-500">Role Match</p>
+            <p class="text-2xl font-bold text-slate-900">AI Score</p>
+          </div>
+          <div class="bg-white/90 border border-slate-100 rounded-lg p-4">
+            <p class="text-sm text-slate-500">Rewrite</p>
+            <p class="text-2xl font-bold text-slate-900">In Minutes</p>
+          </div>
+          <div class="bg-white/90 border border-slate-100 rounded-lg p-4">
+            <p class="text-sm text-slate-500">Export</p>
+            <p class="text-2xl font-bold text-slate-900">PDF + TEX</p>
+          </div>
         </div>
+      </div>
 
-        <!-- How It Works --> 
-        <div class="mt-24">
-            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
-                How It Works
-            </h2>
-            <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                <div class="text-center">
-                    <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                        1
-                    </div>
-                    <h3 class="font-semibold text-lg mb-2">Paste Job Description</h3>
-                    <p class="text-gray-600">Copy and paste the job posting you're interested in</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                        2
-                    </div>
-                    <h3 class="font-semibold text-lg mb-2">Upload Resume</h3>
-                    <p class="text-gray-600">Upload your resume in PDF or DOCX format</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                        3
-                    </div>
-                    <h3 class="font-semibold text-lg mb-2">Get Insights</h3>
-                    <p class="text-gray-600">Receive detailed analysis and recommendations</p>
-                </div>
-            </div>
+      <div class="relative">
+        <div class="hero-card rounded-2xl p-4 sm:p-6 md:p-8">
+          <div class="video-shell mb-4 sm:mb-6">
+            <video
+              class="hero-video"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              poster="/assets/images/Hirivo-logo.jpg"
+              aria-label="Hirivo platform preview">
+              <source src="/assets/videos/Hirivo.mp4" type="video/mp4">
+            </video>
+            <div class="video-overlay"></div>
+            <img
+              src="/assets/images/Hirivo-vector.png"
+              alt="Hirivo logo"
+              class="video-logo">
+          </div>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Resume Rewrite Preview</h2>
+          <p class="text-slate-600 mt-2">Select improvements, add keywords, and generate recruiter-ready output.</p>
+          <ul class="mt-4 sm:mt-6 space-y-2 sm:space-y-3 text-slate-700 text-sm sm:text-base">
+            <li class="flex items-start gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-600 mt-2"></span>
+              Suggestion-based rewrite controls
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-600 mt-2"></span>
+              ATS keyword optimization workflow
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-600 mt-2"></span>
+              Download generated PDF instantly
+            </li>
+          </ul>
         </div>
+      </div>
+    </section>
 
-        <!-- CTA Section -->
-        <div class="mt-24 bg-blue-600 rounded-2xl p-12 text-center text-white">
-            <h2 class="text-3xl font-bold mb-4">Ready to Optimize Your Resume?</h2>
-            <p class="text-xl mb-8 opacity-90">
-                Join thousands of job seekers who have improved their applications
-            </p>
-            <button
-                (click)="navigateToAnalyze()"
-                class="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block">
-                Get Started Free
-            </button>
+    <section id="features" class="mt-14 sm:mt-20 grid md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <article *ngFor="let feature of features" class="bg-white rounded-xl border border-slate-100 p-6 shadow-sm hover:shadow-lg transition">
+        <h3 class="text-lg font-semibold text-slate-900 mb-2">{{ feature.title }}</h3>
+        <p class="text-slate-600 text-sm">{{ feature.description }}</p>
+      </article>
+    </section>
+
+    <section id="how-it-works" class="mt-14 sm:mt-20">
+      <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-8 sm:mb-10 text-center">How It Works</h2>
+      <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
+        <article *ngFor="let step of steps" class="bg-white border border-slate-100 rounded-xl p-5">
+          <p class="text-xs font-bold text-blue-700 tracking-widest">{{ step.number }}</p>
+          <h3 class="text-lg font-semibold text-slate-900 mt-2">{{ step.title }}</h3>
+          <p class="text-slate-600 text-sm mt-2">{{ step.description }}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="mt-14 sm:mt-20 bg-slate-900 text-white rounded-2xl p-6 sm:p-8 md:p-10">
+      <div class="grid lg:grid-cols-3 gap-8 items-start">
+        <div class="lg:col-span-2">
+          <h2 class="text-2xl sm:text-3xl font-bold">Built For Focused Job Search Execution</h2>
+          <p class="text-slate-300 mt-3 max-w-2xl">
+            Tight feedback loops help you tailor resume quality for each role instead of sending one generic version.
+          </p>
         </div>
+        <div class="flex lg:justify-end">
+          <button
+            (click)="navigateToAnalyze()"
+            class="bg-white text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-slate-100 transition">
+            Create My Analysis
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-14 sm:mt-20 max-w-3xl mx-auto">
+      <h2 class="text-2xl sm:text-3xl font-bold text-center text-slate-900 mb-8">FAQ</h2>
+      <div class="space-y-4">
+        <details *ngFor="let faq of faqs" class="bg-white border border-slate-200 rounded-xl p-4">
+          <summary class="cursor-pointer font-semibold text-slate-900">{{ faq.question }}</summary>
+          <p class="mt-3 text-slate-600 text-sm">{{ faq.answer }}</p>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <footer class="bg-slate-950 text-slate-300 py-8 mt-14 sm:mt-16">
+    <div class="container mx-auto px-4 sm:px-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <p>&copy; 2026 Hirivo Resume Analyser. All rights reserved.</p>
+      <div class="flex items-center gap-4 text-sm">
+        <a href="#" class="hover:text-white transition">Privacy</a>
+        <a href="#" class="hover:text-white transition">Terms</a>
+      </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8 mt-16">
-        <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2025 Resume Analyser. All rights reserved.</p>
-            <div class="mt-4 space-x-4">
-                <a href="#" class="hover:text-blue-400 transition">Privacy</a>
-                <a href="#" class="hover:text-blue-400 transition">Terms</a>
-            </div>
-        </div>
-    </footer>
+  </footer>
 </div>

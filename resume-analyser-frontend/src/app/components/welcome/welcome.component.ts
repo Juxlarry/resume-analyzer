@@ -15,24 +15,58 @@ export class WelcomeComponent {
 
   features = [
     {
-      icon: '🎯',
-      title: 'AI-Powered Analysis',
-      description: 'Advanced AI analyzes your resume against job descriptions for perfect matching'
+      title: 'Role-Match Scoring',
+      description: 'Understand how closely your resume aligns with the role before you apply.'
     },
     {
-      icon: '📊',
-      title: 'Detailed Insights',
-      description: 'Get comprehensive feedback on strengths, weaknesses, and improvement areas'
+      title: 'Actionable Improvements',
+      description: 'Get precise guidance on what to improve, not generic writing tips.'
     },
     {
-      icon: '⚡',
-      title: 'Instant Results',
-      description: 'Receive your analysis in seconds with actionable recommendations'
+      title: 'Rewrite + Export',
+      description: 'Generate a polished rewrite and download as PDF or LaTeX.'
     },
     {
-      icon: '🔒',
-      title: 'Secure & Private',
-      description: 'Your data is encrypted and never shared with third parties'
+      title: 'Secure by Design',
+      description: 'Your files stay private with authenticated endpoints and ownership checks.'
+    }
+  ];
+
+  steps = [
+    {
+      number: '01',
+      title: 'Upload Resume',
+      description: 'Start with your current resume in PDF or DOCX.'
+    },
+    {
+      number: '02',
+      title: 'Paste Job Description',
+      description: 'Provide the role requirements you are targeting.'
+    },
+    {
+      number: '03',
+      title: 'Review Suggestions',
+      description: 'Select improvements, keywords, and project additions.'
+    },
+    {
+      number: '04',
+      title: 'Generate & Download',
+      description: 'Produce a rewritten resume and download PDF instantly.'
+    }
+  ];
+
+  faqs = [
+    {
+      question: 'Can I rerun analysis for a different role?',
+      answer: 'Yes. You can reuse your existing resume and run a new analysis for each job description.'
+    },
+    {
+      question: 'Do you support both resume parsing and rewrite?',
+      answer: 'Yes. The platform analyzes your current resume and can generate a rewritten version with selected improvements.'
+    },
+    {
+      question: 'Will this guarantee interviews?',
+      answer: 'No tool can guarantee outcomes, but stronger alignment and clearer impact language usually improves response rates.'
     }
   ];
 
