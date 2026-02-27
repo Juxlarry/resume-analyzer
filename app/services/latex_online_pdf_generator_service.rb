@@ -15,7 +15,11 @@ class LatexOnlinePdfGeneratorService
 
     Rails.logger.info("Starting LaTeX.Online PDF generation for ResumeRewrite ##{resume_rewrite_id}")
 
-    tex_key = upload_to_s3(latex_code, resume_rewrite_id)
+    sanitized_latex = LatexSanitizerService.sanitize(latex_code)
+    validation = LatexSanitizerService.validate(sanitized_latex)
+    return failure("LaTeX validation failed: #{validation[:errors].first}") unless validation[:valid]
+
+    tex_key = upload_to_s3(sanitized_latex, resume_rewrite_id)
     tex_url = generate_presigned_url(tex_key)
     pdf_data = compile_with_latex_online(tex_url)
 
@@ -67,6 +71,76 @@ class LatexOnlinePdfGeneratorService
     url
   end
 
+  # private_class_method def self.compile_with_latex_online(tex_url)
+  #   compile_url = URI.parse("#{LATEX_ONLINE_URL}?url=#{CGI.escape(tex_url)}")
+
+  #   response = Net::HTTP.start(
+  #     compile_url.host,
+  #     compile_url.port,
+  #     use_ssl: true,
+  #     open_timeout: OPEN_TIMEOUT_SECONDS,
+  #     read_timeout: READ_TIMEOUT_SECONDS
+  #   ) do |http|
+  #     request = Net::HTTP::Get.new(compile_url.request_uri)
+  #     http.request(request)
+  #   end
+
+  #   if response.is_a?(Net::HTTPSuccess)
+  #     return nil if response.body.blank?
+  #     # unless pdf_data?(response.body)
+  #     #   Rails.logger.error("LaTeX.Online returned non-PDF content")
+  #     #   return nil
+  #     # end
+
+  #     unless pdf_data?(response.body)
+  #       Rails.logger.error("LaTeX compilation error output:")
+  #       Rails.logger.error(response.body.to_s.first(2000)) # log first 2000 chars
+  #       puts "========== LATEX COMPILATION ERROR =========="
+  #       puts response.body.to_s.first(3000)
+  #       puts "============================================="
+  #       return nil
+  #     end
+
+  #     Rails.logger.info("LaTeX.Online returned PDF (#{response.body.bytesize} bytes)")
+  #     response.body
+  #   else
+  #     Rails.logger.error("LaTeX.Online error (#{response.code}): #{response.body.to_s.first(500)}")
+  #     nil
+  #   end
+  # rescue Net::ReadTimeout => e
+  #   Rails.logger.error("LaTeX.Online timeout: #{e.message}")
+  #   nil
+  # rescue StandardError => e
+  #   Rails.logger.error("LaTeX.Online request error: #{e.class} - #{e.message}")
+  #   nil
+  # end
+
+
+  # private_class_method def self.compile_with_latex_online(tex_url)
+  #   compile_url = URI.parse("#{LATEX_ONLINE_URL}?url=#{CGI.escape(tex_url)}")
+
+  #   response = Net::HTTP.start(
+  #     compile_url.host,
+  #     compile_url.port,
+  #     use_ssl: true,
+  #     open_timeout: OPEN_TIMEOUT_SECONDS,
+  #     read_timeout: READ_TIMEOUT_SECONDS
+  #   ) do |http|
+  #     request = Net::HTTP::Get.new(compile_url.request_uri)
+  #     http.request(request)
+  #   end
+
+  #   puts "====== HTTP RESPONSE DEBUG ======"
+  #   puts "Status: #{response.code}"
+  #   puts "Headers: #{response.to_hash}"
+  #   puts "Body (first 2000 chars):"
+  #   puts response.body.to_s.first(2000)
+  #   puts "=================================="
+
+  #   return response.body
+  # end
+
+
   private_class_method def self.compile_with_latex_online(tex_url)
     compile_url = URI.parse("#{LATEX_ONLINE_URL}?url=#{CGI.escape(tex_url)}")
 
@@ -81,15 +155,20 @@ class LatexOnlinePdfGeneratorService
       http.request(request)
     end
 
-    if response.is_a?(Net::HTTPSuccess)
-      return nil if response.body.blank?
+    Rails.logger.info("LaTeX.Online status: #{response.code}, content-type: #{response['content-type']}, size: #{response.body.to_s.bytesize} bytes")
 
-      Rails.logger.info("LaTeX.Online returned PDF (#{response.body.bytesize} bytes)")
-      response.body
-    else
-      Rails.logger.error("LaTeX.Online error (#{response.code}): #{response.body.to_s.first(500)}")
-      nil
+    unless response.is_a?(Net::HTTPSuccess)
+      Rails.logger.error("LaTeX.Online error (#{response.code}): #{response.body.to_s.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?").first(500)}")
+      return nil
     end
+
+    unless pdf_data?(response.body)
+      Rails.logger.error("LaTeX.Online returned non-PDF content: #{response.body.to_s.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?").first(500)}")
+      return nil
+    end
+
+    Rails.logger.info("PDF generated successfully (#{response.body.bytesize} bytes)")
+    response.body
   rescue Net::ReadTimeout => e
     Rails.logger.error("LaTeX.Online timeout: #{e.message}")
     nil
@@ -97,6 +176,7 @@ class LatexOnlinePdfGeneratorService
     Rails.logger.error("LaTeX.Online request error: #{e.class} - #{e.message}")
     nil
   end
+
 
   private_class_method def self.delete_from_s3(key)
     active_storage_service.delete(key)
@@ -115,7 +195,10 @@ class LatexOnlinePdfGeneratorService
   end
 
   private_class_method def self.s3_bucket
-    ENV["AWS_S3_BUCKET"].presence || raise("AWS_S3_BUCKET is not set")
+    ENV["AWS_S3_BUCKET"].presence ||
+      ENV["AWS_BUCKET"].presence ||
+      ENV["AWS_S3_BUCKET_NAME"].presence ||
+      raise("S3 bucket env var is not set (expected AWS_S3_BUCKET, AWS_BUCKET, or AWS_S3_BUCKET_NAME)")
   end
 
   private_class_method def self.s3_client
@@ -129,5 +212,9 @@ class LatexOnlinePdfGeneratorService
   private_class_method def self.failure(error)
     Rails.logger.error(error)
     { success: false, error: error }
+  end
+
+  private_class_method def self.pdf_data?(binary)
+    binary.to_s.start_with?("%PDF")
   end
 end

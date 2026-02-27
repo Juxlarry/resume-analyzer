@@ -109,4 +109,11 @@ export class JobService {
       takeWhile(response => response.status === 'pending' || response.status === 'processing', true)
     );
   }
+
+  parseJobDescriptionText(text: string): Observable<{ title: string; description: string }> {
+    return this.http.post<{ title: string; description: string }>(
+      `${this.apiUrl}/job_descriptions/parse_pdf_text`,
+      { text }
+    );
+  }
 }

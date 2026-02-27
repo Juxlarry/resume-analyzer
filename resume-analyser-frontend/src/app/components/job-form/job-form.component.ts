@@ -2,10 +2,13 @@ import { Component, ViewChild, ElementRef, ChangeDetectorRef } from "@angular/co
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 import { JobService } from "../../services/job.service";
-import { interval, Subscription } from "rxjs";
-import { max, switchMap, takeWhile } from "rxjs/operators";
-import { Alert, AlertService } from "../../services/alert.service";
+import { interval, Subscription, firstValueFrom } from "rxjs";
+import { switchMap, takeWhile } from "rxjs/operators";
+import { AlertService } from "../../services/alert.service";
 
+
+// pdf.js is loaded via CDN in index.html — see instructions below
+declare const pdfjsLib: any;
 
 @Component({
     selector: "app-job-form",
@@ -20,6 +23,7 @@ import { Alert, AlertService } from "../../services/alert.service";
 
 export class JobFormComponent {
     @ViewChild('fileInput') fileInput!: ElementRef;
+    @ViewChild("jdFileInput") jdFileInput!: ElementRef;
 
     jobForm: FormGroup;
     analysisResult: any = null;
@@ -29,6 +33,14 @@ export class JobFormComponent {
     loadingMessage = 'Submitting...';
     analysisStatus = 'Processing your resume...';
     errorMessage: string | null = null;
+
+    // JD PDF extraction state
+    isExtractingJd = false;
+    jdFileName: string | null = null;
+    jdExtractionError: string | null = null;
+    fieldsAutoFilled = false;
+
+
     private pollingSubscription?: Subscription;
 
     constructor(
@@ -40,16 +52,105 @@ export class JobFormComponent {
         this.jobForm = this.fb.group({
             title: ["", Validators.required],
             description: ["", [Validators.required, Validators.minLength(50)]],
-            // resume_file: [null, Validators.required],
         });
     }
 
+    // Upload and Extract text from PDF using pdf.js
+    async onJdFileSelected(event: any): Promise<void> {
+        const file: File = event.target.files[0];
+        if (!file) return;
+
+        if (file.type !== "application/pdf") {
+        this.jdExtractionError = "Please upload a PDF file.";
+        return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            this.jdExtractionError = "File must be under 10MB.";
+            return;
+        }
+
+        this.isExtractingJd = true;
+        this.jdExtractionError = null;
+        this.jdFileName = null;
+        this.fieldsAutoFilled = false;
+
+        try {
+            const text = await this.extractTextFromPdf(file);
+
+            if (!text || text.trim().length < 50) {
+                throw new Error("Could not extract enough text from this PDF.");
+            }
+
+            const parsed = await this.parseJobDescriptionWithAI(text);
+
+            this.jobForm.patchValue({
+                title: parsed.title,
+                description: parsed.description,
+            });
+
+            this.jdFileName = file.name;
+            this.fieldsAutoFilled = true;
+            this.alertService.success("Job description extracted and filled successfully!");
+            this.cdr.detectChanges();
+        } catch (err: any) {
+            this.jdExtractionError = err.message || "Failed to extract job description.";
+            this.alertService.error(this.jdExtractionError!);
+        } finally {
+            this.isExtractingJd = false;
+            // Reset file input so same file can be re-uploaded if needed
+            this.jdFileInput.nativeElement.value = "";
+        }
+    }
+
+
+    private extractTextFromPdf(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = async (e: any) => {
+                try {
+                    const typedArray = new Uint8Array(e.target.result);
+                    const pdf = await pdfjsLib.getDocument({ data: typedArray }).promise;
+
+                    let fullText = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const content = await page.getTextContent();
+                        const pageText = content.items.map((item: any) => item.str).join(" ");
+                        fullText += pageText + "\n";
+                    }
+
+                    resolve(fullText.trim());
+                } catch (err) {
+                    reject(new Error("Failed to read PDF. Please ensure it is not password-protected."));
+                }
+            };
+
+            reader.onerror = () => reject(new Error("Failed to read file."));
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+
+    private async parseJobDescriptionWithAI(rawText: string): Promise<{ title: string; description: string }> {
+        const response = await firstValueFrom(
+            this.jobService.parseJobDescriptionText(rawText)
+        );
+        return response;  // 
+    }
+
+
+    // Resume file selection and validation - Upload
     onFileSelected(event: any): void {
         const file = event.target.files[0];
         if (!file) return; 
 
         //validate file type
-        const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+        const allowedTypes = [
+            "application/pdf", 
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        ];
 
         //validate file size (max 10MB)
         if(file.size > 10 * 1024 * 1024 || !allowedTypes.includes(file.type)){
@@ -90,7 +191,6 @@ export class JobFormComponent {
             error: (err) => {
                 console.error("Submission failed:", err);
                 const errorMsg = err.error?.errors?.join(", ") || "Failed to submit. Please try again.";
-
                 this.alertService.error(errorMsg);
                 this.isLoading = false;
             }
@@ -103,7 +203,7 @@ export class JobFormComponent {
                 console.log("Analysis started:", response);
                 this.loadingMessage = 'Analyzing resume...';
                 this.isAnalyzing = true;
-                this.isLoading = true;
+                // this.isLoading = true;
 
                 this.pollAnalysisStatus(jobId);
             }, 
@@ -112,7 +212,7 @@ export class JobFormComponent {
 
                 this.alertService.error("Failed to start analysis. Please try again.");
                 this.isLoading = false;
-            }
+            },
         });
     }
 
@@ -123,7 +223,7 @@ export class JobFormComponent {
         this.pollingSubscription = interval(5000)
             .pipe(
                 switchMap(() => this.jobService.getAnalysisStatus(jobId)),
-                takeWhile(response => {
+                takeWhile((response) => {
                     pollCount++;
 
                     if (pollCount >= maxPolls) {
@@ -148,8 +248,9 @@ export class JobFormComponent {
                     } else if (response.status === 'failed') {
                         const errorMsg = response.error ||"Analysis failed. Please try again.";
                         this.alertService.error(errorMsg);
-                       this.isAnalyzing = false;
+                        this.isAnalyzing = false;
                         this.isLoading = false;
+                        this.cdr.detectChanges();
                         this.pollingSubscription?.unsubscribe();
                     }else if (response.status === 'processing') {
                         this.analysisStatus = response.estimated_wait_time ? `Processing your resume... (Estimated wait time: ${response.estimated_wait_time} seconds)` : 'Processing your resume...';
@@ -167,9 +268,10 @@ export class JobFormComponent {
         );
     }
 
+
     formatVerdict(verdict: string): string {
-        if (!verdict) return '';
-        return verdict.replace('_', ' ');
+        if (!verdict) return "";
+        return verdict.replace(/_/g, " ");
     }
 
     printResults(): void {
@@ -177,13 +279,13 @@ export class JobFormComponent {
     }
 
     private scrollToResults() {
-    setTimeout(() => {
-        const element = document.querySelector('.analysis-result');
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }, 100);
-}
+        setTimeout(() => {
+            const element = document.querySelector('.analysis-result');
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
+    }
 
     resetForm(): void {
         this.jobForm.reset();
@@ -194,11 +296,13 @@ export class JobFormComponent {
         this.errorMessage = null;
         this.loadingMessage = 'Submitting...';
         this.analysisStatus = 'Processing your resume...';
+        this.jdFileName = null;
+        this.jdExtractionError = null;
+        this.fieldsAutoFilled = false;
         
-        if (this.fileInput) {
-            this.fileInput.nativeElement.value = '';
-        }
-        
+        if (this.fileInput) this.fileInput.nativeElement.value = '';
+        if (this.jdFileInput) this.jdFileInput.nativeElement.value = "";
+
         this.pollingSubscription?.unsubscribe();
     }
 

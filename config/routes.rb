@@ -44,6 +44,10 @@ Rails.application.routes.draw do
       get '/two_factor/status', to: 'two_factor#status'
       post '/two_factor/regenerate_backup_codes', to: 'two_factor#regenerate_backup_codes'
 
+      # API for parsing job descriptions with AI
+      post "job_descriptions/parse_pdf_text", to: "job_description_parser#parse"
+
+
 
       get '/health', to: 'health#show'
 

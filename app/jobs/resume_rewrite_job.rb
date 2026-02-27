@@ -8,8 +8,19 @@ class ResumeRewriteJob < ApplicationJob
 
     result = LatexResumeGeneratorService.new.generate(rewrite: rewrite)
 
+    # rewrite.update!(
+    #   status: :completed,
+    #   latex_code: result[:latex_code],
+    #   improvements_summary: result[:improvements_summary],
+    #   ai_model: result[:ai_model],
+    #   prompt_tokens: result[:prompt_tokens],
+    #   completion_tokens: result[:completion_tokens],
+    #   total_tokens: result[:total_tokens],
+    #   estimated_cost: result[:estimated_cost]
+    # )
+
+    # Save latex output but stay in :processing until PDF is also attached
     rewrite.update!(
-      status: :completed,
       latex_code: result[:latex_code],
       improvements_summary: result[:improvements_summary],
       ai_model: result[:ai_model],
@@ -20,6 +31,10 @@ class ResumeRewriteJob < ApplicationJob
     )
 
     attach_pdf_if_possible(rewrite)
+
+    # Only mark completed once everything is done
+    rewrite.update!(status: :completed)
+
   rescue ActiveRecord::RecordNotFound
     Rails.logger.warn "ResumeRewriteJob skipped - rewrite #{resume_rewrite_id} was not found"
   rescue => e
@@ -45,10 +60,22 @@ class ResumeRewriteJob < ApplicationJob
       return
     end
 
+    # Get original resume filename without extension, fallback to rewrite id
+    original_filename = rewrite.resume_analysis
+                             .job_description
+                             .resume
+                             .filename
+                             .base
+
+    
+    pdf_filename = "#{original_filename}_rewrite_#{Time.current.strftime('%Y%m%d')}.pdf"
+
     rewrite.pdf_file.attach(
       io: StringIO.new(pdf_result[:pdf_data]),
-      filename: "resume_rewrite_#{rewrite.id}_#{Time.current.strftime('%Y%m%d')}.pdf",
+      filename: pdf_filename,
       content_type: "application/pdf"
     )
+
+    Rails.logger.info "PDF attached as: #{pdf_filename}"
   end
 end

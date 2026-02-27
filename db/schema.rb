@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_12_132506) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_25_112100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -89,13 +89,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_132506) do
     t.index ["job_description_id"], name: "index_resume_analyses_on_job_description_id", unique: true
   end
 
+  create_table "resume_rewrites", force: :cascade do |t|
+    t.jsonb "accepted_suggestions", default: [], null: false
+    t.jsonb "additional_keywords", default: [], null: false
+    t.jsonb "additional_projects", default: [], null: false
+    t.string "ai_model"
+    t.integer "completion_tokens"
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.decimal "estimated_cost", precision: 10, scale: 6
+    t.text "improvements_summary"
+    t.text "latex_code"
+    t.integer "prompt_tokens"
+    t.bigint "resume_analysis_id", null: false
+    t.text "special_instructions"
+    t.integer "status", default: 0, null: false
+    t.integer "total_tokens"
+    t.datetime "updated_at", null: false
+    t.index ["resume_analysis_id"], name: "index_resume_rewrites_on_resume_analysis_id"
+    t.index ["status"], name: "index_resume_rewrites_on_status"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "current_sign_in_at"
     t.string "current_sign_in_ip"
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
-    t.datetime "last_sign_in_at" 
+    t.datetime "last_sign_in_at"
     t.string "last_sign_in_ip"
     t.text "otp_backup_codes"
     t.boolean "otp_required_for_login", default: false
@@ -114,4 +135,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_132506) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "admin_activity_logs", "users"
+  add_foreign_key "resume_rewrites", "resume_analyses"
 end
