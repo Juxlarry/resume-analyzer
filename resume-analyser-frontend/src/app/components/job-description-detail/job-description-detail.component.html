@@ -75,6 +75,23 @@
           <p class="text-gray-700 whitespace-pre-wrap">{{ jobDescription.description }}</p>
         </div>
 
+        <div *ngIf="jobDescription.job_link" class="border-t pt-4">
+          <h3 class="font-semibold text-lg text-gray-800 mb-2">Job Link / Extra Context</h3>
+          <a
+            *ngIf="jobDescription.job_link.startsWith('http://') || jobDescription.job_link.startsWith('https://')"
+            [href]="jobDescription.job_link"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-blue-600 hover:text-blue-700 break-all">
+            {{ jobDescription.job_link }}
+          </a>
+          <p
+            *ngIf="!jobDescription.job_link.startsWith('http://') && !jobDescription.job_link.startsWith('https://')"
+            class="text-gray-700 whitespace-pre-wrap">
+            {{ jobDescription.job_link }}
+          </p>
+        </div>
+
         <!-- Resume File Section -->
         <div *ngIf="jobDescription.resume_file" class="border-t pt-4 mt-4">
           <h3 class="font-semibold text-lg text-gray-800 mb-3">Resume File</h3>
@@ -261,9 +278,18 @@
               class="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-100 transition text-sm font-medium disabled:opacity-50">
               Download Generated LaTeX
             </button>
+            <button
+              *ngIf="hasCompletedRewrite"
+              type="button"
+              [disabled]="isDownloadingRewrite"
+              (click)="downloadLatestRewriteDocx()"
+              class="inline-flex items-center gap-2 border border-blue-300 text-blue-700 px-4 py-2 rounded hover:bg-blue-50 transition text-sm font-medium disabled:opacity-50">
+              Download Generated DOCX
+            </button>
           </div>
           <p>File Used here -</p>
           <p>AI Model: {{ jobDescription.resume_analysis?.ai_model_used }}</p>
+          <p>ATS System: {{ jobDescription.resume_analysis?.ats_system_key || 'N/A' }}</p>
           <p>Analyzed on: {{ formatDate(jobDescription.resume_analysis?.updated_at ?? jobDescription.created_at) }}</p>
         </div>
       </div>

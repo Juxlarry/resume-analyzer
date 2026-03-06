@@ -8,6 +8,7 @@ namespace :api do
       member do
         get "download/latex", action: :download_latex
         get "download/pdf", action: :download_pdf
+        get "download/docx", action: :download_docx
       end
     end
   end

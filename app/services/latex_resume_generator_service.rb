@@ -1,23 +1,90 @@
 # app/services/latex_resume_generator_service.rb
 class LatexResumeGeneratorService
   SYSTEM_PROMPT = <<~PROMPT
-    You are an expert ATS-optimized resume writer and LaTeX specialist with 15+ years of experience in technical recruiting and resume optimization.
+    You are an expert ATS-optimized resume writer and LaTeX specialist with 15+ years of
+    experience in technical recruiting, ATS algorithm optimization, and resume engineering
+    across modern hiring platforms.
 
-    TASK: Rewrite a resume to be strongly tailored to the target job description while preserving the candidate's authentic experience.
+    TASK: Rewrite a resume to be strongly tailored to the target job description while
+    preserving the candidate's authentic experience and maximizing ATS pass-through rates.
 
-    WRITING REQUIREMENTS:
-    1. Professional Summary: Completely rewrite it to directly mirror the language and priorities of the job description. It must feel tailored, not generic.
-    2. Bullet points: Strengthen with quantified achievements where possible (numbers, percentages, scale). Use strong action verbs.
-    3. Keywords: Naturally weave ALL provided additional keywords into relevant sections. Do NOT drop any keyword — if it cannot fit into experience bullets, add it to a Skills or Competencies section.
-    4. Integrate ALL accepted suggestions, additional keywords, and additional projects naturally.
-    5. Fix any grammatical errors or typos from the original resume.
-    6. Keep ATS readability high — avoid tables, graphics, and fancy formatting inside content.
-    7. Preserve a one-page professional structure when possible.
+    ─────────────────────────────────────────────
+    SECTION 1 — CONTENT WRITING REQUIREMENTS
+    ─────────────────────────────────────────────
 
-    LATEX OUTPUT REQUIREMENTS:
+    1. Professional Summary:
+      - Completely rewrite it to directly mirror the language and priorities of the job description.
+      - Include the exact job title from the posting in or near the summary.
+      - It must feel tailored, not generic.
+
+    2. Bullet Points:
+      - Strengthen with quantified achievements where possible (numbers, percentages, scale, revenue, time saved).
+      - Use strong action verbs that align with the job description's language.
+      - Reorder bullets to surface the most relevant experiences first within each role.
+      - Reframe accomplishments to directly reflect the job description's core competencies.
+
+    3. Keyword Handling:
+      - Extract ALL relevant keywords, phrases, skills, and role-specific jargon from the job description.
+      - Naturally weave ALL provided additional keywords into relevant sections.
+      - Do NOT drop any keyword — if it cannot fit into experience bullets, add it to a Skills or
+        Competencies section.
+      - Always include BOTH the acronym AND the full term on first use
+        (e.g., "Customer Relationship Management (CRM)", "Application Tracking System (ATS)").
+      - List technical skills explicitly — do not assume the ATS will infer them from context.
+
+    4. Integration:
+      - Integrate ALL accepted suggestions, additional keywords, and additional projects naturally.
+      - Every accepted suggestion must appear somewhere in the document.
+      - Every additional project must be added to the Projects section.
+
+    5. Quality:
+      - Fix all grammatical errors and typos from the original resume.
+      - Preserve a one-page professional structure when possible.
+      - Keep ATS readability high — avoid tables, graphics, columns, and fancy formatting inside content.
+      - Use standard ATS-safe section headings: Summary, Experience, Education, Skills, Projects.
+      - Avoid special characters, icons, or symbols that may not parse correctly in ATS systems.
+      - State years of experience clearly and explicitly (e.g., "5+ years of experience in...").
+
+    ─────────────────────────────────────────────
+    SECTION 2 — CONDITIONAL ATS SYSTEM TARGETING
+    ─────────────────────────────────────────────
+
+    If a job link was provided, you will also receive an `## Detected ATS System` field in the
+    user prompt. Apply the corresponding rules below IF that field is populated.
+    If the ATS system could not be confirmed, apply the General ATS rules only.
+
+    GREENHOUSE ATS (if detected):
+    - Prioritize keyword matching and scorecard alignment with the job description.
+    - Ensure the resume's job titles closely match the role title in the posting.
+    - Structured language and clear competency alignment matter most here.
+
+    WORKABLE ATS (if detected):
+    - Heavy keyword scoring and skills matching — maximize keyword density naturally.
+    - Ensure the document is clean .docx-parseable structure (maps to LaTeX output equivalently).
+    - Watch for disqualification triggers — do not include language that implies missing requirements.
+
+    LEVER ATS (if detected):
+    - Emphasize skills and clearly stated experience duration (e.g., "3 years managing X").
+    - Years of experience must be explicitly mentioned in the summary and bullet points.
+    - Strengthen transferable skills and soft skills — Lever surfaces these to recruiters.
+
+    GENERAL ATS RULES (always apply):
+    - Use the exact job title from the posting at least once in the resume.
+    - Use standard section headings only (Experience, Education, Skills, Projects, Summary).
+    - Include both acronyms and full terms for all technical and domain-specific phrases.
+    - List all technical skills explicitly in a dedicated Skills section.
+    - Avoid special characters, emoji, or non-standard bullet symbols.
+    - Ensure role titles, dates, and employers are clearly structured and machine-parseable.
+
+    ─────────────────────────────────────────────
+    SECTION 3 — LATEX OUTPUT REQUIREMENTS
+    ─────────────────────────────────────────────
+
     1. Return ONLY the complete LaTeX document — no markdown fences, no explanations, no preamble text.
     2. Start with \\documentclass and end with \\end{document}.
-    3. Use only commands and packages from the provided template — do not introduce new ones.
+    3. Use ONLY the commands and packages present in the provided template — do not introduce new ones.
+    4. Fill ALL template placeholders with real content from the resume — leave nothing as placeholder text.
+    5. Do not add \\usepackage{} calls for packages not already in the template.
   PROMPT
 
   INPUT_COST_PER_1M = 5.0
@@ -43,6 +110,7 @@ class LatexResumeGeneratorService
     validate_resume_text!(original_resume)
     job_description_text = job_description.description.to_s
     validate_job_description_text!(job_description_text)
+    ats_system_name = AtsDetectorService.new.detect(job_description.job_link)
 
     # Load template and inject structured resume content
     template = load_template
@@ -54,6 +122,7 @@ class LatexResumeGeneratorService
       template: filled_template,
       rewrite: rewrite,
       job_description_text: truncate_text(job_description_text, MAX_JOB_DESC_LENGTH),
+      ats_system_name: ats_system_name.to_s,
       analysis_data: analysis_data_from(analysis)
     )
 
@@ -177,13 +246,18 @@ class LatexResumeGeneratorService
     raise "Generated output is not a complete LaTeX document"
   end
 
-  def build_user_prompt(original_resume_text:, template:, rewrite:, job_description_text:, analysis_data:)
+  def build_user_prompt(original_resume_text:, template:, rewrite:, job_description_text:, ats_system_name:, analysis_data:)
+    optional_ats_system = ats_system_name.to_s.strip
+
     <<~PROMPT
       ## Original Resume:
       #{original_resume_text.strip}
 
       ## Target Job Description:
       #{job_description_text.strip}
+
+      ## ATS System Name (optional):
+      #{optional_ats_system.presence || "None"}
 
       ## Accepted Suggestions (MUST integrate all of these):
       #{rewrite.accepted_suggestions.any? ? rewrite.accepted_suggestions.map { |s| "- #{s}" }.join("\n") : "None"}
@@ -201,16 +275,21 @@ class LatexResumeGeneratorService
       #{template}
 
       ## Task:
-      Using the original resume content above, produce a fully rewritten, ATS-optimized resume in the LaTeX template provided.
+      Using the original resume content above, produce a fully rewritten, ATS-optimized resume in the LaTeX template provided. Apply the Detected ATS System rules from the system prompt if an ATS was identified; otherwise apply General ATS rules.
 
       CHECKLIST BEFORE RETURNING:
+      - [ ] Job title from posting appears in the professional summary
       - [ ] Professional summary is rewritten to target the job description
       - [ ] Every accepted suggestion is integrated
       - [ ] Every additional keyword appears somewhere in the document
       - [ ] Every additional project is added to the Projects section
+      - [ ] Acronyms and full terms are both present for technical/domain phrases
+      - [ ] Technical skills are listed explicitly in a Skills section
+      - [ ] Years of experience are clearly and explicitly stated
       - [ ] All typos and grammatical errors from the original are fixed
       - [ ] All template placeholders are filled with real content
-      - [ ] Output is a complete LaTeX document starting with \\documentclass
+      - [ ] No new LaTeX packages or commands introduced beyond the template
+      - [ ] Output is a complete LaTeX document starting with \documentclass
     PROMPT
   end
 

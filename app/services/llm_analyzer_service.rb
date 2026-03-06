@@ -54,7 +54,7 @@ class LlmAnalyzerService
         @client = OpenAI::Client.new(access_token: api_key)
     end 
 
-    def analyze(job_description, resume_text)
+    def analyze(job_description, resume_text, ats_system_name = nil)
         # Validate inputs
         validation_error = validate_inputs(job_description, resume_text)
         return validation_error if validation_error
@@ -66,7 +66,7 @@ class LlmAnalyzerService
         resume_text = truncate_text(resume_text, MAX_RESUME_LENGTH)
 
         # Build user prompt
-        user_prompt = build_user_prompt(job_description, resume_text)
+        user_prompt = build_user_prompt(job_description, resume_text, ats_system_name)
 
         Rails.logger.info "LLM analysis request initiated. User prompt length: #{user_prompt.length} characters"
 
@@ -129,10 +129,17 @@ class LlmAnalyzerService
         Rails.logger.info "Truncated text: #{truncated[0..100]}..."  # Log first 100 characters
     end
 
-    def build_user_prompt(job_description, resume_text)
+    
+
+    def build_user_prompt(job_description, resume_text, ats_system_name = nil)
+        detected_ats = ats_system_name.to_s.strip
+
         <<~PROMPT
         Job Description:
         #{job_description}
+
+        ATS System Name (optional):
+        #{detected_ats.presence || "Not provided"}
 
         Resume:
         #{resume_text}

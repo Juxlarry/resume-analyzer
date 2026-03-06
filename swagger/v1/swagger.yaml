@@ -294,6 +294,9 @@ paths:
                       type: string
                     description:
                       type: string
+                    job_link:
+                      type: string
+                      nullable: true
                   required:
                   - title
                   - description
@@ -405,6 +408,9 @@ components:
           type: string
         description:
           type: string
+        job_link:
+          type: string
+          nullable: true
         created_at:
           type: string
           format: date-time

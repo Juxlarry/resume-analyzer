@@ -3,7 +3,7 @@ class Api::V1::ResumeRewritesController < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_resume_analysis_for_nested_routes, only: %i[create index]
-  before_action :set_resume_rewrite, only: %i[show download_latex download_pdf]
+  before_action :set_resume_rewrite, only: %i[show download_latex download_pdf download_docx]
 
   # POST /api/v1/resume_analyses/:resume_analysis_id/rewrites 
   def create
@@ -52,9 +52,11 @@ class Api::V1::ResumeRewritesController < ApplicationController
         latex_code: @resume_rewrite.latex_code,
         has_latex: @resume_rewrite.latex_code.present?,
         has_pdf: @resume_rewrite.pdf_file.attached?,
+        has_docx: @resume_rewrite.docx_file.attached?,
         download_urls: {
           latex: download_latex_api_v1_resume_rewrite_url(@resume_rewrite, host: request.base_url),
-          pdf: download_pdf_api_v1_resume_rewrite_url(@resume_rewrite, host: request.base_url)
+          pdf: download_pdf_api_v1_resume_rewrite_url(@resume_rewrite, host: request.base_url),
+          docx: download_docx_api_v1_resume_rewrite_url(@resume_rewrite, host: request.base_url)
         },
         tokens_used: @resume_rewrite.total_tokens,
         cost: @resume_rewrite.estimated_cost.to_f,
@@ -99,6 +101,25 @@ class Api::V1::ResumeRewritesController < ApplicationController
       @resume_rewrite.pdf_file.download,
       filename: filename,
       type: "application/pdf",
+      disposition: "attachment"
+    )
+  end
+
+  # GET /api/v1/resume_rewrites/:id/download/docx
+  def download_docx
+    unless @resume_rewrite.completed?
+      return render json: { error: "Rewrite is not completed yet" }, status: :not_found
+    end
+
+    unless @resume_rewrite.docx_file.attached?
+      return render json: { error: "DOCX is not available for this rewrite" }, status: :not_found
+    end
+
+    filename = "resume_rewrite_#{@resume_rewrite.id}_#{Time.current.strftime('%Y%m%d')}.docx"
+    send_data(
+      @resume_rewrite.docx_file.download,
+      filename: filename,
+      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       disposition: "attachment"
     )
   end

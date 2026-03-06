@@ -52,6 +52,7 @@ export class JobFormComponent {
         this.jobForm = this.fb.group({
             title: ["", Validators.required],
             description: ["", [Validators.required, Validators.minLength(50)]],
+            job_link: [""],
         });
     }
 
@@ -178,6 +179,10 @@ export class JobFormComponent {
         const formData = new FormData();
         formData.append("job_description[title]", this.jobForm.get("title")?.value);
         formData.append("job_description[description]", this.jobForm.get("description")?.value);
+        const jobLink = this.jobForm.get("job_link")?.value?.trim();
+        if (jobLink) {
+            formData.append("job_description[job_link]", jobLink);
+        }
         formData.append("job_description[resume]", this.selectedFile);
         
 

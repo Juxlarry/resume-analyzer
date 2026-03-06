@@ -88,6 +88,18 @@
             </p>
         </div>
 
+        <!-- Job Link / Extra Context -->
+        <div>
+            <label class="block text-sm font-medium mb-2 text-gray-700">Job Link or Extra Job Context (Optional)</label>
+            <input
+                type="text"
+                formControlName="job_link"
+                class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
+                placeholder="https://company.com/job/123 or additional context text"
+            />
+            <p class="text-xs text-gray-500 mt-1">This will be passed to AI prompts when provided.</p>
+        </div>
+
         <!-- Resume Upload -->
         <div>
             <label class="block text-sm font-medium mb-2 text-gray-700">Upload your Resume/CV *</label>
@@ -193,6 +205,9 @@
                    }">
                     {{ formatVerdict(analysisResult.verdict) }}
                 </p>
+                <p class="text-sm text-gray-600 mt-3">
+                    ATS System: <span class="font-medium text-gray-800">{{ analysisResult.ats_system_key || 'N/A' }}</span>
+                </p>
             </div>
 
             <!-- Display Summary-->
@@ -254,4 +269,3 @@
         </div>
     </div>
 </div>
-

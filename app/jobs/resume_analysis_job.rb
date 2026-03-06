@@ -41,10 +41,13 @@ class ResumeAnalysisJob < ApplicationJob
 
     #Call LLM Service
     Rails.logger.info "Calling LLM analyzer..."
+    ats_system_name = AtsDetectorService.new.detect(job_description.job_link)
+    Rails.logger.info "Detected ATS system: #{ats_system_name || 'None'}"
     analyzer = LlmAnalyzerService.new
     result = analyzer.analyze(
       job_description.description, 
-      resume_text
+      resume_text,
+      ats_system_name
     )
 
     #Check for errors in result
@@ -66,6 +69,7 @@ class ResumeAnalysisJob < ApplicationJob
       recommendations: result[:recommendations],
       missing_keywords: result[:missing_keywords],
       verdict: result[:verdict],
+      ats_system_key: ats_system_name,
       ai_model_used: "gpt-4o-mini",
       status: :completed
     )

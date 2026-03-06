@@ -1,6 +1,7 @@
 class ResumeRewrite < ApplicationRecord
   belongs_to :resume_analysis
   has_one_attached :pdf_file
+  has_one_attached :docx_file
 
   enum :status, { pending: 0, processing: 1, completed: 2, failed: 3 }, default: :pending
 
@@ -23,6 +24,10 @@ class ResumeRewrite < ApplicationRecord
 
   def has_pdf?
     pdf_file.attached?
+  end
+
+  def has_docx?
+    docx_file.attached?
   end
 
   private

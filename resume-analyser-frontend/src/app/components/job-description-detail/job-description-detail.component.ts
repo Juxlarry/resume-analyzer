@@ -147,7 +147,29 @@ export class JobDescriptionDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  private handleRewriteDownload(blob: Blob | null, disposition: string | null, extension: 'pdf' | 'tex'): void {
+  downloadLatestRewriteDocx(): void {
+    if (!this.latestRewriteId) {
+      this.alertService.warning('No generated rewrite found yet.');
+      return;
+    }
+
+    this.isDownloadingRewrite = true;
+    this.resumeRewriteService.downloadDocx(this.latestRewriteId).subscribe({
+      next: (response) => {
+        this.handleRewriteDownload(response.body, response.headers.get('content-disposition'), 'docx');
+        this.isDownloadingRewrite = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        this.isDownloadingRewrite = false;
+        const apiError = error?.error?.error || 'Failed to download generated DOCX.';
+        this.alertService.error(apiError);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private handleRewriteDownload(blob: Blob | null, disposition: string | null, extension: 'pdf' | 'tex' | 'docx'): void {
     if (!blob) {
       this.alertService.error('No file data returned.');
       return;

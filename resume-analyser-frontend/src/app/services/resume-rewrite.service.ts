@@ -45,9 +45,11 @@ export interface ResumeRewriteStatusResponse {
     improvements_summary: string;
     has_latex: boolean;
     has_pdf: boolean;
+    has_docx: boolean;
     download_urls: {
       latex: string;
       pdf: string;
+      docx: string;
     };
     latex_code: string;
     tokens_used: number;
@@ -104,6 +106,13 @@ export class ResumeRewriteService {
 
   downloadPdf(rewriteId: number): Observable<HttpResponse<Blob>> {
     return this.http.get(`${this.apiUrl}/resume_rewrites/${rewriteId}/download/pdf`, {
+      observe: 'response',
+      responseType: 'blob'
+    });
+  }
+
+  downloadDocx(rewriteId: number): Observable<HttpResponse<Blob>> {
+    return this.http.get(`${this.apiUrl}/resume_rewrites/${rewriteId}/download/docx`, {
       observe: 'response',
       responseType: 'blob'
     });

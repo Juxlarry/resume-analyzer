@@ -37,6 +37,7 @@ RSpec.configure do |config|
               id: { type: :integer },
               title: { type: :string },
               description: { type: :string },
+              job_link: { type: :string, nullable: true },
               created_at: { type: :string, format: 'date-time' },
               resume_analysis: {
                 type: :object,

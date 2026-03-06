@@ -16,6 +16,7 @@ export interface JobDescription {
   id: number;
   title: string;
   description: string;
+  job_link?: string;
   has_resume: boolean;
   created_at: string;
   resume_file?: ResumeFile;
@@ -27,6 +28,7 @@ export interface ResumeAnalysis {
   match_score: number;
   verdict: string;
   summary: string;
+  ats_system_key?: string;
   strengths: string;
   weaknesses: string;
   recommendations: string;

@@ -15,14 +15,15 @@ class Api::V1::JobDescriptionsController < ApplicationController
   def show
 
     render json: {
-      id: @job_description.id,
+      id: @job_description.id, 
       title: @job_description.title,
       description: @job_description.description,
+      job_link: @job_description.job_link,
       has_resume: @job_description.resume.attached?,
       created_at: @job_description.created_at,
       resume_file: resume_file_data(@job_description),
       resume_analysis: @job_description.resume_analysis&.as_json(
-        only: [:id, :match_score, :verdict, :summary, :strengths, :weaknesses,:recommendations, :missing_keywords, :status, :ai_model_used, :created_at, :updated_at]
+        only: [:id, :match_score, :verdict, :summary, :strengths, :weaknesses,:recommendations, :missing_keywords, :ats_system_key, :status, :ai_model_used, :created_at, :updated_at]
       )
     }
 
@@ -39,6 +40,7 @@ class Api::V1::JobDescriptionsController < ApplicationController
       render json: {
         id: @job_description.id,
         title: @job_description.title,
+        job_link: @job_description.job_link,
         message: "Job deescription created successfully."
       }, status: :created
     else
@@ -130,6 +132,7 @@ class Api::V1::JobDescriptionsController < ApplicationController
         weaknesses: analysis.weaknesses,
         recommendations: analysis.recommendations,
         missing_keywords: analysis.missing_keywords,
+        ats_system_key: analysis.ats_system_key,
         completed_at: analysis.updated_at
       }
     elsif analysis.failed?
@@ -157,7 +160,7 @@ class Api::V1::JobDescriptionsController < ApplicationController
     end
 
     def job_description_params
-      params.require(:job_description).permit(:title, :description, :resume)
+      params.require(:job_description).permit(:title, :description, :job_link, :resume)
     end
 
     def resume_file_data(job_description)

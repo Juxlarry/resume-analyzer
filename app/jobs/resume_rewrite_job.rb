@@ -31,6 +31,7 @@ class ResumeRewriteJob < ApplicationJob
     )
 
     attach_pdf_if_possible(rewrite)
+    attach_docx_if_possible(rewrite)
 
     # Only mark completed once everything is done
     rewrite.update!(status: :completed)
@@ -77,5 +78,33 @@ class ResumeRewriteJob < ApplicationJob
     )
 
     Rails.logger.info "PDF attached as: #{pdf_filename}"
+  end
+
+  def attach_docx_if_possible(rewrite)
+    docx_result = LatexDocxGeneratorService.generate_docx_from_latex(
+      rewrite.latex_code,
+      rewrite.id
+    )
+
+    unless docx_result[:success]
+      Rails.logger.warn "ResumeRewriteJob DOCX generation skipped for #{rewrite.id}: #{docx_result[:error]}"
+      return
+    end
+
+    original_filename = rewrite.resume_analysis
+                             .job_description
+                             .resume
+                             .filename
+                             .base
+
+    docx_filename = "#{original_filename}_rewrite_#{Time.current.strftime('%Y%m%d')}.docx"
+
+    rewrite.docx_file.attach(
+      io: StringIO.new(docx_result[:docx_data]),
+      filename: docx_filename,
+      content_type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+
+    Rails.logger.info "DOCX attached as: #{docx_filename}"
   end
 end

@@ -26,7 +26,8 @@ RSpec.describe 'api/v1/job_descriptions', type: :request do
             type: :object,
             properties: {
               title: { type: :string },
-              description: { type: :string }
+              description: { type: :string },
+              job_link: { type: :string, nullable: true }
             },
             required: %w[title description]
           }

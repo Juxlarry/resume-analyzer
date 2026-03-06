@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_25_112100) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_06_002000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -59,6 +59,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_112100) do
   create_table "job_descriptions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
+    t.text "job_link"
     t.string "title"
     t.datetime "updated_at", null: false
     t.integer "user_id"
@@ -74,6 +75,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_112100) do
 
   create_table "resume_analyses", force: :cascade do |t|
     t.string "ai_model_used"
+    t.string "ats_system_key"
     t.datetime "created_at", null: false
     t.text "error_messages"
     t.bigint "job_description_id"
