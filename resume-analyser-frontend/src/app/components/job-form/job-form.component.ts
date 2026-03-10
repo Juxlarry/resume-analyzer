@@ -1,6 +1,7 @@
 import { Component, ViewChild, ElementRef, ChangeDetectorRef } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { CommonModule } from "@angular/common";
+import { RouterLink } from "@angular/router";
 import { JobService } from "../../services/job.service";
 import { interval, Subscription, firstValueFrom } from "rxjs";
 import { switchMap, takeWhile } from "rxjs/operators";
@@ -15,7 +16,8 @@ declare const pdfjsLib: any;
     standalone: true,
     imports: [
         CommonModule,
-        ReactiveFormsModule 
+        ReactiveFormsModule,
+        RouterLink
     ],
     templateUrl: "./job-form.component.html",
     styleUrls: ["./job-form.component.css"],
@@ -27,6 +29,7 @@ export class JobFormComponent {
 
     jobForm: FormGroup;
     analysisResult: any = null;
+    analysisJobId: number | null = null;
     isLoading: boolean = false;
     isAnalyzing: boolean = false;
     selectedFile: File | null = null;
@@ -189,6 +192,7 @@ export class JobFormComponent {
         this.jobService.createJobDescription(formData).subscribe({
             next: (response: any) => { 
                    console.log("Job description created:", response);
+                this.analysisJobId = response.id ?? null;
                 this.loadingMessage = 'Starting analysis...';
                 
                 this.triggerAnalysis(response.id);
@@ -296,6 +300,7 @@ export class JobFormComponent {
         this.jobForm.reset();
         this.selectedFile = null;
         this.analysisResult = null;
+        this.analysisJobId = null;
         this.isLoading = false;
         this.isAnalyzing = false;
         this.errorMessage = null;

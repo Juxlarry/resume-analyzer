@@ -260,6 +260,12 @@
                     class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                     Analyze Another Resume
                 </button>
+                <a
+                    *ngIf="analysisJobId"
+                    [routerLink]="['/job-descriptions', analysisJobId]"
+                    class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition inline-flex items-center">
+                    View Job Detail
+                </a>
                 <button 
                     (click)="printResults()"
                     class="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">

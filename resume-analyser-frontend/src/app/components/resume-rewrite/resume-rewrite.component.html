@@ -181,6 +181,13 @@
               </button>
               <button
                 type="button"
+                [disabled]="isDownloading || !hasDocxDownload"
+                class="px-5 py-2 border border-blue-300 text-blue-700 rounded hover:bg-blue-50 disabled:opacity-50"
+                (click)="downloadDocx()">
+                Download DOCX
+              </button>
+              <button
+                type="button"
                 [disabled]="isDownloading"
                 class="px-5 py-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50"
                 (click)="downloadLatex()">
@@ -189,6 +196,9 @@
             </div>
             <p *ngIf="!hasPdfDownload" class="text-sm text-gray-500">
               PDF compile was unavailable for this run. LaTeX download is still available.
+            </p>
+            <p *ngIf="!hasDocxDownload" class="text-sm text-gray-500">
+              DOCX export was unavailable for this run. PDF or LaTeX downloads may still be available.
             </p>
             <details>
               <summary class="cursor-pointer text-blue-700">Preview generated LaTeX</summary>

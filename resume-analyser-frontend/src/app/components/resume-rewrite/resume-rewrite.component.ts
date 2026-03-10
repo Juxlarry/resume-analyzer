@@ -42,6 +42,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   isDownloading = false;
   hasPdfDownload = false;
+  hasDocxDownload = false;
 
   private pollingSubscription?: Subscription;
 
@@ -180,6 +181,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
         this.rewriteStatus = response.status;
         this.isSubmitting = false;
         this.hasPdfDownload = false;
+        this.hasDocxDownload = false;
         this.latexCode = '';
         this.rewriteError = '';
         this.cdr.detectChanges();
@@ -203,13 +205,19 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
     this.downloadFile('pdf');
   }
 
-  private downloadFile(format: 'latex' | 'pdf'): void {
+  downloadDocx(): void {
+    this.downloadFile('docx');
+  }
+
+  private downloadFile(format: 'latex' | 'pdf' | 'docx'): void {
     if (!this.rewriteId) return;
 
     this.isDownloading = true;
     const request = format === 'pdf'
       ? this.rewriteService.downloadPdf(this.rewriteId)
-      : this.rewriteService.downloadLatex(this.rewriteId);
+      : format === 'docx'
+        ? this.rewriteService.downloadDocx(this.rewriteId)
+        : this.rewriteService.downloadLatex(this.rewriteId);
 
     request.subscribe({
       next: (response) => {
@@ -221,7 +229,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
           return;
         }
 
-        const extension = format === 'pdf' ? 'pdf' : 'tex';
+        const extension = format === 'pdf' ? 'pdf' : format === 'docx' ? 'docx' : 'tex';
         const filename = this.extractFilename(response.headers.get('content-disposition')) || `resume_rewrite_${this.rewriteId}.${extension}`;
         const objectUrl = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -234,7 +242,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isDownloading = false;
-        const fileType = format === 'pdf' ? 'PDF' : 'LaTeX';
+        const fileType = format === 'pdf' ? 'PDF' : format === 'docx' ? 'DOCX' : 'LaTeX';
         const apiError = error?.error?.error || `Failed to download ${fileType} file.`;
         this.alertService.error(apiError);
         this.cdr.detectChanges();
@@ -312,6 +320,7 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
     if (response.status === 'completed') {
       this.latexCode = response.result?.latex_code ?? '';
       this.hasPdfDownload = response.result?.has_pdf ?? false;
+      this.hasDocxDownload = response.result?.has_docx ?? false;
       this.rewriteError = '';
       if (notifyOnCompletion) {
         this.alertService.success('Resume rewrite completed.');
