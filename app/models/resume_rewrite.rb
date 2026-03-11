@@ -30,6 +30,19 @@ class ResumeRewrite < ApplicationRecord
     docx_file.attached?
   end
 
+  def download_basename
+    job_description = resume_analysis&.job_description
+    email_local = job_description&.user&.email.to_s.split("@").first
+    title = job_description&.title.to_s
+
+    base_parts = [
+      email_local.presence || "resume",
+      title.presence || "resume"
+    ]
+
+    sanitize_filename(base_parts.join(" - "))
+  end
+
   private
 
   def normalize_input_arrays
@@ -74,5 +87,13 @@ class ResumeRewrite < ApplicationRecord
     errors.add(:accepted_suggestions, "must be an array") unless accepted_suggestions.is_a?(Array)
     errors.add(:additional_keywords, "must be an array") unless additional_keywords.is_a?(Array)
     errors.add(:additional_projects, "must be an array") unless additional_projects.is_a?(Array)
+  end
+
+  def sanitize_filename(value)
+    sanitized = value.to_s.strip
+    sanitized = sanitized.gsub(/[\/\\:*?"<>|]/, "-")
+    sanitized = sanitized.gsub(/\s+/, " ").strip
+    sanitized = sanitized.gsub(/\.+\z/, "")
+    sanitized.presence || "resume"
   end
 end

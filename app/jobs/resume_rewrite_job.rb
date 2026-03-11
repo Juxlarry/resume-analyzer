@@ -61,15 +61,7 @@ class ResumeRewriteJob < ApplicationJob
       return
     end
 
-    # Get original resume filename without extension, fallback to rewrite id
-    original_filename = rewrite.resume_analysis
-                             .job_description
-                             .resume
-                             .filename
-                             .base
-
-    
-    pdf_filename = "#{original_filename}_rewrite_#{Time.current.strftime('%Y%m%d')}.pdf"
+    pdf_filename = "#{rewrite.download_basename}.pdf"
 
     rewrite.pdf_file.attach(
       io: StringIO.new(pdf_result[:pdf_data]),
@@ -91,13 +83,7 @@ class ResumeRewriteJob < ApplicationJob
       return
     end
 
-    original_filename = rewrite.resume_analysis
-                             .job_description
-                             .resume
-                             .filename
-                             .base
-
-    docx_filename = "#{original_filename}_rewrite_#{Time.current.strftime('%Y%m%d')}.docx"
+    docx_filename = "#{rewrite.download_basename}.docx"
 
     rewrite.docx_file.attach(
       io: StringIO.new(docx_result[:docx_data]),

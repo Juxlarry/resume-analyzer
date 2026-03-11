@@ -77,7 +77,7 @@ class Api::V1::ResumeRewritesController < ApplicationController
       return render json: { error: "Rewrite is not completed yet" }, status: :not_found
     end
 
-    filename = "resume_rewrite_#{@resume_rewrite.id}_#{Time.current.strftime('%Y%m%d')}.tex"
+    filename = "#{@resume_rewrite.download_basename}.tex"
     send_data(
       @resume_rewrite.latex_code,
       filename: filename,
@@ -96,7 +96,7 @@ class Api::V1::ResumeRewritesController < ApplicationController
       return render json: { error: "PDF is not available for this rewrite" }, status: :not_found
     end
 
-    filename = "resume_rewrite_#{@resume_rewrite.id}_#{Time.current.strftime('%Y%m%d')}.pdf"
+    filename = "#{@resume_rewrite.download_basename}.pdf"
     send_data(
       @resume_rewrite.pdf_file.download,
       filename: filename,
@@ -115,7 +115,7 @@ class Api::V1::ResumeRewritesController < ApplicationController
       return render json: { error: "DOCX is not available for this rewrite" }, status: :not_found
     end
 
-    filename = "resume_rewrite_#{@resume_rewrite.id}_#{Time.current.strftime('%Y%m%d')}.docx"
+    filename = "#{@resume_rewrite.download_basename}.docx"
     send_data(
       @resume_rewrite.docx_file.download,
       filename: filename,
