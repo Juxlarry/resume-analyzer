@@ -1,17 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
 import { Alert, AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-alert',
   standalone: true,
-  imports: [CommonModule],
+  imports: [AsyncPipe],
   templateUrl: './alert.component.html',
   styleUrl: './alert.component.css',
 })
-export class AlertComponent implements OnInit{
-  alerts$!: Observable<Alert[]>; 
+export class AlertComponent implements OnInit {
+  alerts$!: Observable<Alert[]>;
 
   constructor(private alertService: AlertService) {}
 
@@ -24,27 +24,23 @@ export class AlertComponent implements OnInit{
   }
 
   getAlertClasses(type: string): string {
-    const baseClasses = 'flex items-start gap-3 p-4 rounded-lg shadow-lg border-l-4 backdrop-blur-sm';
-    
-    const typeClasses = {
-      success: 'bg-green-50 border-green-500 text-green-900',
-      error: 'bg-red-50 border-red-500 text-red-900',
-      warning: 'bg-yellow-50 border-yellow-500 text-yellow-900',
-      info: 'bg-blue-50 border-blue-500 text-blue-900'
+    const base = 'flex items-start gap-3 p-4 rounded-lg shadow-md border-l-4';
+    const map: Record<string, string> = {
+      success: 'bg-hirivo-green-bg  border-hirivo-green  text-hirivo-green',
+      error:   'bg-hirivo-red-bg    border-hirivo-red    text-hirivo-red',
+      warning: 'bg-hirivo-amber-bg  border-hirivo-amber  text-hirivo-amber',
+      info:    'bg-hirivo-teal-light border-hirivo-teal   text-hirivo-teal',
     };
-
-    return `${baseClasses} ${typeClasses[type as keyof typeof typeClasses]}`;
+    return `${base} ${map[type] ?? map['info']}`;
   }
 
   getIconClasses(type: string): string {
-    const typeClasses = {
-      success: 'text-green-500',
-      error: 'text-red-500',
-      warning: 'text-yellow-500',
-      info: 'text-blue-500'
+    const map: Record<string, string> = {
+      success: 'text-hirivo-green',
+      error:   'text-hirivo-red',
+      warning: 'text-hirivo-amber',
+      info:    'text-hirivo-teal',
     };
-
-    return typeClasses[type as keyof typeof typeClasses];
+    return map[type] ?? map['info'];
   }
-  
 }

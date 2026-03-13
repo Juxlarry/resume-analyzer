@@ -5,9 +5,16 @@ export interface AppConfig {
   sidekiqUrl: string;
 }
 
+// export const environment: AppConfig = {
+//   "apiBaseUrl": "http://localhost:3000/api/v1",
+//   "apiAdminBaseUrl": "http://localhost:3000/api/v1/admin",
+//   "apiDocsUrl": "http://localhost:3000/api-docs/v1/swagger.yaml",
+//   "sidekiqUrl": "http://localhost:3000/sidekiq"
+// } as const;
+
 export const environment: AppConfig = {
-  "apiBaseUrl": "http://localhost:3000/api/v1",
-  "apiAdminBaseUrl": "http://localhost:3000/api/v1/admin",
-  "apiDocsUrl": "http://localhost:3000/api-docs/v1/swagger.yaml",
-  "sidekiqUrl": "http://localhost:3000/sidekiq"
+  "apiBaseUrl": "http://localhost:3030/api/v1",
+  "apiAdminBaseUrl": "http://localhost:3030/api/v1/admin",
+  "apiDocsUrl": "http://localhost:3030/api-docs/v1/swagger.yaml",
+  "sidekiqUrl": "http://localhost:3030/sidekiq"
 } as const;

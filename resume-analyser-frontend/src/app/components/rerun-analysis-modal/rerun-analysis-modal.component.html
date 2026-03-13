@@ -1,105 +1,100 @@
-<!-- Modal Backdrop -->
-<div 
-  *ngIf="isOpen"
-  class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-  (click)="onClose()">
-  
-  <!-- Modal Content -->
-  <div 
-    class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 transform transition-all"
-    (click)="$event.stopPropagation()">
-    
-    <!-- Modal Header -->
-    <div class="flex justify-between items-start mb-4">
-      <div>
-        <h3 class="text-xl font-semibold text-gray-900">Re-run Analysis</h3>
-        <p class="text-sm text-gray-600 mt-1">{{ jobTitle }}</p>
-      </div>
-      <button 
-        (click)="onClose()"
-        class="text-gray-400 hover:text-gray-600 transition">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
+@if (isOpen) {
+  <!-- Backdrop -->
+  <div
+    class="fixed inset-0 bg-hirivo-ink/60 z-50 flex items-center justify-center p-4"
+    (click)="onClose()">
 
-    <!-- Modal Body -->
-    <div class="space-y-4">
-      <p class="text-gray-700">
-        Would you like to upload a new resume for this analysis, or use the existing one?
+    <!-- Panel -->
+    <div
+      class="bg-white rounded-xl shadow-xl max-w-md w-full p-6"
+      (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="flex items-start justify-between mb-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-hirivo-teal-light flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-hirivo-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-semibold text-hirivo-ink">Re-run analysis</h3>
+            @if (jobTitle) {
+              <p class="text-xs text-hirivo-muted mt-0.5 truncate max-w-[220px]">{{ jobTitle }}</p>
+            }
+          </div>
+        </div>
+        <button (click)="onClose()" class="text-hirivo-muted hover:text-hirivo-ink transition p-1 rounded">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <p class="text-sm text-hirivo-muted mb-5">
+        Upload a new version of your resume, or re-run using the resume from your original submission.
       </p>
 
-      <!-- File Upload Section -->
-      <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-        <input 
+      <!-- Upload zone -->
+      <div class="mb-4">
+        <label
+          for="rerun-file"
+          class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-hirivo-border rounded-lg cursor-pointer hover:border-hirivo-teal hover:bg-hirivo-teal-light transition bg-hirivo-surface">
+          <svg class="w-7 h-7 text-hirivo-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+          </svg>
+          <span class="text-sm text-hirivo-muted">
+            @if (selectedFile) {
+              <span class="text-hirivo-teal font-medium">{{ selectedFile.name }}</span>
+            } @else {
+              <span>Click to upload PDF or DOCX <span class="text-xs">(max 10 MB)</span></span>
+            }
+          </span>
+        </label>
+        <input
+          id="rerun-file"
           #fileInput
           type="file"
-          (change)="onFileSelected($event)"
           accept=".pdf,.docx"
           class="hidden"
+          (change)="onFileSelected($event)"
         />
-
-        <div *ngIf="!selectedFile">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-          </svg>
-          <p class="mt-2 text-sm text-gray-600">Upload a new resume (optional)</p>
-          <button
-            type="button"
-            (click)="fileInput.click()"
-            class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm font-medium">
-            Choose File
-          </button>
-          <p class="mt-2 text-xs text-gray-500">PDF or DOCX (Max 10MB)</p>
-        </div>
-
-        <div *ngIf="selectedFile" class="space-y-3">
-          <div class="flex items-center justify-center gap-2 text-green-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span class="font-medium">{{ selectedFile.name }}</span>
-          </div>
-          <button
-            type="button"
-            (click)="removeFile()"
-            class="text-sm text-red-600 hover:text-red-700 font-medium">
-            Remove File
-          </button>
-        </div>
-
-        <!-- Error Message -->
-        <div *ngIf="errorMessage" class="mt-3 p-3 bg-red-50 border border-red-200 rounded">
-          <p class="text-sm text-red-700">{{ errorMessage }}</p>
-        </div>
       </div>
 
-      <!-- Info Box -->
-      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-        <div class="flex">
-          <svg class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p class="text-sm text-blue-700">
-            <span class="font-medium">Note:</span> If you don't upload a new resume, we'll use your previously uploaded resume for this analysis.
-          </p>
-        </div>
-      </div>
-    </div>
+      <!-- Error -->
+      @if (errorMessage) {
+        <p class="text-xs text-hirivo-red mb-4 bg-hirivo-red-bg px-3 py-2 rounded-lg">{{ errorMessage }}</p>
+      }
 
-    <!-- Modal Footer -->
-    <div class="mt-6 flex gap-3">
-      <button
-        (click)="onClose()"
-        class="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition font-medium">
-        Cancel
-      </button>
-      <button
-        (click)="onConfirm()"
-        class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-medium">
-        {{ selectedFile ? 'Re-run with New Resume' : 'Re-run with Existing Resume' }}
-      </button>
+      <!-- Remove file -->
+      @if (selectedFile) {
+        <button
+          (click)="removeFile()"
+          class="text-xs text-hirivo-muted hover:text-hirivo-red transition mb-4 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Remove file
+        </button>
+      }
+
+      <!-- Actions -->
+      <div class="flex gap-3 mt-2">
+        <button
+          (click)="onClose()"
+          class="flex-1 py-2.5 border border-hirivo-border rounded-lg text-sm font-medium text-hirivo-text hover:bg-hirivo-surface transition">
+          Cancel
+        </button>
+        <button
+          (click)="onConfirm()"
+          class="flex-1 py-2.5 bg-hirivo-teal text-white rounded-lg text-sm font-semibold hover:bg-hirivo-teal-mid transition">
+          {{ selectedFile ? 'Re-run with new resume' : 'Re-run with existing resume' }}
+        </button>
+      </div>
+
     </div>
   </div>
-</div>
+}

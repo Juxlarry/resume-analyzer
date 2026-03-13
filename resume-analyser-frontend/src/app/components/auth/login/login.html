@@ -1,123 +1,154 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-md w-full space-y-8">
-    <div>
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-        {{ showOtpInput ? 'Two-Factor Authentication' : 'Sign in to your account' }}
-      </h2>
-      <p *ngIf="showOtpInput" class="mt-2 text-center text-sm text-gray-600">
-        Enter the 6-digit code from your authenticator app
+<div class="min-h-screen bg-hirivo-surface flex items-center justify-center py-12 px-4">
+  <div class="max-w-md w-full">
+
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <a routerLink="/" class="inline-flex items-center gap-2 justify-center">
+        <span class="text-2xl font-bold text-hirivo-ink">Hirivo</span>
+      </a>
+      <p class="mt-2 text-hirivo-muted text-sm">
+        {{ showOtpInput ? 'Two-factor authentication' : 'Sign in to your account' }}
       </p>
     </div>
 
-    <!-- Regular Login Form -->
-    <div *ngIf="!showOtpInput" class="bg-white py-8 px-6 shadow rounded-lg">
-      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-6">
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">
-            Email address
-          </label>
-          <input
-            id="email"
-            type="email"
-            formControlName="email"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-500]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
-          />
-          <p *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" 
-             class="mt-1 text-sm text-red-600">
-            Please enter a valid email address
+    <!-- Sign In Form -->
+    @if (!showOtpInput) {
+      <div class="bg-white rounded-2xl shadow-md border border-hirivo-border py-8 px-7">
+        <h2 class="text-xl font-bold text-hirivo-ink mb-6">Welcome back</h2>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-5">
+
+          <div>
+            <label for="email" class="block text-sm font-medium text-hirivo-ink mb-1.5">
+              Email address
+            </label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              class="w-full px-3 py-2.5 border border-hirivo-border rounded-lg text-sm bg-hirivo-surface focus:ring-2 focus:ring-hirivo-teal focus:border-hirivo-teal transition"
+              [class.border-hirivo-red]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+              placeholder="you@example.com"
+            />
+            @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+              <p class="mt-1 text-xs text-hirivo-red">Please enter a valid email address.</p>
+            }
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="password" class="block text-sm font-medium text-hirivo-ink">
+                Password
+              </label>
+              <a routerLink="/forgot-password" class="text-xs text-hirivo-teal hover:underline">
+                Forgot password?
+              </a>
+            </div>
+            <input
+              id="password"
+              type="password"
+              formControlName="password"
+              class="w-full px-3 py-2.5 border border-hirivo-border rounded-lg text-sm bg-hirivo-surface focus:ring-2 focus:ring-hirivo-teal focus:border-hirivo-teal transition"
+              [class.border-hirivo-red]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+              placeholder="••••••••"
+            />
+            @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+              <p class="mt-1 text-xs text-hirivo-red">Password is required.</p>
+            }
+          </div>
+
+          <button
+            type="submit"
+            [disabled]="loginForm.invalid || isSubmitting"
+            class="w-full py-3 bg-hirivo-teal text-white rounded-lg text-sm font-semibold hover:bg-hirivo-teal-mid disabled:opacity-50 disabled:cursor-not-allowed transition">
+            @if (isSubmitting) {
+              <span class="flex items-center justify-center gap-2">
+                <span class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                Signing in...
+              </span>
+            }
+            @if (!isSubmitting) {
+              Sign In
+            }
+          </button>
+        </form>
+
+        <div class="mt-6 text-center">
+          <p class="text-sm text-hirivo-muted">
+            Don't have an account?
+            <a routerLink="/signup" class="text-hirivo-teal hover:underline font-medium ml-1">
+              Get started free
+            </a>
           </p>
         </div>
-
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            formControlName="password"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-          />
-          <p *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" 
-             class="mt-1 text-sm text-red-600">
-            Password is required
-          </p>
-        </div>
-
-        <button
-          type="submit"
-          [disabled]="loginForm.invalid || isSubmitting"
-          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
-          <span *ngIf="!isSubmitting">Sign in</span>
-          <span *ngIf="isSubmitting">Signing in...</span>
-        </button>
-      </form>
-
-      <div class="mt-6 text-center space-y-2">
-        <a routerLink="/forgot-password" class="text-sm text-blue-600 hover:text-blue-700 block">
-          Forgot your password?
-        </a>
-        <p class="text-sm text-gray-600">
-          Don't have an account?
-          <a routerLink="/signup" class="text-blue-600 hover:text-blue-700 font-medium">
-            Sign up
-          </a>
-        </p>
       </div>
-    </div>
+    }
 
-    <!-- OTP Verification Form -->
-    <div *ngIf="showOtpInput" class="bg-white py-8 px-6 shadow rounded-lg">
-      <div class="text-center mb-6">
-        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
-          <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-        </div>
-      </div>
+    <!-- OTP Form -->
+    @if (showOtpInput) {
+      <div class="bg-white rounded-2xl shadow-md border border-hirivo-border py-8 px-7">
 
-      <form [formGroup]="otpForm" (ngSubmit)="onVerifyOtp()" class="space-y-6">
-        <div>
-          <label for="code" class="block text-sm font-medium text-gray-700 text-center">
-            Authentication Code
-          </label>
-          <input
-            id="code"
-            type="text"
-            formControlName="code"
-            minlength="6"
-            maxlength="8"
-            placeholder="Enter 6-digit code"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-center text-2xl tracking-widest focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-500]="otpForm.get('code')?.invalid && otpForm.get('code')?.touched"
-          />
-          <p *ngIf="otpForm.get('code')?.invalid && otpForm.get('code')?.touched" 
-             class="mt-1 text-sm text-red-600 text-center">
-            Please enter a valid code
-          </p>
-          <p class="mt-2 text-xs text-gray-500 text-center">
-            Or use one of your backup codes
+        <div class="text-center mb-6">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-hirivo-teal-light mb-3">
+            <svg class="h-6 w-6 text-hirivo-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-hirivo-ink">Verify your identity</h2>
+          <p class="text-sm text-hirivo-muted mt-1">
+            Enter the 6-digit code from your authenticator app
           </p>
         </div>
 
-        <button
-          type="submit"
-          [disabled]="otpForm.invalid || isSubmitting"
-          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
-          <span *ngIf="!isSubmitting">Verify & Sign in</span>
-          <span *ngIf="isSubmitting">Verifying...</span>
-        </button>
-      </form>
+        <form [formGroup]="otpForm" (ngSubmit)="onVerifyOtp()" class="space-y-5">
+          <div>
+            <input
+              id="code"
+              type="text"
+              formControlName="code"
+              minlength="6"
+              maxlength="8"
+              placeholder="000000"
+              class="block w-full px-3 py-3 border border-hirivo-border rounded-lg text-center text-2xl tracking-widest bg-hirivo-surface focus:ring-2 focus:ring-hirivo-teal focus:border-hirivo-teal transition"
+              [class.border-hirivo-red]="otpForm.get('code')?.invalid && otpForm.get('code')?.touched"
+            />
+            @if (otpForm.get('code')?.invalid && otpForm.get('code')?.touched) {
+              <p class="mt-1 text-xs text-hirivo-red text-center">Please enter a valid code.</p>
+            }
+            <p class="mt-2 text-xs text-hirivo-muted text-center">
+              Or use one of your backup codes.
+            </p>
+          </div>
 
-      <div class="mt-6 text-center">
-        <button
-          (click)="backToLogin()"
-          class="text-sm text-blue-600 hover:text-blue-700">
-          ← Back to login
-        </button>
+          <button
+            type="submit"
+            [disabled]="otpForm.invalid || isSubmitting"
+            class="w-full py-3 bg-hirivo-teal text-white rounded-lg text-sm font-semibold hover:bg-hirivo-teal-mid disabled:opacity-50 disabled:cursor-not-allowed transition">
+            @if (isSubmitting) {
+              <span class="flex items-center justify-center gap-2">
+                <span class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                Verifying...
+              </span>
+            }
+            @if (!isSubmitting) {
+              Verify and Sign In
+            }
+          </button>
+        </form>
+
+        <div class="mt-5 text-center">
+          <button
+            (click)="backToLogin()"
+            class="text-sm text-hirivo-teal hover:underline">
+            ← Back to sign in
+          </button>
+        </div>
       </div>
-    </div>
+    }
+
+    <p class="mt-6 text-center text-xs text-hirivo-muted">
+      Precision tools for the modern job seeker.
+    </p>
+
   </div>
 </div>

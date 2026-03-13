@@ -1,5 +1,4 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../services/admin.service';
 import { AlertService } from '../../../services/alert.service';
@@ -7,7 +6,7 @@ import { AlertService } from '../../../services/alert.service';
 @Component({
   selector: 'app-admin-activity-logs',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './admin-activity-logs.component.html',
   styleUrls: ['./admin-activity-logs.component.css']
 })
@@ -15,23 +14,15 @@ export class AdminActivityLogsComponent implements OnInit {
   logs: any[] = [];
   isLoading = true;
 
-  // Pagination
   currentPage = 1;
   perPage = 50;
   totalPages = 1;
   totalCount = 0;
 
-  // Filter
   actionFilter = 'all';
 
-  // Stats
-  stats: any = {
-    total_actions: 0,
-    today_actions: 0,
-    action_breakdown: {}
-  };
+  stats: any = { total_actions: 0, today_actions: 0, action_breakdown: {} };
 
-  Object = Object;
   Math = Math;
 
   constructor(
@@ -48,7 +39,6 @@ export class AdminActivityLogsComponent implements OnInit {
   loadLogs(page: number = 1): void {
     this.isLoading = true;
     this.currentPage = page;
-
     this.adminService.getActivityLogs(page, this.perPage, this.actionFilter).subscribe({
       next: (response: any) => {
         this.logs = response.logs;
@@ -57,8 +47,7 @@ export class AdminActivityLogsComponent implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: (error) => {
-        console.error('Error loading logs:', error);
+      error: () => {
         this.alertService.error('Failed to load activity logs');
         this.isLoading = false;
       }
@@ -67,59 +56,39 @@ export class AdminActivityLogsComponent implements OnInit {
 
   loadStats(): void {
     this.adminService.getActivityLogStats().subscribe({
-      next: (stats) => {
-        this.stats = stats;
-      },
-      error: (error) => {
-        console.error('Error loading stats:', error);
-      }
+      next: (stats) => { this.stats = stats; },
+      error: (err) => console.error('Stats error:', err)
     });
   }
 
-  onFilterChange(): void {
-    this.loadLogs(1);
-  }
+  onFilterChange(): void { this.loadLogs(1); }
 
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.loadLogs(page);
-    }
+    if (page >= 1 && page <= this.totalPages) this.loadLogs(page);
   }
 
   formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleString('en-GB', {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
     });
   }
 
   getActionBadgeClass(action: string): string {
-    switch (action) {
-      case 'user_created':
-        return 'bg-green-100 text-green-800';
-      case 'user_updated':
-      case 'role_changed':
-        return 'bg-blue-100 text-blue-800';
-      case 'user_deleted':
-      case 'job_deleted':
-        return 'bg-red-100 text-red-800';
-      case 'analysis_viewed':
-        return 'bg-purple-100 text-purple-800';
-      case 'settings_changed':
-        return 'bg-orange-100 text-orange-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+    const map: Record<string, string> = {
+      user_created:    'bg-hirivo-green-bg text-hirivo-green',
+      user_updated:    'bg-hirivo-teal-light text-hirivo-teal',
+      role_changed:    'bg-hirivo-teal-light text-hirivo-teal',
+      user_deleted:    'bg-hirivo-red-bg text-hirivo-red',
+      job_deleted:     'bg-hirivo-red-bg text-hirivo-red',
+      analysis_viewed: 'bg-hirivo-gold-light text-hirivo-gold',
+      settings_changed:'bg-hirivo-amber-bg text-hirivo-amber',
+    };
+    return map[action] ?? 'bg-hirivo-surface text-hirivo-muted';
   }
 
   formatAction(action: string): string {
-    return action.split('_').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    return action.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   }
 
   getMostCommonAction(): string {

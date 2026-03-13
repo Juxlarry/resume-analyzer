@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { APP_CONFIG } from '../../../config/app-config';
@@ -7,12 +6,7 @@ import { APP_CONFIG } from '../../../config/app-config';
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [
-    CommonModule, 
-    RouterLink, 
-    RouterLinkActive, 
-    RouterOutlet
-  ],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.css']
 })

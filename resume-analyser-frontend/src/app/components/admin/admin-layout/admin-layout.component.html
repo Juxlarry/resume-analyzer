@@ -1,130 +1,140 @@
-<div class="min-h-screen bg-gray-50 flex">
+<div class="min-h-screen bg-hirivo-surface flex">
+
   <!-- Sidebar -->
-  <aside 
+  <aside
     [class.w-64]="isSidebarOpen"
-    [class.w-20]="!isSidebarOpen"
-    class="bg-gray-900 text-white transition-all duration-300 flex flex-col">
-    
+    [class.w-16]="!isSidebarOpen"
+    class="bg-hirivo-ink text-white transition-all duration-300 flex flex-col flex-shrink-0">
+
     <!-- Logo -->
-    <div class="p-4 border-b border-gray-800">
-      <div class="flex items-center justify-between">
-        <h1 *ngIf="isSidebarOpen" class="text-xl font-bold">Admin Panel</h1>
-        <h1 *ngIf="!isSidebarOpen" class="text-xl font-bold">AP</h1>
-        <button 
-          (click)="toggleSidebar()"
-          class="p-2 rounded hover:bg-gray-800 transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </div>
+    <div class="px-4 py-4 border-b border-white/10 flex items-center justify-between min-h-[64px]">
+      @if (isSidebarOpen) {
+        <span class="text-lg font-bold tracking-tight text-white">Hirivo Admin</span>
+      } @else {
+        <span class="text-sm font-bold text-hirivo-teal mx-auto">H</span>
+      }
+      <button
+        (click)="toggleSidebar()"
+        class="p-1.5 rounded hover:bg-white/10 transition flex-shrink-0"
+        [class.ml-auto]="!isSidebarOpen">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
     </div>
 
-    <!-- Navigation -->
-    <nav class="flex-1 p-4 space-y-2">
-      <a 
+    <!-- Nav -->
+    <nav class="flex-1 px-3 py-4 space-y-1">
+
+      <a
         routerLink="/admin"
-        routerLinkActive="bg-blue-600"
+        routerLinkActive="bg-hirivo-teal text-white"
         [routerLinkActiveOptions]="{exact: true}"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition">
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-white/80 hover:text-white">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
         </svg>
-        <span *ngIf="isSidebarOpen" class="font-medium">Dashboard</span>
+        @if (isSidebarOpen) { <span class="text-sm font-medium">Dashboard</span> }
       </a>
 
-      <a 
+      <a
         routerLink="/admin/users"
-        routerLinkActive="bg-blue-600"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition">
+        routerLinkActive="bg-hirivo-teal text-white"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-white/80 hover:text-white">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
         </svg>
-        <span *ngIf="isSidebarOpen" class="font-medium">Users</span>
+        @if (isSidebarOpen) { <span class="text-sm font-medium">Users</span> }
       </a>
 
-      <a 
+      <a
         routerLink="/admin/jobs"
-        routerLinkActive="bg-blue-600"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition">
+        routerLinkActive="bg-hirivo-teal text-white"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-white/80 hover:text-white">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
-        <span *ngIf="isSidebarOpen" class="font-medium">Job Analyses</span>
+        @if (isSidebarOpen) { <span class="text-sm font-medium">Job Analyses</span> }
       </a>
 
-      <a 
+      <a
         routerLink="/admin/activity-logs"
-        routerLinkActive="bg-blue-600"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition">
+        routerLinkActive="bg-hirivo-teal text-white"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-white/80 hover:text-white">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
         </svg>
-        <span *ngIf="isSidebarOpen" class="font-medium">Activity Logs</span>
+        @if (isSidebarOpen) { <span class="text-sm font-medium">Activity Logs</span> }
       </a>
 
-      <a 
+      <a
         [href]="sidekiqUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition">
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-white/80 hover:text-white">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
         </svg>
-        <span *ngIf="isSidebarOpen" class="font-medium">Background Jobs</span>
+        @if (isSidebarOpen) { <span class="text-sm font-medium">Background Jobs</span> }
       </a>
+
     </nav>
 
-    <!-- User Menu -->
-    <div class="p-4 border-t border-gray-800">
-      <!-- Exit Admin Mode Button -->
-      <a 
-        routerLink="/welcome"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition mb-2 text-white">
+    <!-- Footer -->
+    <div class="px-3 py-4 border-t border-white/10 space-y-1">
+
+      <a
+        routerLink="/"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-hirivo-teal hover:bg-hirivo-teal-mid transition text-white">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
-        <span *ngIf="isSidebarOpen" class="font-medium">Exit Admin Mode</span>
+        @if (isSidebarOpen) { <span class="text-sm font-medium">Exit Admin</span> }
       </a>
 
-      <!-- Logout Button -->
-      <button 
+      <button
         (click)="logout()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition text-left">
+        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-white/70 hover:text-white">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
         </svg>
-        <span *ngIf="isSidebarOpen" class="font-medium">Logout</span>
+        @if (isSidebarOpen) { <span class="text-sm font-medium">Logout</span> }
       </button>
 
-      <!-- User Info -->
-      <div *ngIf="isSidebarOpen && currentUser" class="mt-4 pt-4 border-t border-gray-800">
-        <p class="text-xs text-gray-400 truncate">{{ currentUser.email }}</p>
-        <p class="text-xs text-red-400 uppercase mt-1 font-semibold">{{ currentUser.role }}</p>
-      </div>
+      @if (isSidebarOpen && currentUser) {
+        <div class="pt-3 mt-1 border-t border-white/10">
+          <p class="text-xs text-white/50 truncate px-1">{{ currentUser.email }}</p>
+          <p class="text-xs text-hirivo-teal uppercase font-semibold mt-0.5 px-1">{{ currentUser.role }}</p>
+        </div>
+      }
     </div>
+
   </aside>
 
-  <!-- Main Content -->
+  <!-- Main -->
   <div class="flex-1 flex flex-col overflow-hidden">
-    <!-- Top Header -->
-    <header class="bg-white shadow-sm z-10">
-      <div class="px-6 py-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-2xl font-bold text-gray-900">Resume Analyzer Admin</h2>
-          
-          <div class="flex items-center gap-4">
-            <span class="text-sm text-gray-600" *ngIf="currentUser">
-              Welcome, <span class="font-medium">{{ currentUser.email }}</span>
-            </span>
-          </div>
-        </div>
+
+    <!-- Top bar -->
+    <header class="bg-white border-b border-hirivo-border z-10 min-h-[64px] flex items-center px-6">
+      <div class="flex items-center justify-between w-full">
+        <h2 class="text-lg font-semibold text-hirivo-ink">Hirivo — Admin Console</h2>
+        @if (currentUser) {
+          <span class="text-xs text-hirivo-muted">
+            Signed in as <span class="font-semibold text-hirivo-text">{{ currentUser.email }}</span>
+          </span>
+        }
       </div>
     </header>
 
-    <!-- Page Content -->
-    <main class="flex-1 overflow-y-auto bg-gray-50">
+    <!-- Page content -->
+    <main class="flex-1 overflow-y-auto bg-hirivo-surface">
       <router-outlet></router-outlet>
     </main>
+
   </div>
 </div>

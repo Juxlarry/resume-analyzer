@@ -20,6 +20,7 @@ import { AdminUsersComponent } from './components/admin/admin-users/admin-users.
 import { AdminJobsComponent } from './components/admin/admin-jobs/admin-jobs.component';
 import { AdminActivityLogsComponent } from './components/admin/admin-activity-logs/admin-activity-logs.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { PrivacyComponent } from './components/privacy/privacy.component';
 
 export const routes: Routes = [
     {
@@ -30,6 +31,10 @@ export const routes: Routes = [
     {
         path: 'welcome',
         component: WelcomeComponent,
+    },
+    {
+        path: 'privacy',
+        component: PrivacyComponent,
     },
     {
         path: 'login',

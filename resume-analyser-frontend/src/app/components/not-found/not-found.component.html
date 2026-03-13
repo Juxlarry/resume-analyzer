@@ -1,47 +1,47 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-6">
-  <div class="max-w-md w-full text-center">
-    <!-- 404 Illustration -->
+<div class="min-h-screen bg-hirivo-surface flex items-center justify-center px-6">
+  <div class="max-w-lg w-full text-center">
+
+    <!-- Visual -->
     <div class="mb-8">
-      <svg class="w-64 h-64 mx-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    </div>
-
-    <!-- Error Message -->
-    <h1 class="text-6xl font-bold text-gray-900 mb-4">404</h1>
-    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Page Not Found</h2>
-    <p class="text-gray-600 mb-8">
-      Oops! The page you're looking for doesn't exist. It might have been moved or deleted.
-    </p>
-
-    <!-- Action Buttons -->
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a 
-        routerLink="/welcome"
-        class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg">
-        Go Home
-      </a>
-      <!--<button 
-        onclick="history.back()"
-        class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition border-2 border-blue-600">
-        Go Back
-      </button>-->
-    </div>
-
-    <!-- Help Links -->
-    <div class="mt-12 pt-8 border-t border-gray-200">
-      <p class="text-sm text-gray-600 mb-4">Need help?</p>
-      <div class="flex flex-col gap-2">
-        <a routerLink="" class="text-blue-600 hover:text-blue-700 text-sm">
-          Resume Analyser
-        </a>
-       <!-- <a routerLink="/job-descriptions" class="text-blue-600 hover:text-blue-700 text-sm">
-          My Analyses
-        </a>
-        <a routerLink="/analyze" class="text-blue-600 hover:text-blue-700 text-sm">
-          New Analysis
-        </a>-->
+      <div class="w-32 h-32 rounded-full bg-hirivo-teal-light flex items-center justify-center mx-auto">
+        <svg class="w-16 h-16 text-hirivo-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
       </div>
     </div>
+
+    <!-- Heading -->
+    <p class="text-7xl font-black text-hirivo-teal mb-3">404</p>
+    <h1 class="text-2xl font-bold text-hirivo-ink mb-3">Page not found</h1>
+    <p class="text-hirivo-muted mb-10 text-sm leading-relaxed">
+      The page you're looking for doesn't exist or may have been moved.<br>
+      Let's get you back on track.
+    </p>
+
+    <!-- Primary CTA -->
+    <div class="flex flex-col sm:flex-row gap-3 justify-center mb-12">
+      <a
+        routerLink="/"
+        class="bg-hirivo-teal text-white px-8 py-3 rounded-lg font-semibold text-sm hover:bg-hirivo-teal-mid transition shadow-sm">
+        Go to Home
+      </a>
+      <a
+        routerLink="/analyze"
+        class="bg-white text-hirivo-teal px-8 py-3 rounded-lg font-semibold text-sm border border-hirivo-teal hover:bg-hirivo-teal-light transition">
+        Analyse My Resume
+      </a>
+    </div>
+
+    <!-- Help links -->
+    <div class="pt-8 border-t border-hirivo-border">
+      <p class="text-xs text-hirivo-muted mb-3">Need help?</p>
+      <a
+        href="mailto:help@hirivo.com"
+        class="text-sm text-hirivo-teal hover:underline font-medium">
+        help&#64;hirivo.com
+      </a>
+    </div>
+
   </div>
 </div>

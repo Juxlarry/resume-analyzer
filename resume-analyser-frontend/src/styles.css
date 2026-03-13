@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,5 +11,22 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ── Hirivo Brand Variables ──────────────────────────────────────── */
+:root {
+  --hirivo-teal:        #0A5C6B;
+  --hirivo-teal-mid:    #0E7A8C;
+  --hirivo-teal-light:  #E6F4F6;
+  --hirivo-gold:        #C8860A;
+  --hirivo-gold-light:  #FEF6E7;
+  --hirivo-ink:         #0F1F27;
+  --hirivo-text:        #1E3340;
+  --hirivo-muted:       #506070;
+  --hirivo-border:      #D4DFE4;
+  --hirivo-surface:     #F5F8FA;
+  --hirivo-green:       #1B6E3A;
+  --hirivo-amber:       #B85C00;
+  --hirivo-red:         #AE1C2D;
 }

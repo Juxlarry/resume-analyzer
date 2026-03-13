@@ -1,277 +1,452 @@
-<div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-6 text-gray-800">Resume Analyser Tool</h1>
-    <p class="text-gray-500 mb-6 text-sm">Analyse how well your resume matches a job description and get AI-powered suggestions.</p>
+<div class="container mx-auto p-6 max-w-3xl">
 
-    <!-- Optional: Upload Job Description PDF -->
-    <div class="mb-6 p-5 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 shadow-sm">
-        <div class="flex items-center justify-between mb-3">
-        <div>
-            <h2 class="text-sm font-semibold text-blue-800 uppercase tracking-wide">Quick Fill from Job PDF</h2>
-            <p class="text-xs text-blue-600 mt-0.5">Upload a job description PDF to auto-fill the form below</p>
-        </div>
-        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">Optional</span>
-        </div>
+  <!-- Page header -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-hirivo-ink">Analyse Your Resume</h1>
+    <p class="text-hirivo-muted mt-1 text-sm">
+      Upload your resume and add a job description. Hirivo calculates your ATS match score
+      and generates an optimised resume — in under 60 seconds.
+    </p>
+  </div>
 
-        <div class="flex items-center gap-4 flex-wrap">
-        <input
-            #jdFileInput
-            type="file"
-            (change)="onJdFileSelected($event)"
-            accept=".pdf"
-            class="hidden"
-        />
+  <!-- JD PDF quick-fill -->
+  <div class="mb-6 p-5 bg-hirivo-teal-light rounded-xl border border-hirivo-teal/ 20 shadow-sm">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <h2 class="text-sm font-semibold text-hirivo-teal uppercase tracking-wide">
+          Quick Fill from Job PDF
+        </h2>
+        <p class="text-xs text-hirivo-muted mt-0.5">
+          Upload a job description PDF to auto-fill the form below
+        </p>
+      </div>
+      <span class="text-xs bg-white text-hirivo-teal px-2 py-1 rounded-full font-medium border border-hirivo-teal/20">
+        Optional
+      </span>
+    </div>
 
-        <button
-            type="button"
-            (click)="jdFileInput.click()"
-            [disabled]="isExtractingJd"
-            class="px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
-            <svg *ngIf="!isExtractingJd" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="flex items-center gap-4 flex-wrap">
+      <input
+        #jdFileInput
+        type="file"
+        (change)="onJdFileSelected($event)"
+        accept=".pdf"
+        class="hidden"
+      />
+      <button
+        type="button"
+        (click)="jdFileInput.click()"
+        [disabled]="isExtractingJd"
+        class="px-4 py-2 bg-white border border-hirivo-teal text-hirivo-teal rounded-lg text-sm font-medium hover:bg-hirivo-teal-light transition flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+        @if (!isExtractingJd) {
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span *ngIf="isExtractingJd" class="animate-spin inline-block w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full"></span>
-            {{ isExtractingJd ? 'Extracting...' : 'Upload Job PDF' }}
-        </button>
+          </svg>
+        }
+        @if (isExtractingJd) {
+          <span class="animate-spin inline-block w-4 h-4 border-2 border-hirivo-teal border-t-transparent rounded-full"></span>
+        }
+        {{ isExtractingJd ? 'Extracting...' : 'Upload Job PDF' }}
+      </button>
 
-        <span *ngIf="jdFileName" class="text-sm text-green-700 font-medium flex items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      @if (jdFileName) {
+        <span class="text-sm text-hirivo-green font-medium flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            {{ jdFileName }}
+          </svg>
+          {{ jdFileName }}
         </span>
-
-        <span *ngIf="jdExtractionError" class="text-sm text-red-600 flex items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      }
+      @if (jdExtractionError) {
+        <span class="text-sm text-hirivo-red flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {{ jdExtractionError }}
+          </svg>
+          {{ jdExtractionError }}
         </span>
-        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Main form -->
+  <form [formGroup]="jobForm" (ngSubmit)="onSubmit()" class="space-y-6 bg-white p-6 rounded-xl shadow-md border border-hirivo-border">
+
+    <!-- Job Title -->
+    <div>
+      <label class="block text-sm font-medium mb-2 text-hirivo-ink">
+        Job Title
+        <span class="text-hirivo-red ml-0.5">*</span>
+        @if (fieldsAutoFilled) {
+          <span class="ml-2 text-xs text-hirivo-green font-normal bg-hirivo-green-bg px-2 py-0.5 rounded-full">
+            Auto-filled
+          </span>
+        }
+      </label>
+      <input
+        type="text"
+        formControlName="title"
+        class="w-full p-3 border border-hirivo-border rounded-lg focus:ring-2 focus:ring-hirivo-teal focus:border-hirivo-teal transition bg-hirivo-surface"
+        placeholder="e.g. Senior Software Engineer, Product Manager, Data Analyst"
+        [class.border-hirivo-red]="jobForm.get('title')?.invalid && jobForm.get('title')?.touched"
+      />
+      @if (jobForm.get('title')?.invalid && jobForm.get('title')?.touched) {
+        <p class="text-hirivo-red text-sm mt-1">Job title is required.</p>
+      }
     </div>
 
-    <form [formGroup]="jobForm" (ngSubmit)="onSubmit()" class="space-y-6 bg-white p-6 rounded-lg shadow-md">
-        <!-- Job Title --> 
-        <div>
-            <label class="block text-sm font-medium mb-2 text-gray-700">Job Title *
-                <span *ngIf="fieldsAutoFilled" class="ml-2 text-xs text-green-600 font-normal bg-green-50 px-2 py-0.5 rounded-full">✓ Auto-filled</span>
-            </label>
-            <input 
-            type="text"
-            formControlName="title" 
-            class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
-            placeholder="e.g.. Senior Ruby Software Engineer"
-            [class.border-red-500]="jobForm.get('title')?.invalid && jobForm.get('title')?.touched"
-            />
-            <p *ngIf="jobForm.get('title')?.invalid && jobForm.get('title')?.touched" 
-               class="text-red-500 text-sm mt-1">
-                Job title is required
+    <!-- Job Description -->
+    <div>
+      <label class="block text-sm font-medium mb-2 text-hirivo-ink">
+        Job Description
+        <span class="text-hirivo-red ml-0.5">*</span>
+        @if (fieldsAutoFilled) {
+          <span class="ml-2 text-xs text-hirivo-green font-normal bg-hirivo-green-bg px-2 py-0.5 rounded-full">
+            Auto-filled
+          </span>
+        }
+      </label>
+      <textarea
+        formControlName="description"
+        rows="6"
+        class="w-full p-3 border border-hirivo-border rounded-lg focus:ring-2 focus:ring-hirivo-teal focus:border-hirivo-teal transition bg-hirivo-surface resize-none"
+        [class.border-hirivo-red]="jobForm.get('description')?.invalid && jobForm.get('description')?.touched"
+        placeholder="Paste the full job description here. Include responsibilities, requirements, and any skills listed — the more detail, the more accurate your ATS score.">
+      </textarea>
+      @if (jobForm.get('description')?.invalid && jobForm.get('description')?.touched) {
+        <p class="text-hirivo-red text-sm mt-1">
+          Job description is required (minimum 50 characters).
+        </p>
+      }
+    </div>
+
+    <!-- Job Link -->
+    <div>
+      <label class="block text-sm font-medium mb-2 text-hirivo-ink">
+        Job Link or Extra Context
+        <span class="text-hirivo-muted font-normal ml-1">(Optional)</span>
+      </label>
+      <input
+        type="text"
+        formControlName="job_link"
+        class="w-full p-3 border border-hirivo-border rounded-lg focus:ring-2 focus:ring-hirivo-teal focus:border-hirivo-teal transition bg-hirivo-surface"
+        placeholder="https://company.com/careers/job-123 or additional context"
+      />
+      <p class="text-xs text-hirivo-muted mt-1">
+        A link to the original job posting or any additional context for the AI analysis.
+      </p>
+    </div>
+
+    <!-- Resume Upload -->
+    <div>
+      <label class="block text-sm font-medium mb-2 text-hirivo-ink">
+        Upload Your Resume / CV
+        <span class="text-hirivo-red ml-0.5">*</span>
+      </label>
+
+      <input
+        #fileInput
+        type="file"
+        (change)="onFileSelected($event)"
+        accept=".pdf,.docx"
+        class="hidden"
+      />
+
+      <div
+        class="border-2 border-dashed border-hirivo-border rounded-xl p-6 text-center cursor-pointer hover:border-hirivo-teal hover:bg-hirivo-teal-light/40 transition"
+        (click)="fileInput.click()">
+        <svg class="w-8 h-8 text-hirivo-muted mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+        </svg>
+        @if (!selectedFile) {
+          <p class="text-sm font-medium text-hirivo-text">Click to upload your resume</p>
+          <p class="text-xs text-hirivo-muted mt-1">PDF or DOCX · Max 10MB</p>
+        }
+        @if (selectedFile) {
+          <p class="text-sm font-semibold text-hirivo-green flex items-center justify-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            {{ selectedFile.name }}
+          </p>
+          <p class="text-xs text-hirivo-muted mt-1">Click to replace</p>
+        }
+      </div>
+
+      <!-- Inline trust badge -->
+      <div class="mt-3 flex items-start gap-2 text-xs text-hirivo-muted bg-hirivo-teal-light border-l-4 border-hirivo-teal rounded-r-lg px-3 py-2">
+        <svg class="w-3.5 h-3.5 text-hirivo-teal flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+        </svg>
+        <span>
+          <strong class="text-hirivo-teal">Your file is never stored.</strong>
+          Hirivo processes your resume in real time using OpenAI GPT-4o and discards it immediately after analysis.
+        </span>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="flex gap-4 pt-2">
+      <button
+        type="submit"
+        [disabled]="jobForm.invalid || !selectedFile || isLoading"
+        class="flex-1 bg-hirivo-teal text-white px-6 py-3 rounded-lg hover:bg-hirivo-teal-mid disabled:opacity-50 disabled:cursor-not-allowed transition font-semibold">
+        @if (!isLoading) {
+          Analyse My Resume
+        }
+        @if (isLoading) {
+          <span class="flex items-center justify-center gap-2">
+            <span class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+            {{ currentProgressLabel }}
+          </span>
+        }
+      </button>
+
+      <button
+        type="button"
+        (click)="resetForm()"
+        [disabled]="isLoading"
+        class="px-6 py-3 border border-hirivo-border rounded-lg hover:bg-hirivo-surface transition text-hirivo-text disabled:opacity-50">
+        Reset
+      </button>
+    </div>
+  </form>
+
+  <!-- ── ANIMATED PROGRESS ─────────────────────────────────────── -->
+  @if (isLoading && progressStep > 0) {
+    <div class="mt-8 bg-white rounded-xl border border-hirivo-border shadow-md p-6">
+
+      <div class="space-y-3 mb-6">
+        @for (ps of progressSteps; track ps.step) {
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
+                 [class.bg-hirivo-teal]="progressStep > ps.step"
+                 [class.text-white]="progressStep > ps.step"
+                 [class.bg-hirivo-teal-light]="progressStep === ps.step"
+                 [class.text-hirivo-teal]="progressStep === ps.step"
+                 [class.ring-2]="progressStep === ps.step"
+                 [class.ring-hirivo-teal]="progressStep === ps.step"
+                 [class.bg-hirivo-surface]="progressStep < ps.step"
+                 [class.text-hirivo-muted]="progressStep < ps.step">
+              @if (progressStep > ps.step) {
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              }
+              @if (progressStep === ps.step) {
+                <span class="animate-spin w-3.5 h-3.5 border-2 border-hirivo-teal border-t-transparent rounded-full block"></span>
+              }
+              @if (progressStep < ps.step) {
+                {{ ps.step }}
+              }
+            </div>
+            <span class="text-sm transition-all duration-300"
+                  [class.font-semibold]="progressStep === ps.step"
+                  [class.text-hirivo-teal]="progressStep === ps.step"
+                  [class.text-hirivo-muted]="progressStep < ps.step"
+                  [class.text-hirivo-text]="progressStep > ps.step">
+              {{ ps.label }}
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Progress bar -->
+      <div class="w-full bg-hirivo-surface rounded-full h-2 mb-5">
+        <div
+          class="bg-hirivo-teal h-2 rounded-full transition-all duration-700"
+          [style.width.%]="progressPercent">
+        </div>
+      </div>
+
+      <!-- Rotating tip -->
+      <div class="bg-hirivo-teal-light rounded-lg px-4 py-3">
+        <p class="text-xs text-hirivo-text leading-relaxed">
+          <span class="font-semibold text-hirivo-teal">Did you know?  </span>
+          {{ progressTips[currentTipIndex] }}
+        </p>
+      </div>
+
+    </div>
+  }
+
+  <!-- ── ERROR ──────────────────────────────────────────────────── -->
+  @if (errorMessage && !isLoading) {
+    <div class="mt-6 p-5 bg-hirivo-red-bg rounded-xl border-l-4 border-hirivo-red">
+      <h3 class="font-semibold text-hirivo-red mb-1">Analysis could not be completed</h3>
+      <p class="text-sm text-hirivo-text">{{ errorMessage }}</p>
+      <p class="text-xs text-hirivo-muted mt-2">
+        If this continues, contact
+        <a href="mailto:help@hirivo.com" class="text-hirivo-teal hover:underline font-medium">help@hirivo.com</a>
+      </p>
+    </div>
+  }
+
+  <!-- ── ANALYSIS RESULT ────────────────────────────────────────── -->
+  @if (analysisResult) {
+    <div class="mt-8 space-y-6 analysis-result">
+
+      <div class="bg-white rounded-xl shadow-md border border-hirivo-border p-6">
+        <h2 class="text-2xl font-bold text-hirivo-ink mb-6">Your Hirivo ATS Report</h2>
+
+        <!-- Match Score -->
+        <div class="text-center p-8 rounded-xl mb-6"
+             [class.bg-hirivo-green-bg]="analysisResult.match_score >= 70"
+             [class.bg-hirivo-amber-bg]="analysisResult.match_score >= 50 && analysisResult.match_score < 70"
+             [class.bg-hirivo-red-bg]="analysisResult.match_score < 50">
+          <p class="text-sm text-hirivo-muted mb-2">ATS Match Score</p>
+          <p class="text-6xl font-bold mb-2"
+             [class.text-hirivo-green]="analysisResult.match_score >= 70"
+             [class.text-hirivo-amber]="analysisResult.match_score >= 50 && analysisResult.match_score < 70"
+             [class.text-hirivo-red]="analysisResult.match_score < 50">
+            {{ analysisResult.match_score }}%
+          </p>
+          <p class="text-sm text-hirivo-muted mb-1">Estimated automated screening pass rate</p>
+          <p class="text-lg font-semibold"
+             [class.text-hirivo-green]="analysisResult.verdict === 'STRONG_MATCH'"
+             [class.text-hirivo-teal]="analysisResult.verdict === 'GOOD_MATCH'"
+             [class.text-hirivo-amber]="analysisResult.verdict === 'PARTIAL_MATCH'"
+             [class.text-hirivo-red]="analysisResult.verdict === 'WEAK_MATCH'">
+            {{ formatVerdict(analysisResult.verdict) }}
+          </p>
+          @if (analysisResult.ats_system_key) {
+            <p class="text-xs text-hirivo-muted mt-2">
+              ATS System: <span class="font-medium text-hirivo-text">{{ analysisResult.ats_system_key }}</span>
             </p>
+          }
         </div>
 
-        <!-- Job Description-->
-        <div>
-            <label class="block text-sm font-medium mb-2 text-gray-700">Job Description *
-                <span *ngIf="fieldsAutoFilled" class="ml-2 text-xs text-green-600 font-normal bg-green-50 px-2 py-0.5 rounded-full">
-                ✓ Auto-filled
+        <!-- Summary -->
+        <div class="border-l-4 border-hirivo-teal pl-4 mb-6">
+          <h3 class="font-semibold text-lg text-hirivo-ink mb-2">Summary</h3>
+          <p class="text-hirivo-text text-sm">{{ analysisResult.summary }}</p>
+        </div>
+
+        <!-- Strengths & Weaknesses -->
+        <div class="grid md:grid-cols-2 gap-5 mb-6">
+          <div class="p-5 rounded-xl bg-hirivo-green-bg">
+            <h3 class="font-semibold text-lg text-hirivo-green flex items-center gap-2 mb-3">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Strengths
+            </h3>
+            <div class="text-hirivo-text text-sm" [innerHTML]="analysisResult.strengths"></div>
+          </div>
+          <div class="p-5 rounded-xl bg-hirivo-red-bg">
+            <h3 class="font-semibold text-lg text-hirivo-red flex items-center gap-2 mb-3">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              Areas for Improvement
+            </h3>
+            <div class="text-hirivo-text text-sm" [innerHTML]="analysisResult.weaknesses"></div>
+          </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="border-l-4 border-hirivo-teal-mid pl-4 mb-6">
+          <h3 class="font-semibold text-lg text-hirivo-ink mb-2">Recommendations</h3>
+          <div class="text-hirivo-text text-sm" [innerHTML]="analysisResult.recommendations"></div>
+        </div>
+
+        <!-- Missing Keywords -->
+        @if (analysisResult.missing_keywords?.length > 0) {
+          <div class="border-l-4 border-hirivo-amber pl-4 mb-6">
+            <h3 class="font-semibold text-lg text-hirivo-ink mb-2">
+              Missing Keywords — Add These to Your Resume
+            </h3>
+            <p class="text-xs text-hirivo-muted mb-3">
+              These terms appear in the job description but are absent from your resume.
+              Hirivo's optimised rewrite adds them naturally.
+            </p>
+            <div class="flex flex-wrap gap-2">
+              @for (keyword of analysisResult.missing_keywords; track keyword) {
+                <span class="px-3 py-1 bg-hirivo-amber-bg text-hirivo-amber rounded-full text-sm font-medium border border-hirivo-amber/20">
+                  {{ keyword }}
                 </span>
-            </label>
-            <textarea 
-                formControlName="description"
-                rows="6"
-                class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
-                [class.border-red-500]="jobForm.get('description')?.invalid && jobForm.get('description')?.touched"
-                placeholder="Paste the job description here ...">      
-            </textarea>
-            <p *ngIf="jobForm.get('description')?.invalid && jobForm.get('description')?.touched" 
-               class="text-red-500 text-sm mt-1">
-                Job description is required (minimum 50 characters)
-            </p>
-        </div>
-
-        <!-- Job Link / Extra Context -->
-        <div>
-            <label class="block text-sm font-medium mb-2 text-gray-700">Job Link or Extra Job Context (Optional)</label>
-            <input
-                type="text"
-                formControlName="job_link"
-                class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
-                placeholder="https://company.com/job/123 or additional context text"
-            />
-            <p class="text-xs text-gray-500 mt-1">This will be passed to AI prompts when provided.</p>
-        </div>
-
-        <!-- Resume Upload -->
-        <div>
-            <label class="block text-sm font-medium mb-2 text-gray-700">Upload your Resume/CV *</label>
-            
-            <div class="flex flex-col gap-3">
-                <input 
-                    #fileInput
-                    type="file"
-                    (change)="onFileSelected($event)"
-                    accept=".pdf,.docx"
-                    class="hidden"
-                />
-
-                <div class="flex items-center gap-4">
-                    <button 
-                        type="button"
-                        (click)="fileInput.click()"
-                        class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                        </svg>
-                        Choose File
-                    </button>
-
-                    <span class="text-sm text-gray-500 italic">
-                        {{ selectedFile ? selectedFile.name : 'No file selected' }}
-                    </span>
-                </div>
-
-                <p class="text-xs text-gray-400">Supported formats: PDF, DOCX (Max 10MB)</p>
+              }
             </div>
+          </div>
+        }
 
-            <div *ngIf="selectedFile" class="mt-2">
-                <p class="text-sm text-green-600 font-medium flex items-center gap-1">
-                    <span class="text-lg">✓</span> File ready for analysis
-                </p>
-            </div>
+        <!-- Action buttons -->
+        <div class="flex flex-wrap gap-3 pt-4 border-t border-hirivo-border">
+          <button
+            (click)="resetForm()"
+            class="px-5 py-2 bg-hirivo-teal text-white rounded-lg hover:bg-hirivo-teal-mid transition font-medium text-sm">
+            Analyse Another Resume
+          </button>
+          @if (analysisJobId) {
+            <a
+              [routerLink]="['/job-descriptions', analysisJobId]"
+              class="px-5 py-2 bg-hirivo-green-bg text-hirivo-green border border-hirivo-green/30 rounded-lg hover:bg-green-100 transition font-medium text-sm inline-flex items-center gap-1.5">
+              View Full Report
+            </a>
+          }
+          <button
+            (click)="printResults()"
+            class="px-5 py-2 border border-hirivo-border rounded-lg hover:bg-hirivo-surface transition text-hirivo-text text-sm">
+            Print Results
+          </button>
         </div>
+      </div>
 
-        <!-- Submit Button-->
-        <div class="flex gap-4">
-            <button
-                type="submit"
-                [disabled]="jobForm.invalid || !selectedFile || isLoading"
-                class="flex-1 bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all font-medium">
-                <span *ngIf="!isLoading">Analyze Resume</span>
-                <span *ngIf="isLoading">{{ loadingMessage }}</span>
-            </button>
-
-            <button
-                type="button"
-                (click)="resetForm()"
-                class="px-6 py-3 border border-gray-300 rounded hover:bg-gray-50 transition disabled:opacity-50">
-                Reset
-            </button>
+      <!-- ATS Methodology disclosure -->
+      <details class="bg-white rounded-xl border border-hirivo-border shadow-sm group">
+        <summary class="cursor-pointer px-6 py-4 flex items-center justify-between list-none">
+          <span class="flex items-center gap-2 font-semibold text-hirivo-ink text-sm">
+            <svg class="w-4 h-4 text-hirivo-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            How Hirivo analyses your resume
+          </span>
+          <svg class="w-4 h-4 text-hirivo-muted group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </summary>
+        <div class="px-6 pb-6 pt-2 border-t border-hirivo-border space-y-3 text-sm text-hirivo-text">
+          <p class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal flex-shrink-0 mt-2"></span>
+            <span>
+              <strong class="text-hirivo-ink">Keyword Match Analysis — </strong>
+              Hirivo extracts key skills, qualifications, and role-specific competencies from the job description and compares them against your resume, including synonyms and industry-standard variants. Missing keywords are listed by priority.
+            </span>
+          </p>
+          <p class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal flex-shrink-0 mt-2"></span>
+            <span>
+              <strong class="text-hirivo-ink">Format and Structure Scoring — </strong>
+              Most ATS platforms reject resumes containing tables, text boxes, graphics, and non-standard section headings. Hirivo identifies every formatting element that may cause a parsing failure.
+            </span>
+          </p>
+          <p class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal flex-shrink-0 mt-2"></span>
+            <span>
+              <strong class="text-hirivo-ink">Job Title Alignment — </strong>
+              Your most recent role is compared against the target position. A significant title gap often reduces ATS ranking even when skills match.
+            </span>
+          </p>
+          <p class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal flex-shrink-0 mt-2"></span>
+            <span>
+              <strong class="text-hirivo-ink">Achievement Quantification — </strong>
+              Resumes with measurable results rank higher in both ATS and human review. Hirivo flags bullet points that lack metrics.
+            </span>
+          </p>
+          <p class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal flex-shrink-0 mt-2"></span>
+            <span>
+              <strong class="text-hirivo-ink">Rewrite Logic — </strong>
+              Hirivo uses OpenAI GPT-4o to rewrite your resume — incorporating missing keywords naturally, restructuring bullets for impact, and removing ATS-hostile formatting. Your experience is never fabricated or misrepresented.
+            </span>
+          </p>
+          <p class="text-xs text-hirivo-muted pt-1">
+            Optimised for Workday, Greenhouse, Taleo, Lever, iCIMS, and SAP SuccessFactors.
+          </p>
         </div>
-    </form>
+      </details>
 
-    <!--Analysis Status -->
-    <div *ngIf="isAnalyzing" class="mt-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-        <div class="flex items-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
-            <div>
-                <h3 class="font-semibold text-blue-900">{{ analysisStatus }}</h3>
-                <p class="text-sm text-blue-700">This usually takes 2-3 minutes...</p>
-            </div>
-        </div>
     </div>
+  }
 
-    <!-- Error Message -->
-    <div *ngIf="errorMessage" class="mt-8 p-6 bg-red-50 rounded-lg border-l-4 border-red-500">
-        <h3 class="font-semibold text-red-900">Error</h3>
-        <p class="text-sm text-red-700">{{ errorMessage }}</p>
-    </div>
-
-    <!-- Analysis Result Section-->
-    <div *ngIf="analysisResult" class="mt-8 p-6 bg-white rounded-lg shadow-md analysis-result">
-        <h2 class="text-2xl font-bold mb-4 text-gray-800">Analysis Result</h2>
-
-        <div class="space-y-6">
-            <!-- Match Score -->
-            <div class="text-center p-6 rounded-lg"
-                 [ngClass]="{
-                     'bg-green-50': analysisResult.match_score >= 70,
-                     'bg-yellow-50': analysisResult.match_score >= 50 && analysisResult.match_score < 70,
-                     'bg-red-50': analysisResult.match_score < 50
-                 }">
-                <p class="text-sm text-gray-600 mb-2">Match Score</p>
-                <p class="text-5xl font-bold"
-                   [ngClass]="{
-                       'text-green-600': analysisResult.match_score >= 70,
-                       'text-yellow-600': analysisResult.match_score >= 50 && analysisResult.match_score < 70,
-                       'text-red-600': analysisResult.match_score < 50
-                   }">
-                    {{ analysisResult.match_score }}%
-                </p>
-                <p class="text-lg font-semibold mt-2"
-                   [ngClass]="{
-                       'text-green-700': analysisResult.verdict === 'STRONG_MATCH',
-                       'text-blue-700': analysisResult.verdict === 'GOOD_MATCH',
-                       'text-yellow-700': analysisResult.verdict === 'PARTIAL_MATCH',
-                       'text-red-700': analysisResult.verdict === 'WEAK_MATCH'
-                   }">
-                    {{ formatVerdict(analysisResult.verdict) }}
-                </p>
-                <p class="text-sm text-gray-600 mt-3">
-                    ATS System: <span class="font-medium text-gray-800">{{ analysisResult.ats_system_key || 'N/A' }}</span>
-                </p>
-            </div>
-
-            <!-- Display Summary-->
-            <div class="border-l-4 border-blue-500 pl-4">
-                <h3 class="font-semibold text-lg text-gray-800">Summary</h3>
-                <p class="mt-2 text-gray-700">{{ analysisResult.summary }}</p>
-            </div>
-
-
-            <div class="grid md:grid-cols-2 gap-6"
-            >
-                <!-- Display Strengths-->
-                <div class="strengths-section p-4 rounded bg-green-50">
-                    <h3 class="font-semibold text-lg text-green-600 flex items-center gap-2 mb-2">
-                        <span>✓</span>Strengths</h3>
-                    <div class="text-gray-700" [innerHTML]="analysisResult.strengths"></div>
-                </div>
-            
-                <!-- Display Weaknesses-->
-                <div class="weaknesses-section p-4 rounded bg-red-50">
-                    <h3 class="font-semibold text-lg text-red-600 flex items-center gap-2 mb-2">
-                        <span>⚠</span> Areas for Improvement
-                    </h3>
-                    <div class="text-gray-700" [innerHTML]="analysisResult.weaknesses"></div>
-                </div>
-            </div>
-
-            <!-- Display Recommendations -->
-            <div class="border-l-4 border-purple-500 pl-4">
-                <h3 class="font-semibold text-lg text-gray-800">Recommendations</h3>
-                <div class="mt-2 text-gray-700" [innerHTML]="analysisResult.recommendations"></div>
-            </div>
-
-            <!-- Missing Keywords -->
-            <div *ngIf="analysisResult.missing_keywords?.length > 0" 
-                 class="border-l-4 border-orange-500 pl-4">
-                <h3 class="font-semibold text-lg text-gray-800">Missing Keywords (Add to Resume)</h3>
-                <div class="mt-2 flex flex-wrap gap-2">
-                    <span *ngFor="let keyword of analysisResult.missing_keywords"
-                          class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
-                        {{ keyword }}
-                    </span>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex gap-4 pt-4 border-t">
-                <button 
-                    (click)="resetForm()"
-                    class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                    Analyze Another Resume
-                </button>
-                <a
-                    *ngIf="analysisJobId"
-                    [routerLink]="['/job-descriptions', analysisJobId]"
-                    class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition inline-flex items-center">
-                    View Job Detail
-                </a>
-                <button 
-                    (click)="printResults()"
-                    class="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
-                    Print Results
-                </button>
-            </div>
-        </div>
-    </div>
 </div>

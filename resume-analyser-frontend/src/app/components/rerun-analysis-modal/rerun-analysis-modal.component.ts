@@ -1,10 +1,9 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-rerun-analysis-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './rerun-analysis-modal.component.html',
   styleUrl: './rerun-analysis-modal.component.css',
 })
@@ -18,26 +17,24 @@ export class RerunAnalysisModal {
   selectedFile: File | null = null;
   errorMessage: string | null = null;
 
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
 
-    if (!file){
+    if (!file) {
       this.selectedFile = null;
-      return; 
+      return;
     }
 
-    // Validate file type
     const allowedTypes = [
-      "application/pdf",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     ];
 
     if (file.size > 10 * 1024 * 1024 || !allowedTypes.includes(file.type)) {
-      this.errorMessage = "Invalid file. Please ensure it is a PDF/DOCX with max size of 10MB.";
+      this.errorMessage = 'Invalid file. Please upload a PDF or DOCX under 10 MB.';
       this.selectedFile = null;
-      if (this.fileInput) {
-        this.fileInput.nativeElement.value = '';
-      }
+      if (this.fileInput) this.fileInput.nativeElement.value = '';
       return;
     }
 
@@ -51,7 +48,6 @@ export class RerunAnalysisModal {
   }
 
   onConfirm(): void {
-    // Emit the selected file (or null if user wants to use existing resume)
     this.confirm.emit(this.selectedFile);
     this.resetModal();
   }
@@ -59,16 +55,12 @@ export class RerunAnalysisModal {
   removeFile(): void {
     this.selectedFile = null;
     this.errorMessage = null;
-    if (this.fileInput) {
-      this.fileInput.nativeElement.value = '';
-    }
+    if (this.fileInput) this.fileInput.nativeElement.value = '';
   }
 
   private resetModal(): void {
     this.selectedFile = null;
     this.errorMessage = null;
-    if (this.fileInput) {
-      this.fileInput.nativeElement.value = '';
-    }
+    if (this.fileInput) this.fileInput.nativeElement.value = '';
   }
 }

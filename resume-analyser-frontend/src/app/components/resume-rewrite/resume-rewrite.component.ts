@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
@@ -17,7 +16,7 @@ import {
 @Component({
   selector: 'app-resume-rewrite',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './resume-rewrite.component.html',
   styleUrls: ['./resume-rewrite.component.css']
 })
@@ -56,14 +55,12 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const routeJobId = Number(this.route.snapshot.params['id']);
-
     if (!Number.isFinite(routeJobId) || routeJobId <= 0) {
       this.errorMessage = 'Invalid job description id.';
       this.isLoading = false;
       this.cdr.detectChanges();
       return;
     }
-
     this.jobId = routeJobId;
     this.loadAnalysis();
   }
@@ -82,7 +79,6 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
         this.availableSuggestions = this.extractSuggestions(job.resume_analysis?.recommendations);
         this.isLoading = false;
         this.cdr.detectChanges();
-
         this.restoreLatestRewrite();
       },
       error: () => {
@@ -95,44 +91,42 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
 
   toggleSuggestion(suggestion: string): void {
     const index = this.selectedSuggestions.indexOf(suggestion);
-
     if (index > -1) {
       this.selectedSuggestions.splice(index, 1);
-      return;
+    } else {
+      this.selectedSuggestions.push(suggestion);
     }
+  }
 
-    this.selectedSuggestions.push(suggestion);
+  isSuggestionSelected(suggestion: string): boolean {
+    return this.selectedSuggestions.includes(suggestion);
   }
 
   addKeyword(value: string): void {
     const keyword = value.trim();
     if (!keyword) return;
-
-    const exists = this.additionalKeywords.some((existing) => existing.toLowerCase() === keyword.toLowerCase());
+    const exists = this.additionalKeywords.some(k => k.toLowerCase() === keyword.toLowerCase());
     if (exists) return;
-
     this.additionalKeywords.push(keyword);
     this.keywordInput = '';
   }
 
   removeKeyword(keyword: string): void {
-    this.additionalKeywords = this.additionalKeywords.filter((item) => item !== keyword);
+    this.additionalKeywords = this.additionalKeywords.filter(k => k !== keyword);
   }
 
   addProject(): void {
     const name = this.newProject.name?.trim() ?? '';
     const description = this.newProject.description?.trim() ?? '';
-
     if (!name || !description) {
       this.alertService.warning('Project name and description are required.');
       return;
     }
-
     this.additionalProjects.push({
       name,
       description,
       technologies: this.newProject.technologies?.trim() || undefined,
-      duration: this.newProject.duration?.trim() || undefined
+      duration:     this.newProject.duration?.trim()     || undefined
     });
     this.newProject = this.emptyProject();
   }
@@ -144,11 +138,11 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
   canSubmit(): boolean {
     return (
       !this.isSubmitting &&
-      this.hasCompletedAnalysis() &&
+      this.jobDescription?.resume_analysis?.status === 'completed' &&
       (
-        this.selectedSuggestions.length > 0 ||
-        this.additionalKeywords.length > 0 ||
-        this.additionalProjects.length > 0 ||
+        this.selectedSuggestions.length   > 0 ||
+        this.additionalKeywords.length    > 0 ||
+        this.additionalProjects.length    > 0 ||
         this.specialInstructions.trim().length > 0
       )
     );
@@ -168,22 +162,22 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
 
     const payload: CreateResumeRewritePayload = {
       resume_rewrite: {
-        accepted_suggestions: this.selectedSuggestions,
-        additional_keywords: this.additionalKeywords,
-        additional_projects: this.additionalProjects,
-        special_instructions: this.specialInstructions.trim() || undefined
+        accepted_suggestions:  this.selectedSuggestions,
+        additional_keywords:   this.additionalKeywords,
+        additional_projects:   this.additionalProjects,
+        special_instructions:  this.specialInstructions.trim() || undefined
       }
     };
 
     this.rewriteService.createRewrite(resumeAnalysisId, payload).subscribe({
       next: (response) => {
-        this.rewriteId = response.id;
-        this.rewriteStatus = response.status;
-        this.isSubmitting = false;
-        this.hasPdfDownload = false;
+        this.rewriteId      = response.id;
+        this.rewriteStatus  = response.status;
+        this.isSubmitting   = false;
+        this.hasPdfDownload  = false;
         this.hasDocxDownload = false;
-        this.latexCode = '';
-        this.rewriteError = '';
+        this.latexCode      = '';
+        this.rewriteError   = '';
         this.cdr.detectChanges();
         this.startPolling(true);
       },
@@ -197,22 +191,14 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
     });
   }
 
-  downloadLatex(): void {
-    this.downloadFile('latex');
-  }
-
-  downloadPdf(): void {
-    this.downloadFile('pdf');
-  }
-
-  downloadDocx(): void {
-    this.downloadFile('docx');
-  }
+  downloadLatex(): void { this.downloadFile('latex'); }
+  downloadPdf():   void { this.downloadFile('pdf');   }
+  downloadDocx():  void { this.downloadFile('docx');  }
 
   private downloadFile(format: 'latex' | 'pdf' | 'docx'): void {
     if (!this.rewriteId) return;
-
     this.isDownloading = true;
+
     const request = format === 'pdf'
       ? this.rewriteService.downloadPdf(this.rewriteId)
       : format === 'docx'
@@ -228,53 +214,46 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
           return;
         }
-
-        const extension = format === 'pdf' ? 'pdf' : format === 'docx' ? 'docx' : 'tex';
-        const filename = this.extractFilename(response.headers.get('content-disposition')) || `resume_rewrite_${this.rewriteId}.${extension}`;
-        const objectUrl = window.URL.createObjectURL(blob);
+        const ext      = format === 'pdf' ? 'pdf' : format === 'docx' ? 'docx' : 'tex';
+        const filename = this.extractFilename(response.headers.get('content-disposition'))
+                         || `resume_rewrite_${this.rewriteId}.${ext}`;
+        const url  = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href = objectUrl;
+        link.href     = url;
         link.download = filename;
         link.click();
-        window.URL.revokeObjectURL(objectUrl);
+        window.URL.revokeObjectURL(url);
         this.isDownloading = false;
         this.cdr.detectChanges();
       },
       error: (error) => {
         this.isDownloading = false;
-        const fileType = format === 'pdf' ? 'PDF' : format === 'docx' ? 'DOCX' : 'LaTeX';
-        const apiError = error?.error?.error || `Failed to download ${fileType} file.`;
+        const label    = format === 'pdf' ? 'PDF' : format === 'docx' ? 'DOCX' : 'LaTeX';
+        const apiError = error?.error?.error || `Failed to download ${label} file.`;
         this.alertService.error(apiError);
         this.cdr.detectChanges();
       }
     });
   }
 
-  private startPolling(notifyOnCompletion: boolean = true): void {
+  private startPolling(notifyOnCompletion = true): void {
     if (!this.rewriteId) return;
-
     this.pollingSubscription?.unsubscribe();
 
     this.pollingSubscription = interval(3000)
       .pipe(
         startWith(0),
         switchMap(() => this.rewriteService.getRewriteStatus(this.rewriteId as number)),
-        takeWhile((response) => response.status === 'pending' || response.status === 'processing', true)
+        takeWhile(r => r.status === 'pending' || r.status === 'processing', true)
       )
       .subscribe({
-        next: (response: ResumeRewriteStatusResponse) => {
-          this.applyRewriteStatus(response, notifyOnCompletion);
-        },
-        error: () => {
+        next:  (r) => this.applyRewriteStatus(r, notifyOnCompletion),
+        error: ()  => {
           this.rewriteError = 'Failed to poll rewrite status.';
           this.alertService.error(this.rewriteError);
           this.cdr.detectChanges();
         }
       });
-  }
-
-  private hasCompletedAnalysis(): boolean {
-    return this.jobDescription?.resume_analysis?.status === 'completed';
   }
 
   private restoreLatestRewrite(): void {
@@ -284,9 +263,8 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
     this.rewriteService.listRewrites(analysisId).subscribe({
       next: (rewrites: ResumeRewriteListItem[]) => {
         if (!rewrites.length) return;
-
         const latest = rewrites[0];
-        this.rewriteId = latest.id;
+        this.rewriteId     = latest.id;
         this.rewriteStatus = latest.status;
         this.cdr.detectChanges();
 
@@ -294,70 +272,49 @@ export class ResumeRewriteComponent implements OnInit, OnDestroy {
           this.startPolling(false);
           return;
         }
-
         this.loadRewriteStatus(latest.id);
       },
-      error: () => {
-        // non-blocking; user can still create a fresh rewrite
-      }
+      error: () => {}
     });
   }
 
-  private loadRewriteStatus(rewriteId: number): void {
-    this.rewriteService.getRewriteStatus(rewriteId).subscribe({
-      next: (response: ResumeRewriteStatusResponse) => {
-        this.applyRewriteStatus(response, false);
-      },
-      error: () => {
-        // non-blocking
-      }
+  private loadRewriteStatus(id: number): void {
+    this.rewriteService.getRewriteStatus(id).subscribe({
+      next:  (r) => this.applyRewriteStatus(r, false),
+      error: () => {}
     });
   }
 
-  private applyRewriteStatus(response: ResumeRewriteStatusResponse, notifyOnCompletion: boolean): void {
-    this.rewriteStatus = response.status;
-
-    if (response.status === 'completed') {
-      this.latexCode = response.result?.latex_code ?? '';
-      this.hasPdfDownload = response.result?.has_pdf ?? false;
-      this.hasDocxDownload = response.result?.has_docx ?? false;
+  private applyRewriteStatus(r: ResumeRewriteStatusResponse, notify: boolean): void {
+    this.rewriteStatus = r.status;
+    if (r.status === 'completed') {
+      this.latexCode    = r.result?.latex_code ?? '';
+      this.hasPdfDownload  = r.result?.has_pdf  ?? false;
+      this.hasDocxDownload = r.result?.has_docx ?? false;
       this.rewriteError = '';
-      if (notifyOnCompletion) {
-        this.alertService.success('Resume rewrite completed.');
-      }
-    } else if (response.status === 'failed') {
-      this.rewriteError = response.error || 'Rewrite failed.';
+      if (notify) this.alertService.success('Resume rewrite completed.');
+    } else if (r.status === 'failed') {
+      this.rewriteError = r.error || 'Rewrite failed.';
       this.alertService.error(this.rewriteError);
     }
-
     this.cdr.detectChanges();
   }
 
-  private extractSuggestions(recommendationsHtml: string | undefined): string[] {
-    if (!recommendationsHtml) return [];
-
-    const parser = new DOMParser();
-    const document = parser.parseFromString(recommendationsHtml, 'text/html');
-    const items = Array.from(document.querySelectorAll('li'))
-      .map((element) => element.textContent?.trim() || '')
-      .filter((value) => value.length > 0);
-
+  private extractSuggestions(html: string | undefined): string[] {
+    if (!html) return [];
+    const doc   = new DOMParser().parseFromString(html, 'text/html');
+    const items = Array.from(doc.querySelectorAll('li'))
+      .map(el => el.textContent?.trim() || '')
+      .filter(v => v.length > 0);
     return Array.from(new Set(items));
   }
 
   private extractFilename(disposition: string | null): string | null {
     if (!disposition) return null;
-
-    const match = disposition.match(/filename="?([^";]+)"?/i);
-    return match?.[1] ?? null;
+    return disposition.match(/filename="?([^";]+)"?/i)?.[1] ?? null;
   }
 
   private emptyProject(): AdditionalProject {
-    return {
-      name: '',
-      description: '',
-      technologies: '',
-      duration: ''
-    };
+    return { name: '', description: '', technologies: '', duration: '' };
   }
 }

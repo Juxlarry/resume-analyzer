@@ -1,251 +1,256 @@
-<div class="min-h-screen bg-gray-50 py-8">
-  <div class="container mx-auto px-6 max-w-3xl">
-    
-    <!-- Header -->
+<div class="min-h-screen bg-hirivo-surface py-10">
+  <div class="container mx-auto px-6 max-w-2xl">
+
+    <!-- Page header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
-      <p class="text-gray-600">Manage your account settings and preferences</p>
+      <h1 class="text-2xl font-bold text-hirivo-ink">My Profile</h1>
+      <p class="text-sm text-hirivo-muted mt-1">Manage your account settings and security.</p>
     </div>
 
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-    </div>
-
-    <!-- Success Message -->
-    <div *ngIf="successMessage" class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
-      <p class="text-green-700">{{ successMessage }}</p>
-    </div>
-
-    <!-- Error Message -->
-    <div *ngIf="errorMessage" class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
-      <p class="text-red-700">{{ errorMessage }}</p>
-    </div>
-
-    <!-- Profile Content -->
-    <div *ngIf="!isLoading && profile" class="space-y-6">
-      
-      <!-- Account Statistics -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Account Statistics</h2>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="text-center p-4 bg-blue-50 rounded-lg">
-            <p class="text-3xl font-bold text-blue-600">{{ profile.total_analyses }}</p>
-            <p class="text-sm text-gray-600 mt-1">Total Analyses</p>
-          </div>
-          <div class="text-center p-4 bg-green-50 rounded-lg">
-            <p class="text-3xl font-bold text-green-600">{{ profile.completed_analyses }}</p>
-            <p class="text-sm text-gray-600 mt-1">Completed</p>
-          </div>
-          <div class="text-center p-4 bg-purple-50 rounded-lg">
-            <p class="text-sm text-gray-600">Member since</p>
-            <p class="text-lg font-semibold text-purple-600 mt-1">{{ formatDate(profile.created_at) }}</p>
-          </div>
-        </div>
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="flex justify-center items-center py-24">
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-hirivo-teal"></div>
       </div>
+    }
 
-      <!-- Two-Factor Authentication -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex justify-between items-center mb-4">
-          <div>
-            <h2 class="text-xl font-semibold text-gray-900">Two-Factor Authentication</h2>
-            <p class="text-sm text-gray-600 mt-1">Add an extra layer of security to your account</p>
-          </div>
-          <div *ngIf="!isLoading2FA">
-            <span 
-              *ngIf="twoFactorEnabled"
-              class="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-              <span class="w-2 h-2 bg-green-600 rounded-full"></span>
-              Enabled
-            </span>
-            <span 
-              *ngIf="!twoFactorEnabled"
-              class="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">
-              <span class="w-2 h-2 bg-gray-600 rounded-full"></span>
-              Disabled
-            </span>
-          </div>
-        </div>
-
-        <div *ngIf="isLoading2FA" class="flex justify-center py-4">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-
-        <div *ngIf="!isLoading2FA" class="flex gap-3">
-          <a 
-            *ngIf="!twoFactorEnabled"
-            routerLink="/two-factor/setup"
-            class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition font-medium">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            Enable 2FA
-          </a>
-          <a 
-            *ngIf="twoFactorEnabled"
-            routerLink="/two-factor/settings"
-            class="inline-flex items-center gap-2 border border-gray-300 px-6 py-2 rounded hover:bg-gray-50 transition font-medium">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Manage 2FA
-          </a>
-        </div>
+    <!-- Flash messages -->
+    @if (successMessage) {
+      <div class="mb-6 flex items-start gap-3 bg-hirivo-green-bg border-l-4 border-hirivo-green p-4 rounded-lg">
+        <svg class="w-5 h-5 text-hirivo-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="text-sm text-hirivo-green font-medium">{{ successMessage }}</p>
       </div>
+    }
+    @if (errorMessage) {
+      <div class="mb-6 flex items-start gap-3 bg-hirivo-red-bg border-l-4 border-hirivo-red p-4 rounded-lg">
+        <svg class="w-5 h-5 text-hirivo-red flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <p class="text-sm text-hirivo-red font-medium">{{ errorMessage }}</p>
+      </div>
+    }
 
-      <!-- Admin Access Section (only for admins) -->
-      <div *ngIf="isAdmin" class="bg-gradient-to-r from-red-50 to-pink-50 rounded-lg shadow-md p-6 border-2 border-red-200">
-        <div class="flex items-start justify-between">
-          <div class="flex items-start gap-4">
-            <div class="p-3 bg-red-100 rounded-lg">
-              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
+    @if (!isLoading && profile) {
+      <div class="space-y-5">
+
+        <!-- Stats -->
+        <div class="bg-white rounded-xl border border-hirivo-border p-6">
+          <h2 class="text-base font-semibold text-hirivo-ink mb-4">Account Statistics</h2>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="text-center p-4 bg-hirivo-teal-light rounded-lg">
+              <p class="text-3xl font-bold text-hirivo-teal">{{ profile.total_analyses }}</p>
+              <p class="text-xs text-hirivo-muted mt-1">Total Analyses</p>
             </div>
+            <div class="text-center p-4 bg-hirivo-green-bg rounded-lg">
+              <p class="text-3xl font-bold text-hirivo-green">{{ profile.completed_analyses }}</p>
+              <p class="text-xs text-hirivo-muted mt-1">Completed</p>
+            </div>
+            <div class="text-center p-4 bg-hirivo-surface rounded-lg border border-hirivo-border">
+              <p class="text-xs text-hirivo-muted">Member since</p>
+              <p class="text-sm font-semibold text-hirivo-text mt-1">{{ formatDate(profile.created_at) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2FA -->
+        <div class="bg-white rounded-xl border border-hirivo-border p-6">
+          <div class="flex items-start justify-between mb-4">
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">Administrator Access</h3>
-              <p class="text-sm text-gray-600 mt-1">
-                You have full administrator privileges to manage this application
-              </p>
-              <div class="flex gap-3 mt-4">
-                <a 
-                  routerLink="/admin"
-                  class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition">
-                  Open Admin Dashboard
+              <h2 class="text-base font-semibold text-hirivo-ink">Two-Factor Authentication</h2>
+              <p class="text-xs text-hirivo-muted mt-1">Add an extra layer of security to your account.</p>
+            </div>
+            @if (!isLoading2FA) {
+              @if (twoFactorEnabled) {
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-hirivo-green-bg text-hirivo-green rounded-full text-xs font-semibold">
+                  <span class="w-1.5 h-1.5 bg-hirivo-green rounded-full"></span>
+                  Enabled
+                </span>
+              } @else {
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-hirivo-surface text-hirivo-muted rounded-full text-xs font-semibold border border-hirivo-border">
+                  <span class="w-1.5 h-1.5 bg-hirivo-muted rounded-full"></span>
+                  Disabled
+                </span>
+              }
+            }
+          </div>
+
+          @if (isLoading2FA) {
+            <div class="flex justify-center py-4">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-hirivo-teal"></div>
+            </div>
+          } @else {
+            <div class="flex gap-3">
+              @if (!twoFactorEnabled) {
+                <a
+                  routerLink="/two-factor/setup"
+                  class="inline-flex items-center gap-2 bg-hirivo-teal text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-hirivo-teal-mid transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  </svg>
+                  Enable 2FA
                 </a>
-                <a 
-                  routerLink="/admin/users"
-                  class="px-4 py-2 border border-red-600 text-red-600 rounded-lg font-medium hover:bg-red-50 transition">
-                  Manage Users
+              } @else {
+                <a
+                  routerLink="/two-factor/settings"
+                  class="inline-flex items-center gap-2 border border-hirivo-border text-hirivo-text px-5 py-2 rounded-lg text-sm font-semibold hover:bg-hirivo-surface transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  Manage 2FA
                 </a>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Admin access -->
+        @if (isAdmin) {
+          <div class="bg-hirivo-teal-light border border-hirivo-teal rounded-xl p-6">
+            <div class="flex items-start gap-4">
+              <div class="p-2.5 bg-hirivo-teal rounded-lg flex-shrink-0">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-semibold text-hirivo-ink">Administrator Access</h3>
+                <p class="text-xs text-hirivo-muted mt-1 mb-4">You have full administrator privileges.</p>
+                <div class="flex gap-3">
+                  <a
+                    routerLink="/admin"
+                    class="px-4 py-2 bg-hirivo-teal text-white rounded-lg text-sm font-semibold hover:bg-hirivo-teal-mid transition">
+                    Admin Dashboard
+                  </a>
+                  <a
+                    routerLink="/admin/users"
+                    class="px-4 py-2 border border-hirivo-teal text-hirivo-teal rounded-lg text-sm font-semibold hover:bg-white transition">
+                    Manage Users
+                  </a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        }
 
-      <!-- Email Settings -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Email Settings</h2>
-        <form [formGroup]="profileForm" (ngSubmit)="updateEmail()" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-            <input
-              type="email"
-              formControlName="email"
-              class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
-              [class.border-red-500]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
-            />
-            <p *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" 
-               class="text-red-500 text-sm mt-1">
-              Please enter a valid email address
-            </p>
-          </div>
-          
-          <button
-            type="submit"
-            [disabled]="profileForm.invalid || isSaving"
-            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition">
-            <span *ngIf="!isSaving">Update Email</span>
-            <span *ngIf="isSaving">Updating...</span>
-          </button>
-        </form>
-      </div>
-
-      <!-- Password Settings -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold text-gray-900">Password Settings</h2>
-          <button
-            (click)="togglePasswordForm()"
-            class="text-blue-600 hover:text-blue-700 font-medium">
-            {{ showPasswordForm ? 'Cancel' : 'Change Password' }}
-          </button>
+        <!-- Email settings -->
+        <div class="bg-white rounded-xl border border-hirivo-border p-6">
+          <h2 class="text-base font-semibold text-hirivo-ink mb-4">Email Address</h2>
+          <form [formGroup]="profileForm" (ngSubmit)="updateEmail()" class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-hirivo-text mb-1.5">Email</label>
+              <input
+                type="email"
+                formControlName="email"
+                class="w-full px-3 py-2.5 border border-hirivo-border rounded-lg text-sm text-hirivo-ink focus:outline-none focus:ring-2 focus:ring-hirivo-teal focus:border-hirivo-teal transition"
+                [class.border-hirivo-red]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
+              />
+              @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+                <p class="text-xs text-hirivo-red mt-1">Please enter a valid email address.</p>
+              }
+            </div>
+            <button
+              type="submit"
+              [disabled]="profileForm.invalid || isSaving"
+              class="bg-hirivo-teal text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-hirivo-teal-mid disabled:opacity-50 disabled:cursor-not-allowed transition">
+              @if (isSaving) { Saving… } @else { Update Email }
+            </button>
+          </form>
         </div>
 
-        <form *ngIf="showPasswordForm" 
-              [formGroup]="passwordForm" 
-              (ngSubmit)="updatePassword()" 
-              class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-            <input
-              type="password"
-              formControlName="password"
-              class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
-              [class.border-red-500]="passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched"
-              placeholder="Minimum 8 characters"
-            />
-            <p *ngIf="passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched" 
-               class="text-red-500 text-sm mt-1">
-              Password must be at least 8 characters
-            </p>
+        <!-- Password settings -->
+        <div class="bg-white rounded-xl border border-hirivo-border p-6">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h2 class="text-base font-semibold text-hirivo-ink">Password</h2>
+              @if (!showPasswordForm) {
+                <p class="text-xs text-hirivo-muted mt-1">Click to change your password.</p>
+              }
+            </div>
+            <button
+              (click)="togglePasswordForm()"
+              class="text-sm text-hirivo-teal hover:underline font-medium">
+              {{ showPasswordForm ? 'Cancel' : 'Change Password' }}
+            </button>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-            <input
-              type="password"
-              formControlName="password_confirmation"
-              class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 transition"
-              [class.border-red-500]="passwordForm.hasError('passwordMismatch') && passwordForm.get('password_confirmation')?.touched"
-            />
-            <p *ngIf="passwordForm.hasError('passwordMismatch') && passwordForm.get('password_confirmation')?.touched" 
-               class="text-red-500 text-sm mt-1">
-              Passwords do not match
-            </p>
-          </div>
+          @if (showPasswordForm) {
+            <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()" class="space-y-4">
+              <div>
+                <label class="block text-xs font-medium text-hirivo-text mb-1.5">New Password</label>
+                <input
+                  type="password"
+                  formControlName="password"
+                  placeholder="Minimum 8 characters"
+                  class="w-full px-3 py-2.5 border border-hirivo-border rounded-lg text-sm text-hirivo-ink focus:outline-none focus:ring-2 focus:ring-hirivo-teal focus:border-hirivo-teal transition"
+                  [class.border-hirivo-red]="passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched"
+                />
+                @if (passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched) {
+                  <p class="text-xs text-hirivo-red mt-1">Password must be at least 8 characters.</p>
+                }
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-hirivo-text mb-1.5">Confirm New Password</label>
+                <input
+                  type="password"
+                  formControlName="password_confirmation"
+                  placeholder="Re-enter password"
+                  class="w-full px-3 py-2.5 border border-hirivo-border rounded-lg text-sm text-hirivo-ink focus:outline-none focus:ring-2 focus:ring-hirivo-teal focus:border-hirivo-teal transition"
+                  [class.border-hirivo-red]="passwordForm.hasError('passwordMismatch') && passwordForm.get('password_confirmation')?.touched"
+                />
+                @if (passwordForm.hasError('passwordMismatch') && passwordForm.get('password_confirmation')?.touched) {
+                  <p class="text-xs text-hirivo-red mt-1">Passwords do not match.</p>
+                }
+              </div>
+              <button
+                type="submit"
+                [disabled]="passwordForm.invalid || isSaving"
+                class="bg-hirivo-teal text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-hirivo-teal-mid disabled:opacity-50 disabled:cursor-not-allowed transition">
+                @if (isSaving) { Saving… } @else { Update Password }
+              </button>
+            </form>
+          }
+        </div>
 
-          <button
-            type="submit"
-            [disabled]="passwordForm.invalid || isSaving"
-            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition">
-            <span *ngIf="!isSaving">Update Password</span>
-            <span *ngIf="isSaving">Updating...</span>
-          </button>
-        </form>
+        <!-- Account info -->
+        <div class="bg-white rounded-xl border border-hirivo-border p-6">
+          <h2 class="text-base font-semibold text-hirivo-ink mb-4">Account Information</h2>
+          <dl class="space-y-3 text-sm">
+            <div class="flex justify-between py-2 border-b border-hirivo-surface">
+              <dt class="text-hirivo-muted">Account ID</dt>
+              <dd class="font-medium text-hirivo-ink">{{ profile.id }}</dd>
+            </div>
+            <div class="flex justify-between py-2 border-b border-hirivo-surface">
+              <dt class="text-hirivo-muted">Role</dt>
+              <dd class="font-medium text-hirivo-ink capitalize">{{ profile.role }}</dd>
+            </div>
+            <div class="flex justify-between py-2">
+              <dt class="text-hirivo-muted">Member Since</dt>
+              <dd class="font-medium text-hirivo-ink">{{ formatDate(profile.created_at) }}</dd>
+            </div>
+          </dl>
+        </div>
 
-        <p *ngIf="!showPasswordForm" class="text-gray-600">
-          Click "Change Password" to update your password
-        </p>
-      </div>
-
-      <!-- Account Information -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Account Information</h2>
-        <div class="space-y-3 text-sm">
-          <div class="flex justify-between">
-            <span class="text-gray-600">Account ID:</span>
-            <span class="font-medium text-gray-900">{{ profile.id }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Role:</span>
-            <span class="font-medium text-gray-900 capitalize">{{ profile.role }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Member Since:</span>
-            <span class="font-medium text-gray-900">{{ formatDate(profile.created_at) }}</span>
+        <!-- Quick actions -->
+        <div class="bg-white rounded-xl border border-hirivo-border p-6">
+          <h2 class="text-base font-semibold text-hirivo-ink mb-4">Quick Actions</h2>
+          <div class="flex flex-wrap gap-3">
+            <a
+              routerLink="/analyze"
+              class="inline-block bg-hirivo-teal text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-hirivo-teal-mid transition">
+              New Analysis
+            </a>
+            <a
+              routerLink="/job-descriptions"
+              class="inline-block border border-hirivo-border text-hirivo-text px-5 py-2 rounded-lg text-sm font-semibold hover:bg-hirivo-surface transition">
+              View My Analyses
+            </a>
           </div>
         </div>
-      </div>
 
-      <!-- Quick Actions -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div class="flex flex-wrap gap-3">
-          <a 
-            routerLink="/analyze"
-            class="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
-            New Analysis
-          </a>
-          <a 
-            routerLink="/job-descriptions"
-            class="inline-block border border-gray-300 px-6 py-2 rounded hover:bg-gray-50 transition">
-            View My Analyses
-          </a>
-        </div>
       </div>
-    </div>
+    }
   </div>
 </div>

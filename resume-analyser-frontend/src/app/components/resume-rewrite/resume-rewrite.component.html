@@ -1,217 +1,342 @@
-<div class="min-h-screen bg-gray-50 py-8">
-  <div class="container mx-auto max-w-5xl px-6">
+<div class="min-h-screen bg-hirivo-surface py-8">
+  <div class="container mx-auto max-w-3xl px-6">
+
+    <!-- Back -->
     <div class="mb-6">
       <a
         [routerLink]="['/job-descriptions', jobId]"
-        class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        class="inline-flex items-center gap-2 text-hirivo-teal hover:text-hirivo-teal-mid font-medium text-sm transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
         Back to Analysis
       </a>
     </div>
 
-    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-    </div>
-
-    <div *ngIf="errorMessage && !isLoading" class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
-      <p class="text-red-700">{{ errorMessage }}</p>
-    </div>
-
-    <div *ngIf="!isLoading && jobDescription" class="space-y-6">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Resume Rewrite</h1>
-        <p class="text-gray-600">{{ jobDescription.title }}</p>
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="flex justify-center items-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-hirivo-teal"></div>
       </div>
+    }
 
-      <div
-        *ngIf="jobDescription.resume_analysis?.status !== 'completed'"
-        class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-lg">
-        <p class="text-yellow-900 font-semibold">Analysis is not completed yet.</p>
-        <p class="text-yellow-700 mt-1">Complete resume analysis first, then start rewrite.</p>
+    <!-- Error -->
+    @if (errorMessage && !isLoading) {
+      <div class="bg-hirivo-red-bg border-l-4 border-hirivo-red p-6 rounded-xl">
+        <h3 class="font-semibold text-hirivo-red mb-1">Could not load analysis</h3>
+        <p class="text-hirivo-text text-sm">{{ errorMessage }}</p>
+        <p class="text-xs text-hirivo-muted mt-2">
+          Contact <a href="mailto:help@hirivo.com" class="text-hirivo-teal hover:underline">help@hirivo.com</a> if this continues.
+        </p>
       </div>
+    }
 
-      <div *ngIf="jobDescription.resume_analysis?.status === 'completed'" class="space-y-6">
-        <section class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Select Improvements to Apply</h2>
-          <div *ngIf="availableSuggestions.length === 0" class="text-sm text-gray-500">
-            No parsed suggestions found. Add keywords/projects or instructions below.
-          </div>
-          <div class="space-y-2">
-            <label
-              *ngFor="let suggestion of availableSuggestions"
-              class="flex items-start gap-3 p-3 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer">
-              <input
-                type="checkbox"
-                class="mt-1"
-                [checked]="selectedSuggestions.includes(suggestion)"
-                (change)="toggleSuggestion(suggestion)">
-              <span class="text-gray-700">{{ suggestion }}</span>
-            </label>
-          </div>
-        </section>
+    @if (!isLoading && jobDescription) {
+      <div class="space-y-6">
 
-        <section class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Add Keywords</h2>
-          <div class="flex gap-2">
-            <input
-              type="text"
-              class="flex-1 border border-gray-300 rounded px-3 py-2"
-              placeholder="Enter keyword"
-              [(ngModel)]="keywordInput"
-              (keyup.enter)="addKeyword(keywordInput)">
-            <button
-              type="button"
-              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              (click)="addKeyword(keywordInput)">
-              Add
-            </button>
-          </div>
-
-          <div class="mt-4 flex flex-wrap gap-2" *ngIf="additionalKeywords.length > 0">
-            <span
-              *ngFor="let keyword of additionalKeywords"
-              class="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-              {{ keyword }}
-              <button type="button" class="font-bold" (click)="removeKeyword(keyword)">x</button>
+        <!-- Page header -->
+        <div class="bg-white rounded-xl shadow-md border border-hirivo-border p-6">
+          <h1 class="text-3xl font-bold text-hirivo-ink mb-1">Generate Optimised Resume</h1>
+          <p class="text-hirivo-muted text-sm">{{ jobDescription.title }}</p>
+          <div class="mt-3 flex items-start gap-2 text-xs text-hirivo-muted bg-hirivo-teal-light border-l-4 border-hirivo-teal rounded-r-lg px-3 py-2">
+            <svg class="w-3.5 h-3.5 text-hirivo-teal flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <span>
+              Hirivo uses OpenAI GPT-4o to rewrite your resume — incorporating missing keywords naturally,
+              restructuring bullet points for impact, and removing ATS-hostile formatting.
+              Your experience is never fabricated or misrepresented.
             </span>
           </div>
+        </div>
 
-          <div class="mt-4" *ngIf="(jobDescription.resume_analysis?.missing_keywords?.length || 0) > 0">
-            <p class="text-sm text-gray-500 mb-2">Suggested missing keywords:</p>
-            <div class="flex flex-wrap gap-2">
+        <!-- Analysis not complete -->
+        @if (jobDescription.resume_analysis?.status !== 'completed') {
+          <div class="bg-hirivo-amber-bg border-l-4 border-hirivo-amber p-6 rounded-xl">
+            <h3 class="font-semibold text-hirivo-amber mb-1">Analysis Required</h3>
+            <p class="text-hirivo-text text-sm">
+              Your resume analysis must be completed before generating an optimised version.
+              Return to the analysis page and wait for it to finish.
+            </p>
+          </div>
+        }
+
+        @if (jobDescription.resume_analysis?.status === 'completed') {
+
+          <!-- Suggestions -->
+          <section class="bg-white rounded-xl shadow-md border border-hirivo-border p-6">
+            <h2 class="text-lg font-semibold text-hirivo-ink mb-1">Apply Recommended Improvements</h2>
+            <p class="text-xs text-hirivo-muted mb-4">
+              Select the recommendations from your ATS report that you want applied to the optimised resume.
+            </p>
+
+            @if (availableSuggestions.length === 0) {
+              <p class="text-sm text-hirivo-muted italic">
+                No parsed suggestions found. Add keywords or custom instructions below.
+              </p>
+            }
+
+            <div class="space-y-2">
+              @for (suggestion of availableSuggestions; track suggestion) {
+                <label class="flex items-start gap-3 p-3 border border-hirivo-border rounded-lg hover:bg-hirivo-surface cursor-pointer transition"
+                       [class.border-hirivo-teal]="isSuggestionSelected(suggestion)"
+                       [class.bg-hirivo-teal-light]="isSuggestionSelected(suggestion)">
+                  <input
+                    type="checkbox"
+                    class="mt-1 accent-[#0A5C6B]"
+                    [checked]="isSuggestionSelected(suggestion)"
+                    (change)="toggleSuggestion(suggestion)">
+                  <span class="text-hirivo-text text-sm">{{ suggestion }}</span>
+                </label>
+              }
+            </div>
+          </section>
+
+          <!-- Keywords -->
+          <section class="bg-white rounded-xl shadow-md border border-hirivo-border p-6">
+            <h2 class="text-lg font-semibold text-hirivo-ink mb-1">Add Keywords</h2>
+            <p class="text-xs text-hirivo-muted mb-4">
+              Add keywords you want incorporated. Hirivo will weave them in naturally — no keyword stuffing.
+            </p>
+
+            <div class="flex gap-2">
+              <input
+                type="text"
+                class="flex-1 border border-hirivo-border rounded-lg px-3 py-2 text-sm bg-hirivo-surface focus:ring-2 focus:ring-hirivo-teal focus:border-hirivo-teal transition"
+                placeholder="e.g. Agile, Python, Stakeholder Management"
+                [(ngModel)]="keywordInput"
+                (keyup.enter)="addKeyword(keywordInput)">
               <button
-                *ngFor="let keyword of jobDescription.resume_analysis?.missing_keywords"
                 type="button"
-                class="px-3 py-1 border border-gray-300 rounded-full text-sm hover:bg-gray-100"
-                (click)="addKeyword(keyword)">
-                {{ keyword }}
+                class="px-4 py-2 bg-hirivo-teal text-white rounded-lg hover:bg-hirivo-teal-mid transition text-sm font-medium"
+                (click)="addKeyword(keywordInput)">
+                Add
               </button>
             </div>
-          </div>
-        </section>
 
-        <section class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Add New Projects</h2>
-          <div class="grid md:grid-cols-2 gap-3">
+            @if (additionalKeywords.length > 0) {
+              <div class="mt-4 flex flex-wrap gap-2">
+                @for (keyword of additionalKeywords; track keyword) {
+                  <span class="inline-flex items-center gap-2 px-3 py-1 bg-hirivo-teal-light text-hirivo-teal rounded-full text-sm font-medium border border-hirivo-teal/20">
+                    {{ keyword }}
+                    <button type="button" class="hover:text-hirivo-ink transition font-bold leading-none" (click)="removeKeyword(keyword)">×</button>
+                  </span>
+                }
+              </div>
+            }
+
+            @if ((jobDescription.resume_analysis?.missing_keywords?.length || 0) > 0) {
+              <div class="mt-4">
+                <p class="text-xs text-hirivo-muted mb-2 font-medium">Missing keywords from your ATS report — click to add:</p>
+                <div class="flex flex-wrap gap-2">
+                  @for (keyword of jobDescription.resume_analysis?.missing_keywords; track keyword) {
+                    <button
+                      type="button"
+                      class="px-3 py-1 border border-hirivo-amber/40 bg-hirivo-amber-bg text-hirivo-amber rounded-full text-sm hover:border-hirivo-amber transition"
+                      (click)="addKeyword(keyword)">
+                      + {{ keyword }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </section>
+
+          <!-- Projects -->
+          <section class="bg-white rounded-xl shadow-md border border-hirivo-border p-6">
+            <h2 class="text-lg font-semibold text-hirivo-ink mb-1">Add New Projects</h2>
+            <p class="text-xs text-hirivo-muted mb-4">
+              Have a recent project that is not on your resume yet? Add it here and Hirivo will include it.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-3">
+              <input
+                type="text"
+                class="border border-hirivo-border rounded-lg px-3 py-2 text-sm bg-hirivo-surface focus:ring-2 focus:ring-hirivo-teal transition"
+                placeholder="Project Name"
+                [(ngModel)]="newProject.name">
+              <input
+                type="text"
+                class="border border-hirivo-border rounded-lg px-3 py-2 text-sm bg-hirivo-surface focus:ring-2 focus:ring-hirivo-teal transition"
+                placeholder="Duration (e.g. Jan 2024 – Mar 2024)"
+                [(ngModel)]="newProject.duration">
+            </div>
+            <textarea
+              class="w-full border border-hirivo-border rounded-lg px-3 py-2 mt-3 text-sm bg-hirivo-surface focus:ring-2 focus:ring-hirivo-teal transition resize-none"
+              rows="3"
+              placeholder="Project description — what you built, your role, and the impact"
+              [(ngModel)]="newProject.description"></textarea>
             <input
               type="text"
-              class="border border-gray-300 rounded px-3 py-2"
-              placeholder="Project Name"
-              [(ngModel)]="newProject.name">
-            <input
-              type="text"
-              class="border border-gray-300 rounded px-3 py-2"
-              placeholder="Duration (e.g., Jan 2024 - Mar 2024)"
-              [(ngModel)]="newProject.duration">
-          </div>
-          <textarea
-            class="w-full border border-gray-300 rounded px-3 py-2 mt-3"
-            rows="3"
-            placeholder="Project Description"
-            [(ngModel)]="newProject.description"></textarea>
-          <input
-            type="text"
-            class="w-full border border-gray-300 rounded px-3 py-2 mt-3"
-            placeholder="Technologies (comma-separated)"
-            [(ngModel)]="newProject.technologies">
-          <button
-            type="button"
-            class="mt-3 px-4 py-2 bg-gray-900 text-white rounded hover:bg-black"
-            (click)="addProject()">
-            Add Project
-          </button>
+              class="w-full border border-hirivo-border rounded-lg px-3 py-2 mt-3 text-sm bg-hirivo-surface focus:ring-2 focus:ring-hirivo-teal transition"
+              placeholder="Technologies used (comma-separated)"
+              [(ngModel)]="newProject.technologies">
+            <button
+              type="button"
+              class="mt-3 px-5 py-2 bg-hirivo-ink text-white rounded-lg hover:opacity-90 transition text-sm font-medium"
+              (click)="addProject()">
+              Add Project
+            </button>
 
-          <div class="mt-4 space-y-3" *ngIf="additionalProjects.length > 0">
-            <div *ngFor="let project of additionalProjects; let i = index" class="border border-gray-200 rounded p-4">
-              <div class="flex items-start justify-between gap-4">
-                <div>
-                  <h4 class="font-semibold text-gray-900">{{ project.name }}</h4>
-                  <p class="text-sm text-gray-700 mt-1">{{ project.description }}</p>
-                  <p class="text-sm text-gray-600 mt-1" *ngIf="project.technologies">
-                    <strong>Tech:</strong> {{ project.technologies }}
-                  </p>
-                  <p class="text-sm text-gray-600" *ngIf="project.duration">
-                    <strong>Duration:</strong> {{ project.duration }}
+            @if (additionalProjects.length > 0) {
+              <div class="mt-5 space-y-3">
+                @for (project of additionalProjects; track project.name; let i = $index) {
+                  <div class="border border-hirivo-border rounded-xl p-4 bg-hirivo-surface">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <h4 class="font-semibold text-hirivo-ink text-sm">{{ project.name }}</h4>
+                        <p class="text-sm text-hirivo-text mt-1">{{ project.description }}</p>
+                        @if (project.technologies) {
+                          <p class="text-xs text-hirivo-muted mt-1">
+                            <span class="font-medium">Tech:</span> {{ project.technologies }}
+                          </p>
+                        }
+                        @if (project.duration) {
+                          <p class="text-xs text-hirivo-muted">
+                            <span class="font-medium">Duration:</span> {{ project.duration }}
+                          </p>
+                        }
+                      </div>
+                      <button
+                        type="button"
+                        class="text-hirivo-red text-xs hover:underline flex-shrink-0"
+                        (click)="removeProject(i)">
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </section>
+
+          <!-- Special Instructions -->
+          <section class="bg-white rounded-xl shadow-md border border-hirivo-border p-6">
+            <h2 class="text-lg font-semibold text-hirivo-ink mb-1">Special Instructions</h2>
+            <p class="text-xs text-hirivo-muted mb-3">
+              Optional. Tell Hirivo anything specific — formatting preferences, sections to emphasise,
+              or tone adjustments.
+            </p>
+            <textarea
+              class="w-full border border-hirivo-border rounded-lg px-3 py-2 text-sm bg-hirivo-surface focus:ring-2 focus:ring-hirivo-teal transition resize-none"
+              rows="4"
+              placeholder="e.g. Keep the summary under 3 sentences. Emphasise leadership experience. Use British English spelling."
+              [(ngModel)]="specialInstructions"></textarea>
+          </section>
+
+          <!-- Submit -->
+          <section class="bg-white rounded-xl shadow-md border border-hirivo-border p-6">
+            <button
+              type="button"
+              [disabled]="!canSubmit()"
+              class="px-6 py-3 bg-hirivo-teal text-white rounded-lg font-semibold hover:bg-hirivo-teal-mid disabled:opacity-50 disabled:cursor-not-allowed transition"
+              (click)="submitRewrite()">
+              @if (!isSubmitting) { Generate Optimised Resume }
+              @if (isSubmitting) {
+                <span class="flex items-center gap-2">
+                  <span class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                  Starting rewrite...
+                </span>
+              }
+            </button>
+            @if (!canSubmit() && !isSubmitting) {
+              <p class="text-xs text-hirivo-muted mt-2">
+                Select at least one improvement, keyword, project, or add custom instructions to continue.
+              </p>
+            }
+          </section>
+
+          <!-- Rewrite Status -->
+          @if (rewriteId) {
+            <section class="bg-white rounded-xl shadow-md border border-hirivo-border p-6 space-y-4">
+              <h3 class="text-lg font-semibold text-hirivo-ink">Rewrite Status</h3>
+
+              @if (rewriteStatus === 'pending' || rewriteStatus === 'processing') {
+                <div class="flex items-center gap-3 bg-hirivo-teal-light rounded-xl p-4">
+                  <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-hirivo-teal flex-shrink-0"></div>
+                  <div>
+                    <p class="text-sm font-semibold text-hirivo-ink">Generating your optimised resume…</p>
+                    <p class="text-xs text-hirivo-muted mt-0.5">
+                      Hirivo is rewriting your resume with GPT-4o. This usually takes 2–3 minutes.
+                    </p>
+                  </div>
+                </div>
+              }
+
+              @if (rewriteStatus === 'completed') {
+                <div class="space-y-4">
+                  <div class="flex items-center gap-2 text-hirivo-green">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p class="font-semibold text-sm">Your optimised resume is ready.</p>
+                  </div>
+
+                  <div class="flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      [disabled]="isDownloading || !hasPdfDownload"
+                      class="inline-flex items-center gap-2 px-5 py-2 bg-hirivo-green-bg text-hirivo-green border border-hirivo-green/30 rounded-lg hover:bg-green-100 transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      (click)="downloadPdf()">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                      </svg>
+                      {{ isDownloading ? 'Preparing…' : 'Download as PDF' }}
+                    </button>
+                    <button
+                      type="button"
+                      [disabled]="isDownloading || !hasDocxDownload"
+                      class="inline-flex items-center gap-2 px-5 py-2 border border-hirivo-border text-hirivo-teal rounded-lg hover:bg-hirivo-teal-light transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      (click)="downloadDocx()">
+                      Download as DOCX
+                    </button>
+                    <button
+                      type="button"
+                      [disabled]="isDownloading"
+                      class="inline-flex items-center gap-2 px-5 py-2 border border-hirivo-border text-hirivo-muted rounded-lg hover:bg-hirivo-surface transition text-sm font-medium disabled:opacity-50"
+                      (click)="downloadLatex()">
+                      Download as LaTeX
+                    </button>
+                  </div>
+
+                  @if (!hasPdfDownload) {
+                    <p class="text-xs text-hirivo-muted">PDF compilation was unavailable for this run. LaTeX download is still available.</p>
+                  }
+                  @if (!hasDocxDownload) {
+                    <p class="text-xs text-hirivo-muted">DOCX export was unavailable for this run. PDF or LaTeX may still be available.</p>
+                  }
+
+                  @if (latexCode) {
+                    <details class="group">
+                      <summary class="cursor-pointer text-sm text-hirivo-teal font-medium flex items-center gap-1 list-none">
+                        <svg class="w-4 h-4 group-open:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                        Preview generated LaTeX
+                      </summary>
+                      <pre class="mt-3 p-4 bg-hirivo-surface border border-hirivo-border rounded-xl text-xs overflow-auto max-h-96 font-mono">{{ latexCode }}</pre>
+                    </details>
+                  }
+                </div>
+              }
+
+              @if (rewriteStatus === 'failed') {
+                <div class="bg-hirivo-red-bg border-l-4 border-hirivo-red rounded-r-lg p-4">
+                  <p class="font-semibold text-hirivo-red text-sm">Generation failed.</p>
+                  @if (rewriteError) {
+                    <p class="text-xs text-hirivo-text mt-1">{{ rewriteError }}</p>
+                  }
+                  <p class="text-xs text-hirivo-muted mt-2">
+                    Please try submitting again. If the problem continues, contact
+                    <a href="mailto:help@hirivo.com" class="text-hirivo-teal hover:underline">help@hirivo.com</a>
                   </p>
                 </div>
-                <button type="button" class="text-red-600 text-sm" (click)="removeProject(i)">Remove</button>
-              </div>
-            </div>
-          </div>
-        </section>
+              }
+            </section>
+          }
 
-        <section class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Special Instructions (Optional)</h2>
-          <textarea
-            class="w-full border border-gray-300 rounded px-3 py-2"
-            rows="4"
-            placeholder="Any specific formatting or content requests..."
-            [(ngModel)]="specialInstructions"></textarea>
-        </section>
-
-        <section class="bg-white rounded-lg shadow-md p-6">
-          <button
-            type="button"
-            [disabled]="!canSubmit()"
-            class="px-6 py-3 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            (click)="submitRewrite()">
-            {{ isSubmitting ? 'Starting rewrite...' : 'Generate Rewritten Resume' }}
-          </button>
-        </section>
-
-        <section *ngIf="rewriteId" class="bg-white rounded-lg shadow-md p-6 space-y-4">
-          <h3 class="text-lg font-semibold text-gray-900">Rewrite Status</h3>
-
-          <div *ngIf="rewriteStatus === 'pending' || rewriteStatus === 'processing'" class="flex items-center gap-3 text-blue-700">
-            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-            <p>Generating your resume... this usually takes 2-3 minutes.</p>
-          </div>
-
-          <div *ngIf="rewriteStatus === 'completed'" class="space-y-3">
-            <p class="text-green-700 font-semibold">Resume generated successfully.</p>
-            <div class="flex items-center gap-3">
-              <button
-                type="button"
-                [disabled]="isDownloading || !hasPdfDownload"
-                class="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-                (click)="downloadPdf()">
-                {{ isDownloading ? 'Preparing download...' : 'Download PDF' }}
-              </button>
-              <button
-                type="button"
-                [disabled]="isDownloading || !hasDocxDownload"
-                class="px-5 py-2 border border-blue-300 text-blue-700 rounded hover:bg-blue-50 disabled:opacity-50"
-                (click)="downloadDocx()">
-                Download DOCX
-              </button>
-              <button
-                type="button"
-                [disabled]="isDownloading"
-                class="px-5 py-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50"
-                (click)="downloadLatex()">
-                Download LaTeX
-              </button>
-            </div>
-            <p *ngIf="!hasPdfDownload" class="text-sm text-gray-500">
-              PDF compile was unavailable for this run. LaTeX download is still available.
-            </p>
-            <p *ngIf="!hasDocxDownload" class="text-sm text-gray-500">
-              DOCX export was unavailable for this run. PDF or LaTeX downloads may still be available.
-            </p>
-            <details>
-              <summary class="cursor-pointer text-blue-700">Preview generated LaTeX</summary>
-              <pre class="mt-3 p-3 bg-gray-100 rounded text-xs overflow-auto max-h-96">{{ latexCode }}</pre>
-            </details>
-          </div>
-
-          <div *ngIf="rewriteStatus === 'failed'" class="text-red-700">
-            <p>Generation failed.</p>
-            <p class="text-sm mt-1">{{ rewriteError }}</p>
-          </div>
-        </section>
+        }
       </div>
-    </div>
+    }
   </div>
 </div>

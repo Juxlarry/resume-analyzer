@@ -1,328 +1,354 @@
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-hirivo-surface py-8">
   <div class="container mx-auto px-6 max-w-5xl">
-    
-    <!-- Back Button -->
+
+    <!-- Back -->
     <div class="mb-6">
-      <a 
+      <a
         routerLink="/job-descriptions"
-        class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        class="inline-flex items-center gap-2 text-hirivo-teal hover:text-hirivo-teal-mid font-medium text-sm transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
         Back to My Analyses
       </a>
     </div>
 
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-    </div>
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="flex justify-center items-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-hirivo-teal"></div>
+      </div>
+    }
 
-    <!-- Error State -->
-    <div *ngIf="errorMessage && !isLoading" class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
-      <p class="text-red-700">{{ errorMessage }}</p>
-    </div>
+    <!-- Error -->
+    @if (errorMessage && !isLoading) {
+      <div class="bg-hirivo-red-bg border-l-4 border-hirivo-red p-6 rounded-xl">
+        <h3 class="font-semibold text-hirivo-red mb-1">Could not load analysis</h3>
+        <p class="text-hirivo-text text-sm">{{ errorMessage }}</p>
+        <p class="text-xs text-hirivo-muted mt-2">
+          Contact <a href="mailto:help@hirivo.com" class="text-hirivo-teal hover:underline">help@hirivo.com</a> if this continues.
+        </p>
+      </div>
+    }
 
-    <!-- Main Content -->
-    <div *ngIf="jobDescription && !isLoading" class="space-y-6">
-      
-      <!-- Header Section -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex justify-between items-start mb-4">
-          <div class="flex-1">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ jobDescription.title }}</h1>
-            <p class="text-sm text-gray-500">
-              Created on {{ formatDate(jobDescription.created_at) }}
-            </p>
-            <p class="text-sm text-gray-500">Analyzed on: {{ formatDate(jobDescription.resume_analysis?.updated_at ?? jobDescription.created_at) }}</p>
-          </div>
-          
-          <!-- Action Buttons -->
-          <div class="flex gap-2">
-            <button
+    @if (jobDescription && !isLoading) {
+      <div class="space-y-6">
+
+        <!-- Header card -->
+        <div class="bg-white rounded-xl shadow-md border border-hirivo-border p-6">
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex-1">
+              <h1 class="text-3xl font-bold text-hirivo-ink mb-1">{{ jobDescription.title }}</h1>
+              <p class="text-sm text-hirivo-muted">Created {{ formatDate(jobDescription.created_at) }}</p>
+              <p class="text-sm text-hirivo-muted">
+                Analysed {{ formatDate(jobDescription.resume_analysis?.updated_at ?? jobDescription.created_at) }}
+              </p>
+            </div>
+            <div class="flex gap-2">
+              <button
                 (click)="openRerunModal()"
                 [disabled]="isPolling"
-                class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                class="p-2 border border-hirivo-border rounded-lg hover:bg-hirivo-surface transition disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Re-run analysis">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <svg class="w-5 h-5 text-hirivo-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                 </svg>
-            </button>
-            
-            <button
-              (click)="printResults()"
-              class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition"
-              title="Print results">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-              </svg>
-            </button>
-            
-            <button
-              (click)="openDeleteConfirmation()"
-              class="px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition"
-              title="Delete analysis">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
+              </button>
+              <button
+                (click)="printResults()"
+                class="p-2 border border-hirivo-border rounded-lg hover:bg-hirivo-surface transition"
+                title="Print results">
+                <svg class="w-5 h-5 text-hirivo-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                </svg>
+              </button>
+              <button
+                (click)="openDeleteConfirmation()"
+                class="p-2 border border-red-200 text-hirivo-red rounded-lg hover:bg-hirivo-red-bg transition"
+                title="Delete analysis">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <!-- Job Description Content -->
-        <div class="border-t pt-4">
-          <h3 class="font-semibold text-lg text-gray-800 mb-2">Job Description</h3>
-          <p class="text-gray-700 whitespace-pre-wrap">{{ jobDescription.description }}</p>
-        </div>
+          <!-- Job Description text -->
+          <div class="border-t border-hirivo-border pt-4">
+            <h3 class="font-semibold text-hirivo-ink mb-2">Job Description</h3>
+            <p class="text-hirivo-text whitespace-pre-wrap text-sm">{{ jobDescription.description }}</p>
+          </div>
 
-        <div *ngIf="jobDescription.job_link" class="border-t pt-4">
-          <h3 class="font-semibold text-lg text-gray-800 mb-2">Job Link / Extra Context</h3>
-          <a
-            *ngIf="jobDescription.job_link.startsWith('http://') || jobDescription.job_link.startsWith('https://')"
-            [href]="jobDescription.job_link"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-blue-600 hover:text-blue-700 break-all">
-            {{ jobDescription.job_link }}
-          </a>
-          <p
-            *ngIf="!jobDescription.job_link.startsWith('http://') && !jobDescription.job_link.startsWith('https://')"
-            class="text-gray-700 whitespace-pre-wrap">
-            {{ jobDescription.job_link }}
-          </p>
-        </div>
+          @if (jobDescription.job_link) {
+            <div class="border-t border-hirivo-border pt-4 mt-4">
+              <h3 class="font-semibold text-hirivo-ink mb-2">Job Link / Extra Context</h3>
+              @if (jobDescription.job_link.startsWith('http://') || jobDescription.job_link.startsWith('https://')) {
+                <a
+                  [href]="jobDescription.job_link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-hirivo-teal hover:underline break-all text-sm">
+                  {{ jobDescription.job_link }}
+                </a>
+              } @else {
+                <p class="text-hirivo-text whitespace-pre-wrap text-sm">{{ jobDescription.job_link }}</p>
+              }
+            </div>
+          }
 
-        <!-- Resume File Section -->
-        <div *ngIf="jobDescription.resume_file" class="border-t pt-4 mt-4">
-          <h3 class="font-semibold text-lg text-gray-800 mb-3">Resume File</h3>
-          
-          <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <div class="flex items-center justify-between">
-              <!-- File Info -->
-              <div class="flex items-center gap-4 flex-1">
-                <!-- File Icon -->
-                <div class="flex-shrink-0">
-                  <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg *ngIf="jobDescription.resume_file.content_type === 'application/pdf'" 
-                        class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
-                    </svg>
-                    <svg *ngIf="jobDescription.resume_file.content_type !== 'application/pdf'" 
-                        class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
-                    </svg>
+          <!-- Resume File -->
+          @if (jobDescription.resume_file) {
+            <div class="border-t border-hirivo-border pt-4 mt-4">
+              <h3 class="font-semibold text-hirivo-ink mb-3">Resume File</h3>
+              <div class="bg-hirivo-surface rounded-xl p-4 border border-hirivo-border">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                  <div class="flex items-center gap-4 flex-1">
+                    <div class="w-12 h-12 bg-hirivo-teal-light rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg class="w-6 h-6 text-hirivo-teal" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/>
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium text-hirivo-ink truncate">{{ jobDescription.resume_file.filename }}</p>
+                      <div class="flex items-center gap-3 text-xs text-hirivo-muted mt-1">
+                        <span>{{ getFileExtension(jobDescription.resume_file.filename) }}</span>
+                        <span>{{ formatFileSize(jobDescription.resume_file.size) }}</span>
+                        <span>Uploaded {{ formatDate(jobDescription.resume_file.created_at) }}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-
-                <!-- File Details -->
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-900 truncate">
-                    {{ jobDescription.resume_file.filename }}
-                  </p>
-                  <div class="flex items-center gap-3 text-xs text-gray-500 mt-1">
-                    <span class="inline-flex items-center gap-1">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  <div class="flex gap-2">
+                    <button
+                      (click)="previewResume()"
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-hirivo-teal text-white rounded-lg hover:bg-hirivo-teal-mid transition text-sm font-medium">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                       </svg>
-                      {{ getFileExtension(jobDescription.resume_file.filename) }}
-                    </span>
-                    <span class="inline-flex items-center gap-1">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                      Preview
+                    </button>
+                    <button
+                      (click)="downloadResume()"
+                      class="inline-flex items-center gap-2 px-4 py-2 border border-hirivo-border rounded-lg hover:bg-hirivo-surface transition text-sm font-medium text-hirivo-text">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                       </svg>
-                      {{ formatFileSize(jobDescription.resume_file.size) }}
-                    </span>
-                    <span class="inline-flex items-center gap-1">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Uploaded {{ formatDate(jobDescription.resume_file.created_at) }}
-                    </span>
+                      Download
+                    </button>
                   </div>
                 </div>
               </div>
+            </div>
+          }
+        </div>
 
-              <!-- Action Buttons -->
-              <div class="flex gap-2 ml-4">
-                <button
-                  (click)="previewResume()"
-                  class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm font-medium">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  Preview
-                </button>
-                <button
-                  (click)="downloadResume()"
-                  class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition text-sm font-medium">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Download
-                </button>
+        <!-- Polling progress -->
+        @if (isPolling) {
+          <div class="bg-hirivo-teal-light border-l-4 border-hirivo-teal p-6 rounded-xl">
+            <div class="flex items-center gap-4">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-hirivo-teal flex-shrink-0"></div>
+              <div>
+                <h3 class="font-semibold text-hirivo-ink">Analysis in Progress</h3>
+                <p class="text-sm text-hirivo-muted mt-0.5">
+                  Hirivo is processing your resume with OpenAI GPT-4o. This usually takes 1–3 minutes.
+                </p>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        }
 
-      <!-- Processing State -->
-      <div *ngIf="isPolling" class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
-        <div class="flex items-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
-          <div>
-            <h3 class="font-semibold text-blue-900">Analysis in Progress</h3>
-            <p class="text-sm text-blue-700">This usually takes 2-3 minutes...</p>
+        <!-- Analysis Results -->
+        @if (jobDescription.resume_analysis?.status === 'completed') {
+          <div class="bg-white rounded-xl shadow-md border border-hirivo-border p-6 space-y-6">
+            <h2 class="text-2xl font-bold text-hirivo-ink">Your Hirivo ATS Report</h2>
+
+            <!-- Score -->
+            <div class="text-center p-8 rounded-xl"
+                 [class.bg-hirivo-green-bg]="(jobDescription.resume_analysis?.match_score ?? 0) >= 70"
+                 [class.bg-hirivo-amber-bg]="(jobDescription.resume_analysis?.match_score ?? 0) >= 50 && (jobDescription.resume_analysis?.match_score ?? 0) < 70"
+                 [class.bg-hirivo-red-bg]="(jobDescription.resume_analysis?.match_score ?? 0) < 50">
+              <p class="text-sm text-hirivo-muted mb-2">ATS Match Score</p>
+              <p class="text-6xl font-bold mb-2"
+                 [class.text-hirivo-green]="(jobDescription.resume_analysis?.match_score ?? 0) >= 70"
+                 [class.text-hirivo-amber]="(jobDescription.resume_analysis?.match_score ?? 0) >= 50 && (jobDescription.resume_analysis?.match_score ?? 0) < 70"
+                 [class.text-hirivo-red]="(jobDescription.resume_analysis?.match_score ?? 0) < 50">
+                {{ jobDescription.resume_analysis?.match_score }}%
+              </p>
+              <p class="text-sm text-hirivo-muted mb-1">Estimated automated screening pass rate</p>
+              <p class="text-xl font-semibold"
+                 [class.text-hirivo-green]="jobDescription.resume_analysis?.verdict === 'STRONG_MATCH'"
+                 [class.text-hirivo-teal]="jobDescription.resume_analysis?.verdict === 'GOOD_MATCH'"
+                 [class.text-hirivo-amber]="jobDescription.resume_analysis?.verdict === 'PARTIAL_MATCH'"
+                 [class.text-hirivo-red]="jobDescription.resume_analysis?.verdict === 'WEAK_MATCH'">
+                {{ formatVerdict(jobDescription.resume_analysis?.verdict ?? '') }}
+              </p>
+              @if (jobDescription.resume_analysis?.ats_system_key) {
+                <p class="text-xs text-hirivo-muted mt-2">
+                  ATS System: <span class="font-medium text-hirivo-text">{{ jobDescription.resume_analysis?.ats_system_key }}</span>
+                </p>
+              }
+            </div>
+
+            <!-- Summary -->
+            <div class="border-l-4 border-hirivo-teal pl-4">
+              <h3 class="font-semibold text-lg text-hirivo-ink mb-2">Summary</h3>
+              <p class="text-hirivo-text text-sm">{{ jobDescription.resume_analysis?.summary }}</p>
+            </div>
+
+            <!-- Strengths & Weaknesses -->
+            <div class="grid md:grid-cols-2 gap-5">
+              <div class="p-5 rounded-xl bg-hirivo-green-bg">
+                <h3 class="font-semibold text-lg text-hirivo-green flex items-center gap-2 mb-3">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  Strengths
+                </h3>
+                <div class="text-hirivo-text text-sm" [innerHTML]="jobDescription.resume_analysis?.strengths"></div>
+              </div>
+              <div class="p-5 rounded-xl bg-hirivo-red-bg">
+                <h3 class="font-semibold text-lg text-hirivo-red flex items-center gap-2 mb-3">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  </svg>
+                  Areas for Improvement
+                </h3>
+                <div class="text-hirivo-text text-sm" [innerHTML]="jobDescription.resume_analysis?.weaknesses"></div>
+              </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="border-l-4 border-hirivo-teal-mid pl-4">
+              <h3 class="font-semibold text-lg text-hirivo-ink mb-2">Recommendations</h3>
+              <div class="text-hirivo-text text-sm" [innerHTML]="jobDescription.resume_analysis?.recommendations"></div>
+            </div>
+
+            <!-- Missing Keywords -->
+            @if ((jobDescription.resume_analysis?.missing_keywords?.length ?? 0) > 0) {
+              <div class="border-l-4 border-hirivo-amber pl-4">
+                <h3 class="font-semibold text-lg text-hirivo-ink mb-2">
+                  Missing Keywords — Add These to Your Resume
+                </h3>
+                <p class="text-xs text-hirivo-muted mb-3">
+                  These terms appear in the job description but are absent from your resume.
+                  The optimised rewrite adds them naturally.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  @for (keyword of jobDescription.resume_analysis?.missing_keywords; track keyword) {
+                    <span class="px-3 py-1 bg-hirivo-amber-bg text-hirivo-amber rounded-full text-sm font-medium border border-hirivo-amber/20">
+                      {{ keyword }}
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Download row -->
+            <div class="pt-4 border-t border-hirivo-border">
+              <div class="flex flex-wrap gap-3 items-center">
+                <a
+                  [routerLink]="['/job-descriptions', jobDescription.id, 'rewrite']"
+                  class="inline-flex items-center gap-2 bg-hirivo-teal text-white px-5 py-2 rounded-lg hover:bg-hirivo-teal-mid transition text-sm font-semibold">
+                  Generate Optimised Resume
+                </a>
+                @if (hasCompletedRewrite) {
+                  <button
+                    type="button"
+                    [disabled]="isDownloadingRewrite"
+                    (click)="downloadLatestRewritePdf()"
+                    class="inline-flex items-center gap-2 bg-hirivo-green-bg text-hirivo-green border border-hirivo-green/30 px-5 py-2 rounded-lg hover:bg-green-100 transition text-sm font-medium disabled:opacity-50">
+                    Download as PDF
+                  </button>
+                  <button
+                    type="button"
+                    [disabled]="isDownloadingRewrite"
+                    (click)="downloadLatestRewriteDocx()"
+                    class="inline-flex items-center gap-2 border border-hirivo-border text-hirivo-teal px-5 py-2 rounded-lg hover:bg-hirivo-teal-light transition text-sm font-medium disabled:opacity-50">
+                    Download as DOCX
+                  </button>
+                  <button
+                    type="button"
+                    [disabled]="isDownloadingRewrite"
+                    (click)="downloadLatestRewriteLatex()"
+                    class="inline-flex items-center gap-2 border border-hirivo-border text-hirivo-muted px-5 py-2 rounded-lg hover:bg-hirivo-surface transition text-sm font-medium disabled:opacity-50">
+                    Download as LaTeX
+                  </button>
+                }
+              </div>
+              <div class="mt-4 text-xs text-hirivo-muted space-y-0.5">
+                <p>AI Model: {{ jobDescription.resume_analysis?.ai_model_used }}</p>
+                <p>ATS System: {{ jobDescription.resume_analysis?.ats_system_key || 'N/A' }}</p>
+                <p>Analysed: {{ formatDate(jobDescription.resume_analysis?.updated_at ?? jobDescription.created_at) }}</p>
+              </div>
+            </div>
+
+            <!-- ATS Methodology -->
+            <details class="border-t border-hirivo-border pt-4 group">
+              <summary class="cursor-pointer flex items-center justify-between list-none text-sm font-semibold text-hirivo-ink">
+                <span class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-hirivo-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  How Hirivo analyses your resume
+                </span>
+                <svg class="w-4 h-4 text-hirivo-muted group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </summary>
+              <div class="mt-4 space-y-3 text-sm text-hirivo-text">
+                <p class="flex items-start gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal flex-shrink-0 mt-2"></span>
+                  <span><strong class="text-hirivo-ink">Keyword Match Analysis — </strong>Hirivo extracts key skills and competencies from the job description and compares them against your resume, including synonyms and industry-standard variants.</span>
+                </p>
+                <p class="flex items-start gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal flex-shrink-0 mt-2"></span>
+                  <span><strong class="text-hirivo-ink">Format and Structure Scoring — </strong>Identifies tables, text boxes, graphics, and non-standard headings that cause ATS parsing failures.</span>
+                </p>
+                <p class="flex items-start gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal flex-shrink-0 mt-2"></span>
+                  <span><strong class="text-hirivo-ink">Job Title Alignment — </strong>Compares your most recent role to the target position. Title gaps reduce ATS ranking even when skills match.</span>
+                </p>
+                <p class="flex items-start gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal flex-shrink-0 mt-2"></span>
+                  <span><strong class="text-hirivo-ink">Rewrite Logic — </strong>OpenAI GPT-4o rewrites your resume with missing keywords added naturally, bullets restructured for impact, and ATS-hostile formatting removed. Your experience is never fabricated.</span>
+                </p>
+                <p class="text-xs text-hirivo-muted pt-1">Optimised for Workday, Greenhouse, Taleo, Lever, iCIMS, and SAP SuccessFactors.</p>
+              </div>
+            </details>
           </div>
-        </div>
-      </div>
+        }
 
-      <!-- Analysis Results -->
-      <div *ngIf="jobDescription.resume_analysis?.status === 'completed'" 
-           class="bg-white rounded-lg shadow-md p-6 space-y-6">
-        
-        <h2 class="text-2xl font-bold text-gray-900">Analysis Results</h2>
-
-        <!-- Match Score -->
-        <div class="text-center p-8 rounded-lg"
-             [ngClass]="getScoreBgClass(jobDescription.resume_analysis?.match_score ?? 0)">
-          <p class="text-sm text-gray-600 mb-2">Match Score</p>
-          <p class="text-6xl font-bold mb-3"
-             [ngClass]="getScoreClass(jobDescription.resume_analysis?.match_score ?? 0)">
-            {{ jobDescription.resume_analysis?.match_score }}%
-          </p>
-          <p class="text-xl font-semibold"
-             [ngClass]="{
-               'text-green-700': jobDescription.resume_analysis?.verdict === 'STRONG_MATCH',
-               'text-blue-700': jobDescription.resume_analysis?.verdict === 'GOOD_MATCH',
-               'text-yellow-700': jobDescription.resume_analysis?.verdict === 'PARTIAL_MATCH',
-               'text-red-700': jobDescription.resume_analysis?.verdict === 'WEAK_MATCH'
-             }">
-            {{ formatVerdict(jobDescription.resume_analysis?.verdict ?? '') }}
-          </p>
-        </div>
-
-        <!-- Summary -->
-        <div class="border-l-4 border-blue-500 pl-4">
-          <h3 class="font-semibold text-lg text-gray-800 mb-2">Summary</h3>
-          <p class="text-gray-700">{{ jobDescription.resume_analysis?.summary }}</p>
-        </div>
-
-        <!-- Strengths and Weaknesses Grid -->
-        <div class="grid md:grid-cols-2 gap-6">
-          <!-- Strengths -->
-          <div class="p-6 rounded-lg bg-green-50">
-            <h3 class="font-semibold text-lg text-green-700 flex items-center gap-2 mb-3">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Strengths
-            </h3>
-            <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis?.strengths"></div>
-          </div>
-
-          <!-- Weaknesses -->
-          <div class="p-6 rounded-lg bg-red-50">
-            <h3 class="font-semibold text-lg text-red-700 flex items-center gap-2 mb-3">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              Areas for Improvement
-            </h3>
-            <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis?.weaknesses"></div>
-          </div>
-        </div>
-
-        <!-- Recommendations -->
-        <div class="border-l-4 border-purple-500 pl-4">
-          <h3 class="font-semibold text-lg text-gray-800 mb-3">Recommendations</h3>
-          <div class="text-gray-700" [innerHTML]="jobDescription.resume_analysis?.recommendations"></div>
-        </div>
-
-        <!-- Missing Keywords -->
-        <div *ngIf="(jobDescription.resume_analysis?.missing_keywords?.length ?? 0) > 0"  
-        class="border-l-4 border-orange-500 pl-4">
-          <h3 class="font-semibold text-lg text-gray-800 mb-3">
-            Missing Keywords (Add to Resume)
-          </h3>
-          <div class="flex flex-wrap gap-2">
-            <span *ngFor="let keyword of jobDescription.resume_analysis?.missing_keywords"
-            class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
-              {{ keyword }}
-            </span>
-          </div>
-        </div>
-
-        <!-- Analysis Metadata -->
-        <div class="border-t pt-4 text-sm text-gray-500">
-          <div class="mb-3 flex flex-wrap items-center gap-2">
-            <a
-              [routerLink]="['/job-descriptions', jobDescription.id, 'rewrite']"
-              class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-sm font-medium">
-              Rewrite Resume With AI
-            </a>
+        <!-- Failed -->
+        @if (jobDescription.resume_analysis?.status === 'failed') {
+          <div class="bg-hirivo-red-bg border-l-4 border-hirivo-red p-6 rounded-xl">
+            <h3 class="font-semibold text-hirivo-red mb-2">Analysis Failed</h3>
+            <p class="text-hirivo-text text-sm">The analysis could not be completed. Please try re-running.</p>
             <button
-              *ngIf="hasCompletedRewrite"
-              type="button"
-              [disabled]="isDownloadingRewrite"
-              (click)="downloadLatestRewritePdf()"
-              class="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition text-sm font-medium disabled:opacity-50">
-              Download Generated PDF
-            </button>
-            <button
-              *ngIf="hasCompletedRewrite"
-              type="button"
-              [disabled]="isDownloadingRewrite"
-              (click)="downloadLatestRewriteDocx()"
-              class="inline-flex items-center gap-2 border border-blue-300 text-blue-700 px-4 py-2 rounded hover:bg-blue-50 transition text-sm font-medium disabled:opacity-50">
-              Download Generated DOCX
-            </button>
-            <button
-              *ngIf="hasCompletedRewrite"
-              type="button"
-              [disabled]="isDownloadingRewrite"
-              (click)="downloadLatestRewriteLatex()"
-              class="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-100 transition text-sm font-medium disabled:opacity-50">
-              Download Generated LaTeX
+              (click)="openRerunModal()"
+              class="mt-4 bg-hirivo-red text-white px-5 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium">
+              Retry Analysis
             </button>
           </div>
-          <p>File Used here -</p>
-          <p>AI Model: {{ jobDescription.resume_analysis?.ai_model_used }}</p>
-          <p>ATS System: {{ jobDescription.resume_analysis?.ats_system_key || 'N/A' }}</p>
-          <p>Analyzed on: {{ formatDate(jobDescription.resume_analysis?.updated_at ?? jobDescription.created_at) }}</p>
-        </div>
-      </div>
+        }
 
-      <!-- Failed Analysis State -->
-      <div *ngIf="jobDescription.resume_analysis?.status === 'failed'" 
-           class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
-        <h3 class="font-semibold text-red-900 mb-2">Analysis Failed</h3>
-        <p class="text-red-700">
-          The analysis could not be completed. Please try re-running the analysis.
-        </p>
-        <button 
-            (click)="openRerunModal()"
-            class="mt-4 bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">
-            Retry Analysis
-        </button>
-      </div>
+        <!-- No analysis yet -->
+        @if (!jobDescription.resume_analysis) {
+          <div class="bg-hirivo-amber-bg border-l-4 border-hirivo-amber p-6 rounded-xl">
+            <h3 class="font-semibold text-hirivo-amber mb-2">No Analysis Available</h3>
+            <p class="text-hirivo-text text-sm">This resume has not been analysed yet.</p>
+            <button
+              (click)="openRerunModal()"
+              class="mt-4 bg-hirivo-amber text-white px-5 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium">
+              Start Analysis
+            </button>
+          </div>
+        }
 
-      <!-- No Analysis State -->
-      <div *ngIf="!jobDescription.resume_analysis" 
-           class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-lg">
-        <h3 class="font-semibold text-yellow-900 mb-2">No Analysis Available</h3>
-        <p class="text-yellow-700">
-          This job description hasn't been analyzed yet.
-        </p>
-        <button 
-            (click)="openRerunModal()"
-            class="mt-4 bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700 transition">
-            Start Analysis
-        </button>
       </div>
-    </div>
+    }
+
   </div>
+
   <app-rerun-analysis-modal
     [isOpen]="isRerunModalOpen"
     [jobTitle]="jobDescription?.title || ''"
@@ -336,7 +362,7 @@
     [message]="'Are you sure you want to delete &quot;' + (jobDescription?.title || '') + '&quot;? This action cannot be undone.'"
     [confirmText]="'Delete'"
     [cancelText]="'Cancel'"
-    [confirmButtonClass]="'bg-red-600 hover:bg-red-700'"
+    [confirmButtonClass]="'bg-hirivo-red hover:opacity-90'"
     (confirm)="confirmDelete()"
     (cancel)="closeDeleteConfirmation()">
   </app-confirmation-modal>

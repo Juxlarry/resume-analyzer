@@ -1,0 +1,181 @@
+<div class="min-h-screen bg-hirivo-surface">
+  <div class="container mx-auto px-4 sm:px-6 py-12 max-w-4xl">
+
+    <!-- Back link -->
+    <a routerLink="/"
+      class="inline-flex items-center gap-2 text-hirivo-teal hover:text-hirivo-teal-mid text-sm font-medium mb-8 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Back to Hirivo
+    </a>
+
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl sm:text-4xl font-bold text-hirivo-ink">Privacy Policy</h1>
+      <p class="text-hirivo-muted mt-2 text-sm">Last updated: March 2026</p>
+    </div>
+
+    <!-- Trust summary banner -->
+    <div class="bg-hirivo-teal-light border-l-4 border-hirivo-teal rounded-r-lg px-5 py-4 mb-10">
+      <p class="text-sm text-hirivo-text">
+        <span class="font-semibold text-hirivo-teal">The short version: </span>
+        Hirivo processes your resume in real time and discards it immediately after analysis.
+        We never store, share, or sell your documents or personal data.
+        Your privacy is protected by design.
+      </p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-hirivo-border p-6 sm:p-10 space-y-10 text-sm leading-relaxed">
+
+      <!-- 1. What We Collect -->
+      <section>
+        <h2 class="text-xl font-bold text-hirivo-ink mb-4">1. What Data We Collect</h2>
+        <ul class="space-y-3 text-hirivo-text">
+          <li class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal mt-2 flex-shrink-0"></span>
+            <span><strong class="text-hirivo-ink">Resume file</strong> — your uploaded PDF or DOCX, submitted for analysis. Processed in real time and immediately discarded. Never saved to disk or database.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal mt-2 flex-shrink-0"></span>
+            <span><strong class="text-hirivo-ink">Job description text</strong> — pasted text or uploaded file. Processed in real time and immediately discarded.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal mt-2 flex-shrink-0"></span>
+            <span><strong class="text-hirivo-ink">Account information</strong> — if you register: your email address and encrypted password. We do not store payment card details.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal mt-2 flex-shrink-0"></span>
+            <span><strong class="text-hirivo-ink">Anonymous usage analytics</strong> — page views and feature interactions used to improve the product. No personal identifiers attached.</span>
+          </li>
+        </ul>
+      </section>
+
+      <div class="border-t border-hirivo-border"></div>
+
+      <!-- 2. How We Use It -->
+      <section>
+        <h2 class="text-xl font-bold text-hirivo-ink mb-4">2. How We Use Your Data</h2>
+        <p class="text-hirivo-text mb-3">
+          Your resume and job description are transmitted to OpenAI's API for analysis and rewriting.
+          This processing is real-time and session-only. Hirivo does not retain any document content
+          after your results are delivered.
+        </p>
+        <p class="text-hirivo-text">
+          Your email address is used to manage your account, send transactional emails
+          (password reset, login activity), and — only with your explicit consent — product updates.
+          We never send unsolicited commercial email.
+        </p>
+      </section>
+
+      <div class="border-t border-hirivo-border"></div>
+
+      <!-- 3. Data Retention -->
+      <section>
+        <h2 class="text-xl font-bold text-hirivo-ink mb-4">3. Data Retention</h2>
+        <div class="bg-hirivo-green-bg border border-hirivo-green rounded-lg px-4 py-3 mb-4">
+          <p class="text-sm font-medium text-hirivo-green">
+            ✓ Zero document retention. Hirivo does not store resumes, CVs, cover letters, or job descriptions.
+          </p>
+        </div>
+        <p class="text-hirivo-text">
+          Resume and job description files exist only in memory during processing and are
+          discarded immediately after results are returned to you. Account data (email address)
+          is retained while your account is active and permanently deleted within 30 days of
+          an account deletion request to
+          <a href="mailto:privacy@hirivo.com" class="text-hirivo-teal hover:underline font-medium">privacy@hirivo.com</a>.
+        </p>
+      </section>
+
+      <div class="border-t border-hirivo-border"></div>
+
+      <!-- 4. Third-Party Processors -->
+      <section>
+        <h2 class="text-xl font-bold text-hirivo-ink mb-4">4. Third-Party Data Processors</h2>
+        <div class="overflow-x-auto rounded-lg border border-hirivo-border">
+          <table class="w-full text-sm text-left">
+            <thead>
+              <tr class="bg-hirivo-surface">
+                <th class="px-4 py-3 font-semibold text-hirivo-ink">Processor</th>
+                <th class="px-4 py-3 font-semibold text-hirivo-ink">Purpose</th>
+                <th class="px-4 py-3 font-semibold text-hirivo-ink">Location</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hirivo-border">
+              <tr>
+                <td class="px-4 py-3 text-hirivo-ink font-medium">OpenAI LP</td>
+                <td class="px-4 py-3 text-hirivo-muted">Resume analysis and rewriting via GPT-4o API</td>
+                <td class="px-4 py-3 text-hirivo-muted">USA</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 text-hirivo-ink font-medium">Vercel Inc.</td>
+                <td class="px-4 py-3 text-hirivo-muted">Frontend hosting and global CDN delivery</td>
+                <td class="px-4 py-3 text-hirivo-muted">USA / Global CDN</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 text-hirivo-ink font-medium">Railway</td>
+                <td class="px-4 py-3 text-hirivo-muted">API backend hosting</td>
+                <td class="px-4 py-3 text-hirivo-muted">USA</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="border-t border-hirivo-border"></div>
+
+      <!-- 5. Your Rights -->
+      <section>
+        <h2 class="text-xl font-bold text-hirivo-ink mb-4">5. Your Rights</h2>
+        <p class="text-hirivo-text mb-3">
+          Under the Ghana Data Protection Act 2012 (Act 843), Nigeria's NDPR, the EU/UK GDPR, and
+          California's CCPA, you have the right to:
+        </p>
+        <ul class="space-y-2 text-hirivo-text">
+          <li class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal mt-2 flex-shrink-0"></span>
+            Access the personal data we hold about you
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal mt-2 flex-shrink-0"></span>
+            Request correction or deletion of your account data
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal mt-2 flex-shrink-0"></span>
+            Object to or restrict processing of your data
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-hirivo-teal mt-2 flex-shrink-0"></span>
+            Withdraw consent at any time where processing is based on consent
+          </li>
+        </ul>
+        <p class="text-hirivo-text mt-3">
+          As Hirivo stores no resume or document data, the right to erasure for document content
+          is satisfied by design. To exercise your rights for account data, contact
+          <a href="mailto:privacy@hirivo.com" class="text-hirivo-teal hover:underline font-medium">privacy@hirivo.com</a>.
+        </p>
+      </section>
+
+      <div class="border-t border-hirivo-border"></div>
+
+      <!-- 6. Contact -->
+      <section>
+        <h2 class="text-xl font-bold text-hirivo-ink mb-4">6. Contact</h2>
+        <p class="text-hirivo-text mb-3">
+          For privacy enquiries, data access requests, or concerns about how Hirivo handles your data:
+        </p>
+        <div class="space-y-1 text-hirivo-text">
+          <p>Email: <a href="mailto:privacy@hirivo.com" class="text-hirivo-teal hover:underline font-medium">privacy@hirivo.com</a></p>
+          <p>General support: <a href="mailto:help@hirivo.com" class="text-hirivo-teal hover:underline font-medium">help@hirivo.com</a></p>
+          <p>Company: Hirivo, Accra, Ghana (business registration pending 2026)</p>
+        </div>
+      </section>
+
+    </div>
+
+    <p class="text-center text-xs text-hirivo-muted mt-8">
+      This policy was last updated March 2026. Material changes will be communicated to registered users by email.
+    </p>
+
+  </div>
+</div>
